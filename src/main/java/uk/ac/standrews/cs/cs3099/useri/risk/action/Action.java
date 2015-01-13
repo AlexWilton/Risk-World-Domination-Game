@@ -16,7 +16,7 @@ public abstract class Action {
 	
 	
 	/**
-	 * validates the action against the current game state, which is not altered
+	 * Validates the action against the current game state, which is not altered
 	 * @return
 	 * 1 if it is valid
 	 * !=1 if there is an error, see below for error codes
@@ -24,7 +24,7 @@ public abstract class Action {
 	public abstract int validate();
 	
 	/**
-	 * performs the action on the game state and alters it accordingly. Call validate first (merge?)
+	 * Performs the action on the game state and alters it accordingly. Call validate first (merge?)
 	 */
 	public abstract void perform();
 }

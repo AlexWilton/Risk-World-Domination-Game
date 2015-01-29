@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
 import java.util.ArrayList;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.action.Action;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 
 /**
@@ -9,7 +10,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
  *
  */
 public class GameEngine {
-	private State gameState;
+	private State state;
 	private ArrayList<Client> clients;
 	
 	
@@ -24,7 +25,34 @@ public class GameEngine {
 	 * 
 	 */
 	public void gameLoop(){
-		
+		System.out.println("Game Loop running...");
+        Player currentPlayer;
+        while(true) {
+            currentPlayer = state.getCurrentPlayer();
+            Action playerAction = currentPlayer.getPlayerAction();
+            if (playerAction.validateAgainstState(state)) {
+                playerAction.performOnState(state);
+            }else{
+                System.out.println("Error move did not validate");
+                System.exit(1);
+            }
+
+            if(state.winConditionsMet()){
+                Player winner = state.getWinner();
+
+                System.out.println("Winner is " + winner.getID());
+                //TODO follow endGame protocol
+                System.exit(0);
+            }
+
+            //TODO send out update notifications to all clients
+
+        }
 	}
-	public void initialise(State state, ArrayList<Client> clients){}
+
+
+	public void initialise(State state, ArrayList<Client> clients){
+        this.state = state;
+        this.clients = clients;
+    }
 }

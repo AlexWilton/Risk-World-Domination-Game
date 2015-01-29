@@ -12,19 +12,17 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
  */
 public abstract class Action {
 
-	private State currentState;
-	
-	
 	/**
-	 * Validates the action against the current game state, which is not altered
+	 * Validates whether the action can be made against the current game state.
+     * No Action is performed.
 	 * @return
-	 * 1 if it is valid
-	 * !=1 if there is an error, see below for error codes
+	 * true if it is valid
+	 * false if there is an error
 	 */
-	public abstract int validate();
+	public abstract boolean validateAgainstState(State state);
 	
 	/**
-	 * Performs the action on the game state and alters it accordingly. Call validate first (merge?)
+	 * Performs the action on the game state, alters it accordingly returning the new state
 	 */
-	public abstract void perform();
+	public abstract State performOnState(State state);
 }

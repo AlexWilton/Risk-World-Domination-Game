@@ -7,7 +7,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
  * 
  * turns consist of multiple Actions
  * 
- * actions are constructed by Clients, and validate themselves against a game state, and can produce a new gamestate
+ * actions are constructed by Clients, and validate themselves against a game state, and can produce a new state themselves.
  *
  */
 public abstract class Action {

@@ -63,7 +63,6 @@ while (($line = fgets($handle)) !== false) {
     list($continID, $continName, $countryID, $countryName) = split(",",$line,6);
     if($continID != ""){
         $result->continent_names->$continID = $continName;
-        echo $continID . " " . $continName . "\n";
     }
 }
 fclose($handle);

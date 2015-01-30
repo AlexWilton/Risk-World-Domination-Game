@@ -8,11 +8,14 @@ import java.util.ArrayList;
  */
 public class State {
 
+    public enum TurnStage {STAGE_TRADING, STAGE_DEPLOYING, STAGE_BATTLES, STAGE_FORTIFY}
+
 	private Map map;
 	private ArrayList<Player> players;
 	private Player currentPlayer;
     private Player winner = null;
 	private int turnCount;
+    private TurnStage stage;
 
     public Player getCurrentPlayer() {
         return currentPlayer;
@@ -26,5 +29,9 @@ public class State {
 
     public Player getWinner() {
         return winner;
+    }
+
+    public TurnStage getTurnStage(){
+        return stage;
     }
 }

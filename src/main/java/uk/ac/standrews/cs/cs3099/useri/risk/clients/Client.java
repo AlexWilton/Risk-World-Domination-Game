@@ -9,8 +9,16 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
  *
  */
 public abstract class Client {
+
+    State gameState;
 	/**
 	 * @return the next action this player takes based on current game state
 	 */
 	public abstract Action getAction();
+
+    /**
+     * notify player of the
+     */
+    public abstract void pushGameState();
+
 }

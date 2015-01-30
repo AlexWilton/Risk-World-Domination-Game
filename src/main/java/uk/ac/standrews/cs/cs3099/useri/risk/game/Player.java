@@ -30,4 +30,12 @@ public class Player{
         return client.getAction();
     }
 
+    public int getUnassignedArmy (){
+        return unassignedArmy;
+    }
+
+    public ArrayList<Country> getOccupiedCountries(){
+        return getOccupiedCountries();
+    }
+
 }

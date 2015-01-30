@@ -1,5 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.action;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 /**
@@ -11,6 +12,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
  *
  */
 public abstract class Action {
+    private Player player;
 
 	/**
 	 * Validates whether the action can be made against the current game state.
@@ -24,5 +26,9 @@ public abstract class Action {
 	/**
 	 * Performs the action on the game state, alters it accordingly returning the new state
 	 */
-	public abstract State performOnState(State state);
+	public abstract void performOnState(State state);
+
+    public Player getPlayer() {
+        return player;
+    }
 }

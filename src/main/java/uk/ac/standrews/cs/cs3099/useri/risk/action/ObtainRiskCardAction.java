@@ -3,6 +3,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.action;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 /**
+ * Getting risk cards. This is compulsory. If you won an attack, you get a risk card.
  * Created by bs44 on 30/01/15.
  */
 public class ObtainRiskCardAction extends Action {
@@ -25,7 +26,7 @@ public class ObtainRiskCardAction extends Action {
      * @param state
      */
     @Override
-    public State performOnState(State state) {
-        return null;
+    public void performOnState(State state) {
+        state.nextAction();
     }
 }

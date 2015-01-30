@@ -3,6 +3,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.action;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 /**
+ * Trading in risk cards, at the beginning of the turn.
  * Created by bs44 on 30/01/15.
  */
 public class TradeAction extends Action {
@@ -25,7 +26,9 @@ public class TradeAction extends Action {
      * @param state
      */
     @Override
-    public State performOnState(State state) {
-        return null;
+    public void performOnState(State state) {
+
+
+        state.nextAction();
     }
 }

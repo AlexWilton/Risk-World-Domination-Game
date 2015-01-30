@@ -8,15 +8,15 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 public class EndTurnAction extends Action {
     /**
      * Validates whether the action can be made against the current game state.
-     * No Action is performed.
+     * This action only allowed when our player is the turnPlayer.
      *
      * @param state
-     * @return true if it is valid
-     * false if there is an error
+     * @return true if turnPlayer equals this.Player.
+     * false otherwise.
      */
     @Override
     public boolean validateAgainstState(State state) {
-        return false;
+        return this.getPlayer().equals(state.getCurrentPlayer());
     }
 
     /**
@@ -25,7 +25,8 @@ public class EndTurnAction extends Action {
      * @param state
      */
     @Override
-    public State performOnState(State state) {
-        return null;
+    public void performOnState(State state) {
+        state.endTurn();
+        return;
     }
 }

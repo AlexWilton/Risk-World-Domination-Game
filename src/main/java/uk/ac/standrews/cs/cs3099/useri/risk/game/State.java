@@ -10,9 +10,11 @@ public class State {
 
 	private Map map;
 	private ArrayList<Player> players;
+    private ArrayList<RiskCard> cardsDeck;
 	private Player currentPlayer;
     private Player winner = null;
     private TurnStage stage;
+    private boolean wonBattle;
 
     public Player getCurrentPlayer() {
         return currentPlayer;
@@ -39,5 +41,17 @@ public class State {
 
     public TurnStage getTurnStage(){
         return stage;
+    }
+
+    public boolean wonBattle() { return wonBattle; }
+
+    /**
+     * Get the top card from the deck and remove it from the deck.
+     * @return the top card from the deck.
+     */
+    public RiskCard getCard() {
+        RiskCard c = cardsDeck.get(cardsDeck.size() - 1);
+        cardsDeck.remove(c);
+        return c;
     }
 }

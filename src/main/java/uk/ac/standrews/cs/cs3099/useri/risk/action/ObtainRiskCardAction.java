@@ -12,11 +12,16 @@ public class ObtainRiskCardAction extends Action {
      * No Action is performed.
      *
      * @param state
-     * @return true if it is valid
+     * @return true if the player calling the action is the one that can make the turn, and has already won a battle.
      * false if there is an error
      */
     @Override
     public boolean validateAgainstState(State state) {
+        if ( getPlayer().equals( state.getCurrentPlayer() ) ) {
+            if (state.wonBattle()) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -27,6 +32,7 @@ public class ObtainRiskCardAction extends Action {
      */
     @Override
     public void performOnState(State state) {
+        getPlayer().addCard(state.getCard());
         state.nextAction();
     }
 }

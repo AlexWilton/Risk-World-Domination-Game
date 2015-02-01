@@ -9,8 +9,8 @@ public enum TurnStage {
     STAGE_TRADING,
     STAGE_DEPLOYING,
     STAGE_BATTLES,
-    STAGE_GET_CARD,
     STAGE_FORTIFY,
+    STAGE_GET_CARD,
     STAGE_FINISH;
 
     private static TurnStage[] vals = values();

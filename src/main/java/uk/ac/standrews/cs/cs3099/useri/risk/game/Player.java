@@ -38,4 +38,8 @@ public class Player{
         return getOccupiedCountries();
     }
 
+    public void addCard(RiskCard card){
+        cards.add(card);
+    }
+
 }

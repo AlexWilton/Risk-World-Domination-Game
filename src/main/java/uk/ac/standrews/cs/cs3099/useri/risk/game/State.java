@@ -8,24 +8,6 @@ import java.util.ArrayList;
  */
 public class State {
 
-    public enum TurnStage {
-        STAGE_TRADING,
-        STAGE_DEPLOYING,
-        STAGE_BATTLES,
-        STAGE_GET_CARD,
-        STAGE_FORTIFY,
-        STAGE_FINISH {
-            @Override
-            public TurnStage next() {
-                return TurnStage.STAGE_TRADING;
-            }
-        };
-
-        public TurnStage next() {
-            return values()[ordinal() + 1];
-        }
-    }
-
 	private Map map;
 	private ArrayList<Player> players;
 	private Player currentPlayer;

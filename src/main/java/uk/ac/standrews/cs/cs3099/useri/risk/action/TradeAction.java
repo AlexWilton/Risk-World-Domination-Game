@@ -1,5 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.action;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 /**
@@ -7,6 +8,10 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
  * Created by bs44 on 30/01/15.
  */
 public class TradeAction extends Action {
+    public TradeAction(Player player) {
+        super(player);
+    }
+
     /**
      * Validates whether the action can be made against the current game state.
      * No Action is performed.

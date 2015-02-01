@@ -1,11 +1,16 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.action;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 /**
  * Created by bs44 on 30/01/15.
  */
 public class EndTurnAction extends Action {
+    public EndTurnAction(Player player) {
+        super(player);
+    }
+
     /**
      * Validates whether the action can be made against the current game state.
      * This action only allowed when our player is the turnPlayer.

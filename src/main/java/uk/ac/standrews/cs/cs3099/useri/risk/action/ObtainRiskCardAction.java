@@ -1,5 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.action;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 /**
@@ -7,11 +8,15 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
  * Created by bs44 on 30/01/15.
  */
 public class ObtainRiskCardAction extends Action {
+    public ObtainRiskCardAction(Player player) {
+        super(player);
+    }
+
     /**
      * Validates whether the action can be made against the current game state.
      * No Action is performed.
      *
-     * @param state
+     * @param state the current game state
      * @return true if the player calling the action is the one that can make the turn, and has already won a battle.
      * false if there is an error
      */
@@ -26,13 +31,14 @@ public class ObtainRiskCardAction extends Action {
     }
 
     /**
-     * Performs the action on the game state, alters it accordingly returning the new state
+     * Performs the action on the game state, alters it accordingly.
      *
-     * @param state
+     * @param state the current game state to change
      */
     @Override
     public void performOnState(State state) {
         getPlayer().addCard(state.getCard());
+        // This is a singular action, and can only take place once.
         state.nextAction();
     }
 }

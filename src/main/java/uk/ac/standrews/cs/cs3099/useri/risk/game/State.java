@@ -10,6 +10,7 @@ public class State {
 
 	private Map map;
 	private ArrayList<Player> players;
+    //TODO set this to be a queue or something.
     private ArrayList<RiskCard> cardsDeck;
 	private Player currentPlayer;
     private Player winner = null;
@@ -33,6 +34,7 @@ public class State {
     public void endTurn(){
         currentPlayer = players.get((players.indexOf(currentPlayer) + 1) % players.size());
         stage = TurnStage.STAGE_FINISH.next();
+        wonBattle = false;
     }
 
     public Player getWinner() {
@@ -46,12 +48,12 @@ public class State {
     public boolean wonBattle() { return wonBattle; }
 
     /**
-     * Get the top card from the deck and remove it from the deck.
+     * Get the top card (index 0, as proposed in the drawing protocol) from the deck and remove it from the deck.
      * @return the top card from the deck.
      */
     public RiskCard getCard() {
-        RiskCard c = cardsDeck.get(cardsDeck.size() - 1);
-        cardsDeck.remove(c);
+        RiskCard c = cardsDeck.get(0);
+        cardsDeck.remove(0);
         return c;
     }
 }

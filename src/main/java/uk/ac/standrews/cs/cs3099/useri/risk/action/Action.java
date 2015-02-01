@@ -14,6 +14,9 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 public abstract class Action {
     private Player player;
 
+    public Action (Player player){
+        this.player = player;
+    }
 	/**
 	 * Validates whether the action can be made against the current game state.
      * No Action is performed.

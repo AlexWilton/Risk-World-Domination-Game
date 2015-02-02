@@ -29,10 +29,10 @@ public class DeployArmyAction extends Action{
      */
     @Override
     public boolean validateAgainstState(State state) {
-        if (this.getPlayer().equals(state.getCurrentPlayer())) {
+        if (player.equals(state.getCurrentPlayer())) {
             if (state.getTurnStage() == TurnStage.STAGE_DEPLOYING) {
-                if (this.country.getOwner().equals(this.getPlayer())) {
-                    if (this.getPlayer().getUnassignedArmy() >= this.armies) {
+                if (this.country.getOwner().equals(player)) {
+                    if (player.getUnassignedArmy() >= armies) {
                         return true;
                     }
                 }
@@ -49,6 +49,11 @@ public class DeployArmyAction extends Action{
     @Override
     public void performOnState(State state) {
         country.setTroops(country.getTroops() + armies);
+        player.setUnassignedArmy(getPlayer().getUnassignedArmy() - armies);
         //TODO is this all that needs to be done or do we send the messages from here?
+            //TODO number of unassigned Armies needs to be tracked. (i've added this).
+            //TODO state is communicated at the end of every game loop so this is everything.
+
+        //TODO although, still needs TESTS!!!
     }
 }

@@ -12,7 +12,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
  *
  */
 public abstract class Action {
-    private Player player;
+    protected Player player;
 
     public Action (Player player){
         this.player = player;

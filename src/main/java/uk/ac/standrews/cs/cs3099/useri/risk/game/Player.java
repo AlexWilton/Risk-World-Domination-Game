@@ -34,6 +34,10 @@ public class Player{
         return unassignedArmy;
     }
 
+    public void setUnassignedArmy(int value){
+        unassignedArmy = value;
+    }
+
     public ArrayList<Country> getOccupiedCountries(){
         return getOccupiedCountries();
     }

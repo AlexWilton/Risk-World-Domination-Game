@@ -15,7 +15,11 @@ public class Country {
 	private Player owner;
 
     public Country( int countryId, String countryName){
+        this(countryId);
         this.countryName = countryName;
+    }
+
+    public Country(int countryId){
         this.countryId = countryId;
     }
 

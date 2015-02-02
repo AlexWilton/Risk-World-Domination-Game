@@ -8,6 +8,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class Map {
@@ -15,6 +16,7 @@ public class Map {
     private static final String FILEPATH_DEFAULT_MAP = "data/default.map";
 
 	private ArrayList<Continent> continents;
+    private boolean validMap = true;
 
     public Map(ArrayList<Continent> continents){
         this.continents = continents;
@@ -27,22 +29,31 @@ public class Map {
     public Map(){
         JSONParser parser=new JSONParser();
         JSONObject mapData = null;
+
         try {
             mapData = (JSONObject) JSONValue.parse(new FileReader(FILEPATH_DEFAULT_MAP));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        try {
+
             String type = (String) mapData.get("data");
-            if(!type.toLowerCase().equals("map")) throw new Exception();
+            if(!type.toLowerCase().equals("map")) validMap = false;
 
 
-
-        }catch(Exception e){
-            System.out.println("Error: " + FILEPATH_DEFAULT_MAP + " has invalid map format");
-            System.exit(0);
+        //Parse all Country Data store by key
+        ArrayList<Country> countries = new ArrayList<Country>();
+        JSONObject continentsJSON = (JSONObject) mapData.get("continents");
+        int largestCountryID = -1;
+        for(Object continentObj : continentsJSON.values()){
+            JSONArray continentJSON = (JSONArray) continentObj;
+            for(Object countryID : continentJSON){
+                countries.add(new Country((Integer) countryID));
+            }
         }
+
+
+
 
 
 //

@@ -31,7 +31,7 @@ public class FortifyAction extends Action {
      */
     @Override
     public boolean validateAgainstState(State state) {
-        if (this.getPlayer().equals(state.getCurrentPlayer())) {
+        if (player.equals(state.getCurrentPlayer())) {
             if (state.getTurnStage().equals(TurnStage.STAGE_FORTIFY)) {
                 if (from.getOwner().equals(to.getOwner())) {
                     if (from.getTroops() > armies) {

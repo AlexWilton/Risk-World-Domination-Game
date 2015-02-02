@@ -15,7 +15,7 @@ public class FortifyAction extends Action {
     private final int armies;
 
     public FortifyAction(Player player, Country from, Country to, int armies) {
-        super(player);
+        super(player, TurnStage.STAGE_FORTIFY);
         this.from = from;
         this.to = to;
         this.armies = armies;
@@ -31,16 +31,22 @@ public class FortifyAction extends Action {
      */
     @Override
     public boolean validateAgainstState(State state) {
-        if (player.equals(state.getCurrentPlayer())) {
-            if (state.getTurnStage().equals(TurnStage.STAGE_FORTIFY)) {
-                if (from.getOwner().equals(to.getOwner())) {
-                    if (from.getTroops() > armies) {
-                        return true;
-                    }
-                }
+        if (super.validateAgainstState(state)){
+            if (validMove()) {
+                return true;
             }
         }
         return false;
+    }
+
+    private boolean validMove(){
+        if (from.getTroops() <= armies)
+            return false;
+        if (! from.getOwner().equals(player))
+            return false;
+        if (! to.getOwner().equals(player))
+            return false;
+        return true;
     }
 
     /**

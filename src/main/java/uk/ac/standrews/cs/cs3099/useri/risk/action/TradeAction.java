@@ -2,14 +2,16 @@ package uk.ac.standrews.cs.cs3099.useri.risk.action;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 
 /**
  * Trading in risk cards, at the beginning of the turn.
  * Created by bs44 on 30/01/15.
  */
+//TODO implement this action.
 public class TradeAction extends Action {
     public TradeAction(Player player) {
-        super(player);
+        super(player, TurnStage.STAGE_TRADING);
     }
 
     /**
@@ -22,6 +24,9 @@ public class TradeAction extends Action {
      */
     @Override
     public boolean validateAgainstState(State state) {
+        if (super.validateAgainstState(state)){
+            return true;
+        }
         return false;
     }
 
@@ -32,7 +37,6 @@ public class TradeAction extends Action {
      */
     @Override
     public void performOnState(State state) {
-
 
         state.nextAction();
     }

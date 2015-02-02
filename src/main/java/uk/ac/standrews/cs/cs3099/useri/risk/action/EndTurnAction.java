@@ -2,13 +2,15 @@ package uk.ac.standrews.cs.cs3099.useri.risk.action;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 
 /**
  * Created by bs44 on 30/01/15.
  */
+//TODO is this action even needed?
 public class EndTurnAction extends Action {
     public EndTurnAction(Player player) {
-        super(player);
+        super(player, TurnStage.STAGE_FINISH);
     }
 
     /**

@@ -22,7 +22,7 @@ public class AttackAction extends Action {
     Country to;
 
     public AttackAction (Player player, Country from, Country to, int attack, int defend) {
-        super(player);
+        super(player, TurnStage.STAGE_BATTLES);
         this.from = from;
         this.to = to;
         this.attack = attack;
@@ -41,11 +41,9 @@ public class AttackAction extends Action {
      */
     @Override
     public boolean validateAgainstState(State state) {
-        if (player.equals(state.getCurrentPlayer())) {
-            if (state.getTurnStage() == TurnStage.STAGE_DEPLOYING) {
-                if (attackerOK() && defenderOK()){
-                    return true;
-                }
+        if (super.validateAgainstState(state)) {
+            if (attackerOK() && defenderOK()){
+                return true;
             }
         }
         return false;

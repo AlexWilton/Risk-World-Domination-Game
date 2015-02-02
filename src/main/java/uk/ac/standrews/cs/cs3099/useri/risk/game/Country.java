@@ -47,4 +47,6 @@ public class Country {
     public void setOwner(Player owner) {
         this.owner = owner;
     }
+
+    public ArrayList<Country> getNeighbours() { return linkedCountries;}
 }

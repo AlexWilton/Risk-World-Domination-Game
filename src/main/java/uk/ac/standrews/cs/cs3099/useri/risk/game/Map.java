@@ -35,7 +35,7 @@ public class Map {
 
         try {
             String type = (String) mapData.get("data");
-            if(type.toLowerCase().equals("map")) throw new Exception();
+            if(!type.toLowerCase().equals("map")) throw new Exception();
 
 
 
@@ -63,5 +63,9 @@ public class Map {
 //
 //        }
 
+    }
+
+    public ArrayList<Continent> getContinents() {
+        return continents;
     }
 }

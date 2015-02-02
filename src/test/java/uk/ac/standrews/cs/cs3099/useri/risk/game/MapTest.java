@@ -1,11 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
-public class MapTest extends TestCase {
-
-    public void test(){
-        Map map = new Map();
-    }
+public class MapTest {
 
 }

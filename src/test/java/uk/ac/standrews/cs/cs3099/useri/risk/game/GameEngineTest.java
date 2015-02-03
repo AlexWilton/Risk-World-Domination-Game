@@ -16,7 +16,7 @@ public class GameEngineTest {
         engine = new GameEngine();
         State state = new State();
         ArrayList<Client> clients = new ArrayList<Client>();
-        engine.initialise(state, clients);
+        engine.initialise(state);
     }
 
     @Test

@@ -1,6 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.action.Action;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
@@ -43,7 +43,7 @@ public class CLIClient extends Client {
      * notify player of the
      */
     public void pushGameState(){
-
+        //no need for asynchronous updates (yet)
     }
 
     private Action tradeMenu(){
@@ -69,25 +69,19 @@ public class CLIClient extends Client {
 
     private Action deployMenu(){
 
-        Action ret = null;
+        Action ret;
 
         if (gameState.getCurrentPlayer().getUnassignedArmy() > 0) {
             System.out.println("You have " + gameState.getCurrentPlayer().getUnassignedArmy() + " unassigned armies. Assign to which country?");
 
-            int selector = 1;
+            Country target = selectCountry(gameState.getCurrentPlayer().getOccupiedCountries(),false,true,false);
 
-            for (Country c : gameState.getCurrentPlayer().getOccupiedCountries()){
-                System.out.println("" + selector++ + " - " + c.getCountryName());
-            }
-
-            int country = getChoice(1,selector-1);
-
-            System.out.println("How many armies to deploy to " + gameState.getCurrentPlayer().getOccupiedCountries().get(country-1));
+            System.out.println("How many armies to deploy to " + target.getCountryName());
 
             int amount = getChoice(0, gameState.getCurrentPlayer().getUnassignedArmy());
 
 
-            //TODO create the deploy action
+            ret = new DeployArmyAction(gameState.getCurrentPlayer(),target,amount);
         }
         else {
             ret = attackMenu();
@@ -98,13 +92,13 @@ public class CLIClient extends Client {
 
     private Action attackMenu(){
 
-        Action ret = null;
+        Action ret;
         System.out.println("ATTACK MENU");
         System.out.println("Select country of origin for attack. In brackets you see (armies,potential targets). select 0 for no attack");
 
 
         //DETERMINE POINT OF ORIGIN
-        Country origin = selectCountry(gameState.getCurrentPlayer().getOccupiedCountries(),true,false);
+        Country origin = selectCountry(gameState.getCurrentPlayer().getOccupiedCountries(),true,false,false);
 
 
         if (origin != null){
@@ -112,7 +106,7 @@ public class CLIClient extends Client {
 
             System.out.println("Select objective for attack. In brackets you see (armies). select 0 for cancelling attack");
 
-            Country objective = selectCountry(origin.getNeighbours(),false,true);
+            Country objective = selectCountry(origin.getNeighbours(),false,true,false);
 
             if (objective != null){
 
@@ -120,7 +114,10 @@ public class CLIClient extends Client {
 
                 int armies = getChoice(0,origin.getTroops());
 
-                //TODO create attack action
+
+                //get defenders
+                int defenders = objective.getOwner().getClient().getDefenders(origin,objective,armies);
+                ret = new AttackAction(gameState.getCurrentPlayer(),origin,objective,armies,defenders);
 
 
             }
@@ -140,8 +137,42 @@ public class CLIClient extends Client {
     }
 
     private Action fortifyMenu(){
+
+        Action ret;
         System.out.println("FORTIFY MENU");
-        return null;
+        System.out.println("If you want to fortify, select the origin country, if you dont, select 0 to end your turn. in brackets you see (available troops, potential targets).");
+
+        Country origin = selectCountry(gameState.getCurrentPlayer().getOccupiedCountries(),false,true,true);
+
+        if (origin != null){
+            System.out.println("Select the country to fortify, select 0 do choose a different origin. (available troops, potential targets).");
+
+            Country target = selectCountry(origin.getNeighbours(),false,true,true);
+
+            if (target != null){
+                System.out.println("Select the select the amount of armies to transfer 0 - " + (origin.getTroops()-1) );
+
+                int armies = getChoice(0,origin.getTroops()-1);
+
+                ret = new FortifyAction(gameState.getCurrentPlayer(),origin,target,armies);
+            }
+            else{
+                ret = fortifyMenu();
+            }
+        }
+        else{
+            ret = new EndTurnAction(gameState.getCurrentPlayer());
+        }
+
+
+        return ret;
+    }
+
+    public int getDefenders(Country attacker, Country objective, int attackingArmies){
+
+        System.out.println("" + attacker.getCountryName() + " is attacking " + objective.getCountryName() + " with " + attackingArmies + " armies. You have " + objective.getTroops() + " armies to defend with. Choose how many.");
+
+        return getChoice(1,objective.getTroops());
     }
 
     private int getChoice(int min, int max){
@@ -160,7 +191,7 @@ public class CLIClient extends Client {
         return choice;
     }
 
-    private Country selectCountry(ArrayList<Country> countries, boolean showNeighbours, boolean showCountriesWithoutAttackableNeighbours) {
+    private Country selectCountry(ArrayList<Country> countries, boolean showEnemyNeighbours, boolean showCountriesWithoutAttackableNeighbours, boolean showOwnNeighbours) {
 
         ArrayList<Integer> countryMapping = new ArrayList<Integer>();
         countryMapping.add(-1);
@@ -170,17 +201,22 @@ public class CLIClient extends Client {
         for (Country c : countries) {
 
             //construct neighbours string
-            String neighbours = "";
+            String enemyNeighbours = "";
+            String ownNeighbours = "";
             for (Country t : c.getNeighbours()) {
 
                 if (t.getOwner() != c.getOwner())
-                    neighbours += ", " + t.getCountryName();
+                    enemyNeighbours += ", " + t.getCountryName();
+                else
+                    ownNeighbours += ", " + t.getCountryName();
             }
-            if (neighbours.length() > 0)
-                neighbours = neighbours.substring(2);
+            if (enemyNeighbours.length() > 0)
+                enemyNeighbours = enemyNeighbours.substring(2);
+            if (ownNeighbours.length() > 0)
+                ownNeighbours = ownNeighbours.substring(2);
 
-            if (neighbours.length() > 0 || showCountriesWithoutAttackableNeighbours) {
-                System.out.println("" + selector++ + " - " + c.getCountryName() + " (" + c.getTroops() + (showNeighbours ? ", " + neighbours : "") + ")");
+            if (enemyNeighbours.length() > 0 || showCountriesWithoutAttackableNeighbours) {
+                System.out.println("" + selector++ + " - " + c.getCountryName() + " (" + c.getTroops() + (showEnemyNeighbours ? ", " + enemyNeighbours : "") + (showOwnNeighbours ? ", " + ownNeighbours : "")  +  ")");
                 countryMapping.add(countryIndex);
             }
 

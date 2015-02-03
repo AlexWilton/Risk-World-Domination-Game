@@ -26,6 +26,14 @@ public class Player{
         return ID;
     }
 
+    public void addCountry(Country c){
+        occupiedCountries.add(c);
+    }
+
+    public void removeCountry(Country c){
+        occupiedCountries.remove(c);
+    }
+
     public Action getPlayerAction(){
         return client.getAction();
     }

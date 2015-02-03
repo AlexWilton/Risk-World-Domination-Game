@@ -18,8 +18,9 @@ public class AttackAction extends Action {
     private final int attack;
     private final int defend;
     private final Player defender;
-    Country from;
-    Country to;
+    private Country from, to;
+    private int attackerLost = -99, defenderLost = -99;
+
 
     public AttackAction (Player player, Country from, Country to, int attack, int defend) {
         super(player, TurnStage.STAGE_BATTLES);
@@ -42,8 +43,10 @@ public class AttackAction extends Action {
     @Override
     public boolean validateAgainstState(State state) {
         if (super.validateAgainstState(state)) {
-            if (attackerOK() && defenderOK()){
-                return true;
+            if (attackerOK() && defenderOK()) {
+                if (from.getNeighbours().contains(to)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -88,13 +91,39 @@ public class AttackAction extends Action {
     }
 
     /**
-     * Performs the action on the game state, alters it accordingly returning the new state
+     * Performs the action on the game state, alters it accordingly returning the new state. fields attackerLost and
+     * defenderLost have to be set for this to do anything.
      *
-     * @param state
+     * @param state The state to be changed
      */
     @Override
     public void performOnState(State state) {
-        //TODO implement the state changes and write tests!
-        state.nextAction();
+        // TODO Should the action call back to the player, or should the player hand over result of dice rolls?
+        // currently the player (or someone) has to set the results, otherwise the action does nothing.
+        if (defenderLost == -99 || attackerLost == -99){
+            return;
+        }
+        if (defenderLost == to.getTroops()) {
+            // The defender lost the country.
+            state.winning();
+            from.setTroops(from.getTroops() - attack);
+            to.setTroops(attack);
+            to.getOwner().removeCountry(to);
+            player.addCountry(to);
+            to.setOwner(player);
+        }
+        else {
+            from.setTroops(from.getTroops() - attackerLost);
+            to.setTroops(to.getTroops() - defenderLost);
+        }
+        //TODO write tests!
+    }
+
+    public void setBattleResults(int attackerLost, int defenderLost) {
+        // do not set these twice!
+        if (this.attackerLost != -99 || this.defenderLost != -99)
+            return;
+        this.attackerLost = attackerLost;
+        this.defenderLost = defenderLost;
     }
 }

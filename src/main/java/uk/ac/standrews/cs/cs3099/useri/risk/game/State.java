@@ -47,6 +47,10 @@ public class State {
 
     public boolean wonBattle() { return wonBattle; }
 
+    public void winning() {
+        wonBattle = true;
+    }
+
     /**
      * Get the top card (index 0, as proposed in the drawing protocol) from the deck and remove it from the deck.
      * @return the top card from the deck.

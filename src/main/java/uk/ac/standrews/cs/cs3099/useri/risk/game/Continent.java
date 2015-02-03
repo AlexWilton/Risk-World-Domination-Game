@@ -17,4 +17,8 @@ public class Continent {
     public void setReinforcementValue(int reinforcementValue){
         this.reinforcementValue = reinforcementValue;
     }
+
+    public ArrayList<Country> getCountries(){
+        return countries;
+    }
 }

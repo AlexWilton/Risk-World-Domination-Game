@@ -10,7 +10,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.helpers.TestGameStateFactory;
 public class App {
     public static void main(String[] args) {
 
-        System.out.println("Hello World");
+       // System.out.println("Hello World");
 
         State gameState = TestGameStateFactory.getTestGameState();
 

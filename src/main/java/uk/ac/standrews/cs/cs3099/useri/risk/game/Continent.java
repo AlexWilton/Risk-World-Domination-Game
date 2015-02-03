@@ -9,6 +9,13 @@ import java.util.ArrayList;
 public class Continent {
 	private ArrayList<Country> countries = new ArrayList<Country>();
 	private int reinforcementValue = 0;
+    private String name;
+    private int id;
+
+    public Continent(int id,String continentName){
+        name = continentName;
+        this.id = id;
+    }
 
     public void addCountry(Country country){
         countries.add(country);

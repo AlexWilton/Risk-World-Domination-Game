@@ -41,12 +41,16 @@ public class TestGameStateFactory {
 
         //go through all countries
         Iterator<Player> p = players.iterator();
+        int tc =1;
 
         for (Country c : map.getAllCountries()){
             if (!p.hasNext()){
                 p = players.iterator();
             }
-            p.next().occupyCountry(c,2);
+            if (tc > 3) {
+                tc = 1;
+            }
+            p.next().occupyCountry(c, tc++);
         }
 
         gamestate.setup(map,players,riskCards);

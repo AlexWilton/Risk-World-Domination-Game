@@ -19,7 +19,11 @@ public class Player{
 	private boolean inactive;
 
     public Player(int ID,Client client){
+
         this.ID = ID;
+        this.client = client;
+        this.occupiedCountries = new ArrayList<Country>();
+        this.cards = new ArrayList<RiskCard>();
     }
 
     public int getID(){
@@ -39,7 +43,7 @@ public class Player{
     }
 
     public ArrayList<Country> getOccupiedCountries(){
-        return getOccupiedCountries();
+        return occupiedCountries;
     }
 
     public void addCard(RiskCard card){

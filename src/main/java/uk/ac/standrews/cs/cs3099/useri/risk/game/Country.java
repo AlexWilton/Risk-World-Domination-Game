@@ -20,12 +20,9 @@ public class Country {
     }
 
     public Country(int countryId){
-        this.countryId = countryId;
-    }
 
-    public void addTwoWayLinkToCountry(Country otherCountry){
-        linkedCountries.add(otherCountry);
-        otherCountry.addTwoWayLinkToCountry(this);
+        this.countryId = countryId;
+        this.linkedCountries = new ArrayList<Country>();
     }
 
     public void addOneWayLinkToCountry(Country otherCountry){

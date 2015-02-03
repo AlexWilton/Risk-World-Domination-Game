@@ -51,6 +51,7 @@ public class TradeAction extends Action {
             x.setTroops(x.getTroops() + 2);
         }
 
+        player.removeCards(list);
         state.nextAction();
     }
 
@@ -78,15 +79,20 @@ public class TradeAction extends Action {
         return null;
     }
 
+    /**
+     * Calculate the number of armies and whether the trade action is valid in terms of number of risk cards that are
+     * traded in
+     * @param state game state
+     * @return number of armies to be given to the player or 0 if the move is invalid.
+     */
     private int calculateArmies(State state) {
         if (list.size() != 3)
             return 0;
         int cavalry = 0;
         int artillery = 0;
         int infantry = 0;
-        for (int i = 0; i<list.size(); i++){
-            RiskCardType t =
-            switch (list.get(i).getType()){
+        for (RiskCard card:list){
+            switch (card.getType()){
                 case Cavalry:
                     cavalry++;
                     break;

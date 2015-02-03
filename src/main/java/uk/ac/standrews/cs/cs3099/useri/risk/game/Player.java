@@ -67,4 +67,8 @@ public class Player{
         //TODO unimplemented method, required for TradeAction!
         return null;
     }
+
+    public void removeCards(ArrayList<RiskCard> list) {
+        cards.removeAll(list);
+    }
 }

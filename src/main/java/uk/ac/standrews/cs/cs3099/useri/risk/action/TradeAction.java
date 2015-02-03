@@ -8,7 +8,6 @@ import java.util.ArrayList;
  * Trading in risk cards, at the beginning of the turn.
  * Created by bs44 on 30/01/15.
  */
-//TODO implement this action.
 public class TradeAction extends Action {
     private ArrayList<RiskCard> list;
 
@@ -93,13 +92,13 @@ public class TradeAction extends Action {
         int infantry = 0;
         for (RiskCard card:list){
             switch (card.getType()){
-                case Cavalry:
+                case TYPE_CAVALRY:
                     cavalry++;
                     break;
-                case Artillery:
+                case TYPE_ARTILLERY:
                     artillery++;
                     break;
-                case Infantry:
+                case TYPE_INFANTRY:
                     infantry++;
                     break;
             }

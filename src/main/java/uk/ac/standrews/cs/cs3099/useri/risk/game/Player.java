@@ -18,7 +18,7 @@ public class Player{
 	///enable if a player is disconnected to skip his turn
 	private boolean inactive;
 
-    public Player(int ID){
+    public Player(int ID, Client client){
         this.ID = ID;
         this.client = client;
         this.occupiedCountries = new ArrayList<Country>();

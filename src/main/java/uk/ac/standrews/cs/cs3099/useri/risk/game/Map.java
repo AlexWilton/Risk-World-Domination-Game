@@ -79,4 +79,16 @@ public class Map {
     public ArrayList<Continent> getContinents() {
         return continents;
     }
+
+    public ArrayList<Country> getAllCountries(){
+        ArrayList<Country> countries = new ArrayList<Country>();
+
+        for (Continent con : getContinents()){
+            for (Country cou : con.getCountries()){
+                countries.add(cou);
+            }
+        }
+
+        return countries;
+    }
 }

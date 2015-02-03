@@ -17,6 +17,15 @@ public class State {
     private TurnStage stage;
     private boolean wonBattle;
 
+    public void setup(Map map, ArrayList<Player> players, ArrayList<RiskCard> cardsDeck){
+        this.map = map;
+        this.players = players;
+        this.cardsDeck = cardsDeck;
+        this.currentPlayer = players.get(0);
+        this.stage = TurnStage.STAGE_TRADING;
+        wonBattle = false;
+    }
+
     public Player getCurrentPlayer() {
         return currentPlayer;
     }

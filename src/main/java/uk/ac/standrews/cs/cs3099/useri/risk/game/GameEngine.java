@@ -11,7 +11,6 @@ import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
  */
 public class GameEngine {
 	private State state;
-	private ArrayList<Client> clients;
 	
 	
 	/**
@@ -51,8 +50,8 @@ public class GameEngine {
 	}
 
 
-	public void initialise(State state, ArrayList<Client> clients){
+	public void initialise(State state){
         this.state = state;
-        this.clients = clients;
+
     }
 }

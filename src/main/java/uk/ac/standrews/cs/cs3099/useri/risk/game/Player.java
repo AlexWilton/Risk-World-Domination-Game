@@ -18,7 +18,7 @@ public class Player{
 	///enable if a player is disconnected to skip his turn
 	private boolean inactive;
 
-    public Player(int ID){
+    public Player(int ID,Client client){
         this.ID = ID;
     }
 
@@ -50,4 +50,9 @@ public class Player{
         return client;
     }
 
+    public void occupyCountry (Country c, int troops) {
+        c.setOwner(this);
+        c.setTroops(troops);
+        occupiedCountries.add(c);
+    }
 }

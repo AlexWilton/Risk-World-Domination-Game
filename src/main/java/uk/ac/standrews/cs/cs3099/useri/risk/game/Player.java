@@ -46,4 +46,8 @@ public class Player{
         cards.add(card);
     }
 
+    public Client getClient() {
+        return client;
+    }
+
 }

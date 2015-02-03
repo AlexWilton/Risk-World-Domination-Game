@@ -18,8 +18,7 @@ public class Player{
 	///enable if a player is disconnected to skip his turn
 	private boolean inactive;
 
-    public Player(int ID,Client client){
-
+    public Player(int ID){
         this.ID = ID;
         this.client = client;
         this.occupiedCountries = new ArrayList<Country>();
@@ -28,6 +27,14 @@ public class Player{
 
     public int getID(){
         return ID;
+    }
+
+    public void addCountry(Country c){
+        occupiedCountries.add(c);
+    }
+
+    public void removeCountry(Country c){
+        occupiedCountries.remove(c);
     }
 
     public Action getPlayerAction(){
@@ -54,6 +61,19 @@ public class Player{
         return client;
     }
 
+    /**
+     * Choose between countries to place 2 extra armies on when trading in risk cards.
+     * @param occ
+     * @return
+     */
+    public Country choose(ArrayList<Country> occ) {
+        //TODO unimplemented method, required for TradeAction!
+        return null;
+    }
+
+    public void removeCards(ArrayList<RiskCard> list) {
+        cards.removeAll(list);
+    }
     public void occupyCountry (Country c, int troops) {
         c.setOwner(this);
         c.setTroops(troops);

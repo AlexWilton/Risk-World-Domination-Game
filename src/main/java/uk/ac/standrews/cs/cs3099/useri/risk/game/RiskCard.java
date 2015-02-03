@@ -8,4 +8,7 @@ public class RiskCard {
         this.cardType = type;
         this.cardID = cardID;
     }
+
+    public RiskCardType getType(){return cardType;}
+    public int getCardID(){return cardID;}
 }

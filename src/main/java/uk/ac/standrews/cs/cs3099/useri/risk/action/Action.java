@@ -23,6 +23,8 @@ public abstract class Action {
 	/**
 	 * Validates whether the action can be made against the current game state.
      * No Action is performed.
+     * All actions need to be taken at the stage they correspond to and by the player whi needs to take their turn. This
+     * is universal across all actions, so contained in this abstract class.
 	 * @return
 	 * true if it is valid
 	 * false if there is an error

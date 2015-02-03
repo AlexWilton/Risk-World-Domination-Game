@@ -16,6 +16,7 @@ public class State {
     private Player winner = null;
     private TurnStage stage;
     private boolean wonBattle;
+    private int cardSetstradedIn = 0;
 
     public void setup(Map map, ArrayList<Player> players, ArrayList<RiskCard> cardsDeck){
         this.map = map;
@@ -56,6 +57,18 @@ public class State {
 
     public boolean wonBattle() { return wonBattle; }
 
+    public void winning() {
+        wonBattle = true;
+    }
+
+    public int getCardSetstradedIn(){
+        return cardSetstradedIn;
+    }
+
+    public void cardSettradedIn(){
+        cardSetstradedIn++;
+    }
+
     /**
      * Get the top card (index 0, as proposed in the drawing protocol) from the deck and remove it from the deck.
      * @return the top card from the deck.
@@ -66,4 +79,22 @@ public class State {
         return c;
     }
 
+    /**
+     * Get a country by id from the list of countries.
+     * @param id the ID of the country we are looking for
+     * @return Country with ID id, or null if such does not exist.
+     */
+    public Country getCountryByID(int id) {
+        ArrayList<Continent> continents = map.getContinents();
+        for (Continent cont:continents){
+            ArrayList<Country> countries = cont.getCountries();
+            for (Country country:countries){
+                if (country.getCountryId() == id){
+                    return country;
+                }
+            }
+        }
+        return null;
+
+    }
 }

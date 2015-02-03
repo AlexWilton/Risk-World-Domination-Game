@@ -50,4 +50,8 @@ public class Country {
     }
 
     public ArrayList<Country> getNeighbours() { return linkedCountries;}
+
+    public int getCountryId(){
+        return countryId;
+    }
 }

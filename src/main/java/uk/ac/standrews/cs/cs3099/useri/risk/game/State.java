@@ -16,6 +16,7 @@ public class State {
     private Player winner = null;
     private TurnStage stage;
     private boolean wonBattle;
+    private int cardSetstradedIn = 0;
 
     public Player getCurrentPlayer() {
         return currentPlayer;
@@ -51,6 +52,14 @@ public class State {
         wonBattle = true;
     }
 
+    public int getCardSetstradedIn(){
+        return cardSetstradedIn;
+    }
+
+    public void cardSettradedIn(){
+        cardSetstradedIn++;
+    }
+
     /**
      * Get the top card (index 0, as proposed in the drawing protocol) from the deck and remove it from the deck.
      * @return the top card from the deck.
@@ -61,4 +70,14 @@ public class State {
         return c;
     }
 
+    /**
+     * Get a country by id from the list of countries.
+     * @param id the ID of the country we are looking for
+     * @return Country with ID id, or null if such does not exist.
+     */
+    public Country getCountryByID(int id) {
+        //TODO unimplemented method, required for TradeAction!
+        return null;
+
+    }
 }

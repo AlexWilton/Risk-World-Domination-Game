@@ -58,4 +58,13 @@ public class Player{
         return client;
     }
 
+    /**
+     * Choose between countries to place 2 extra armies on when trading in risk cards.
+     * @param occ
+     * @return
+     */
+    public Country choose(ArrayList<Country> occ) {
+        //TODO unimplemented method, required for TradeAction!
+        return null;
+    }
 }

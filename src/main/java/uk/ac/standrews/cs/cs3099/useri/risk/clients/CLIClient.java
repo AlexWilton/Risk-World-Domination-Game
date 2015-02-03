@@ -60,6 +60,7 @@ public class CLIClient extends Client {
                 //TODO create trade action
                 break;
             case 2:
+                gameState.nextAction();
                 ret = deployMenu();break;
         }
 
@@ -84,6 +85,7 @@ public class CLIClient extends Client {
             ret = new DeployArmyAction(gameState.getCurrentPlayer(),target,amount);
         }
         else {
+            gameState.nextAction();
             ret = attackMenu();
         }
 
@@ -129,6 +131,7 @@ public class CLIClient extends Client {
 
         else {
 
+            gameState.nextAction();
             ret = fortifyMenu();
         }
 
@@ -161,6 +164,7 @@ public class CLIClient extends Client {
             }
         }
         else{
+            gameState.nextAction();
             ret = new EndTurnAction(gameState.getCurrentPlayer());
         }
 

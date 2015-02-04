@@ -4,46 +4,47 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
+
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
+
 
 
 public class Map {
 
     private static final String FILEPATH_DEFAULT_MAP = "data/default.map";
 
-	private ArrayList<Continent> continents;
+	private ContinentSet continents;
+    private CountrySet countries;
     private boolean validMap = true;
 
-    public Map(ArrayList<Continent> continents){
-        this.continents = continents;
+    public Map(){
+        this(FILEPATH_DEFAULT_MAP);
     }
 
-
-    /**
-     * Load default Map
-     */
-    public Map(){
-        JSONParser parser=new JSONParser();
+    public Map(String MAP_FILE_PATH){
         JSONObject mapData = null;
-
         try {
-            mapData = (JSONObject) JSONValue.parse(new FileReader(FILEPATH_DEFAULT_MAP));
-        } catch (Exception e) {
-            e.printStackTrace();
+            mapData = (JSONObject) JSONValue.parse(new FileReader(MAP_FILE_PATH));
+        } catch (FileNotFoundException e) {
+            System.out.println("Map " + MAP_FILE_PATH + " couldn't be found");
+            validMap = false;
+        }
+
+        //basic check that json contains map data
+        try {
+            if(!( (String)mapData.get("data")).toLowerCase().equals("map")) validMap = false;
+        }catch(NullPointerException e){
+            validMap = false;
         }
 
 
-        String type = (String) mapData.get("data");
-        if(!type.toLowerCase().equals("map")) validMap = false;
+        countries = parseCountryNames(mapData);
 
-        HashMap<Integer,Country> countries = parseCountryNames(mapData);
-
-        HashMap<Integer,Continent> continents = parseContinentNames(mapData);
+        continents = parseContinentNames(mapData);
 
         makeCountryLinks(mapData,countries);
 
@@ -51,44 +52,38 @@ public class Map {
 
         addContinentValues(mapData,continents);
 
-        this.continents = new ArrayList<Continent>(continents.values());
-        System.out.println();
-
-
-
-
     }
 
-    private HashMap<Integer,Country> parseCountryNames(JSONObject mapData){
+    private CountrySet parseCountryNames(JSONObject mapData){
 
         //Parse all Country Data
-        HashMap<Integer,Country> countries = new HashMap<Integer, Country>();
+        CountrySet countries = new CountrySet();
         JSONObject countriesJSON = (JSONObject) mapData.get("country_names");
 
         for (Object o : countriesJSON.keySet()){
             int id = Integer.parseInt(o.toString());
             String name = countriesJSON.get(o).toString();
-            countries.put(id,new Country(id,name));
+            countries.add(new Country(id,name));
         }
 
         return countries;
     }
 
-    private HashMap<Integer,Continent> parseContinentNames(JSONObject mapData) {
+    private ContinentSet parseContinentNames(JSONObject mapData) {
         //parse all continent data
-        HashMap<Integer,Continent> continents = new HashMap<Integer, Continent>();
+        ContinentSet continents = new ContinentSet();
         JSONObject continentsJSON = (JSONObject) mapData.get("continent_names");
 
         for (Object o : continentsJSON.keySet()){
             int id = Integer.parseInt(o.toString());
             String name = continentsJSON.get(o).toString();
-            continents.put(id, new Continent(id, name));
+            continents.add(new Continent(id, name));
         }
 
         return continents;
     }
 
-    private void makeCountryLinks(JSONObject mapData, HashMap<Integer,Country> countries){
+    private void makeCountryLinks(JSONObject mapData, CountrySet countries){
         //make country links
         JSONArray connectionsJSON = (JSONArray) mapData.get("connections");
 
@@ -100,7 +95,7 @@ public class Map {
         }
     }
 
-    private void putCountriesIntoContinent(JSONObject mapData,HashMap<Integer,Country> countries, HashMap<Integer,Continent> continents){
+    private void putCountriesIntoContinent(JSONObject mapData, CountrySet countries, ContinentSet continents){
         //put countries into continents
         JSONObject continentMappingsJSON = (JSONObject) mapData.get("continents");
 
@@ -118,7 +113,7 @@ public class Map {
         }
     }
 
-    private void addContinentValues(JSONObject mapData, HashMap<Integer,Continent> continents){
+    private void addContinentValues(JSONObject mapData, ContinentSet continents){
         //add continent values
         JSONObject continentValuesJSON = (JSONObject) mapData.get("continent_values");
 
@@ -133,19 +128,15 @@ public class Map {
 
 
 
-    public ArrayList<Continent> getContinents() {
+    public ContinentSet getContinents() {
         return continents;
     }
 
-    public ArrayList<Country> getAllCountries(){
-        ArrayList<Country> countries = new ArrayList<Country>();
-
-        for (Continent con : getContinents()){
-            for (Country cou : con.getCountries()){
-                countries.add(cou);
-            }
-        }
-
+    public CountrySet getAllCountries(){
         return countries;
+    }
+
+    public boolean isValidMap() {
+        return validMap;
     }
 }

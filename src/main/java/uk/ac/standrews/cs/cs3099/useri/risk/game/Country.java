@@ -10,7 +10,7 @@ public class Country {
 
 	private String countryName;
     private int countryId;
-	private ArrayList<Country> linkedCountries;
+	private CountrySet linkedCountries;
 	private int troops;
 	private Player owner;
 
@@ -22,7 +22,7 @@ public class Country {
     public Country(int countryId){
 
         this.countryId = countryId;
-        this.linkedCountries = new ArrayList<Country>();
+        this.linkedCountries = new CountrySet();
     }
 
     public void addOneWayLinkToCountry(Country otherCountry){
@@ -49,7 +49,7 @@ public class Country {
         this.owner = owner;
     }
 
-    public ArrayList<Country> getNeighbours() { return linkedCountries;}
+    public CountrySet getNeighbours() { return linkedCountries;}
 
     public int getCountryId(){
         return countryId;

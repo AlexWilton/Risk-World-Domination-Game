@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class Player{
     private Client client;
     private int ID;
-	private ArrayList<Country> occupiedCountries;
+	private CountrySet occupiedCountries;
 	private ArrayList<RiskCard> cards;
 	private int unassignedArmy;
 	///enable if a player is disconnected to skip his turn
@@ -21,7 +21,7 @@ public class Player{
     public Player(int ID, Client client){
         this.ID = ID;
         this.client = client;
-        this.occupiedCountries = new ArrayList<Country>();
+        this.occupiedCountries = new CountrySet();
         this.cards = new ArrayList<RiskCard>();
     }
 
@@ -49,7 +49,7 @@ public class Player{
         unassignedArmy = value;
     }
 
-    public ArrayList<Country> getOccupiedCountries(){
+    public CountrySet getOccupiedCountries(){
         return occupiedCountries;
     }
 

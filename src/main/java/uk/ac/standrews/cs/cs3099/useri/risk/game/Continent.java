@@ -7,7 +7,7 @@ import java.util.ArrayList;
  *
  */
 public class Continent {
-	private ArrayList<Country> countries = new ArrayList<Country>();
+	private CountrySet countries = new CountrySet();
 	private int reinforcementValue = 0;
     private String name;
     private int id;
@@ -25,7 +25,17 @@ public class Continent {
         this.reinforcementValue = reinforcementValue;
     }
 
-    public ArrayList<Country> getCountries(){
-        return countries;
+    public CountrySet getCountries() { return countries;}
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getReinforcementValue() {
+        return reinforcementValue;
     }
 }

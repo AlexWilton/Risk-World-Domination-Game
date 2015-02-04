@@ -85,16 +85,6 @@ public class State {
      * @return Country with ID id, or null if such does not exist.
      */
     public Country getCountryByID(int id) {
-        ArrayList<Continent> continents = map.getContinents();
-        for (Continent cont:continents){
-            ArrayList<Country> countries = cont.getCountries();
-            for (Country country:countries){
-                if (country.getCountryId() == id){
-                    return country;
-                }
-            }
-        }
-        return null;
-
+        return map.getAllCountries().get(id);
     }
 }

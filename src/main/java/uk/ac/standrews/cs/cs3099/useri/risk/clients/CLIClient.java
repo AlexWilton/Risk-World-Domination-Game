@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.CountrySet;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 import java.io.InputStream;
@@ -208,7 +209,7 @@ public class CLIClient extends Client {
         return choice;
     }
 
-    private Country selectCountry(ArrayList<Country> countries, boolean showEnemyNeighbours, boolean showCountriesWithoutAttackableNeighbours, boolean showOwnNeighbours) {
+    private Country selectCountry(CountrySet countries, boolean showEnemyNeighbours, boolean showCountriesWithoutAttackableNeighbours, boolean showOwnNeighbours) {
 
         ArrayList<Integer> countryMapping = new ArrayList<Integer>();
         countryMapping.add(-1);

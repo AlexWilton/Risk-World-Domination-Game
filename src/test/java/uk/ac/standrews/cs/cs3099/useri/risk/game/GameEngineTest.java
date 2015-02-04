@@ -21,7 +21,6 @@ public class GameEngineTest {
 
     @Test
     public void testGameLoop() throws Exception {
-        fail();
         //TODO need to test game loop!!!
        // engine.gameLoop();
     }

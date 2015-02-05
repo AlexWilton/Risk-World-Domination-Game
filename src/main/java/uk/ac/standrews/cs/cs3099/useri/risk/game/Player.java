@@ -83,7 +83,7 @@ public class Player{
     public boolean equals(Object obj){
         return obj instanceof Player && equals( (Player) obj);
     }
-    
+
     public boolean equals(Player player){
         if(player.getID() == ID)
             return true;

@@ -15,20 +15,20 @@ public class AttackAction extends Action {
     private static final int MAXIMUM_ATTACK = 3;
     private static final int MAXIMUM_DEFEND = 2;
 
-    private final int attack;
-    private final int defend;
-    private final Player defender;
-    private Country from, to;
+    private Country attackingCountry;
+    private Country defendingCountry;
+    private int[] attackerDice;
+    private int[] defenderDice;
     private int attackerLost = -99, defenderLost = -99;
 
 
-    public AttackAction (Player player, Country from, Country to, int attack, int defend) {
+    public AttackAction (Player player, Country attackingCountry, Country defendingCountry, int[] attackerDice, int[] defenderDice) {
         super(player, TurnStage.STAGE_BATTLES);
-        this.from = from;
-        this.to = to;
-        this.attack = attack;
-        this.defend = defend;
-        this.defender = to.getOwner();
+        this.attackingCountry = attackingCountry;
+        this.defendingCountry = defendingCountry;
+        this.attackerDice = attackerDice;
+        this.defenderDice = defenderDice;
+
     }
 
 
@@ -42,14 +42,16 @@ public class AttackAction extends Action {
      */
     @Override
     public boolean validateAgainstState(State state) {
-        if (super.validateAgainstState(state)) {
-            if (attackerOK() && defenderOK()) {
-                if (from.getNeighbours().contains(to)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        if(!super.validateAgainstState(state))
+            return false;
+
+        if(!attackerOK() || !defenderOK())
+            return false;
+
+        if(!attackingCountry.getNeighbours().contains(defendingCountry))
+            return false;
+
+        return true;
     }
 
     /**
@@ -60,14 +62,18 @@ public class AttackAction extends Action {
      * false otherwise.
      */
     private boolean defenderOK() {
-        if (to.getOwner().equals(player))
+        if (defendingCountry.getOwner().equals(player))
+            return false; //cannot attack yourself
+
+        if (defendingCountry.getTroops() < defenderDice.length)
             return false;
-        if (to.getTroops() < defend)
+
+        if (defenderDice.length < MINIMUM_ARMIES)
             return false;
-        if (defend < MINIMUM_ARMIES)
+
+        if (defenderDice.length > MAXIMUM_DEFEND)
             return false;
-        if (defend > MAXIMUM_DEFEND)
-            return false;
+
         return true;
     }
 
@@ -79,14 +85,18 @@ public class AttackAction extends Action {
      * false otherwise.
      */
     private boolean attackerOK() {
-        if (! from.getOwner().equals(player))
+        if (!attackingCountry.getOwner().equals(player))
             return false;
-        if (from.getTroops() <= attack)
+
+        if (attackingCountry.getTroops() <= attackerDice.length)
             return false;
-        if (attack < MINIMUM_ARMIES)
+
+        if (attackerDice.length < MINIMUM_ARMIES)
             return false;
-        if (attack > MAXIMUM_ATTACK)
+
+        if (attackerDice.length > MAXIMUM_ATTACK)
             return false;
+
         return true;
     }
 
@@ -98,32 +108,41 @@ public class AttackAction extends Action {
      */
     @Override
     public void performOnState(State state) {
-        // TODO Should the action call back to the player, or should the player hand over result of dice rolls?
-        // currently the player (or someone) has to set the results, otherwise the action does nothing.
-        if (defenderLost == -99 || attackerLost == -99){
-            return;
-        }
-        if (defenderLost == to.getTroops()) {
-            // The defender lost the country.
-            state.winning();
-            from.setTroops(from.getTroops() - attack);
-            to.setTroops(attack);
-            to.getOwner().removeCountry(to);
-            player.addCountry(to);
-            to.setOwner(player);
-        }
-        else {
-            from.setTroops(from.getTroops() - attackerLost);
-            to.setTroops(to.getTroops() - defenderLost);
-        }
-        //TODO write tests!
-    }
+        int attackerArmiesLost = 0;
+        int defenderArmiesLost = 0;
 
-    public void setBattleResults(int attackerLost, int defenderLost) {
-        // do not set these twice!
-        if (this.attackerLost != -99 || this.defenderLost != -99)
-            return;
-        this.attackerLost = attackerLost;
-        this.defenderLost = defenderLost;
-    }
+        //compute battle result from dice comparison
+
+        int topDefenderDie = 0;
+        for(int dieValue : defenderDice){
+            if(dieValue > topDefenderDie)
+                topDefenderDie = dieValue;
+        }
+        int topAttackerDie = 0;
+        for(int dieValue : attackerDice){
+            if(dieValue > topAttackerDie)
+                topAttackerDie = dieValue;
+        }
+        switch(attackerDice.length) {
+            case 1: //when attacker has one die
+                if (topAttackerDie > topDefenderDie) {
+                    defenderArmiesLost++;
+                } else
+                    attackerArmiesLost++;
+                break;
+            case 2: //when attacker has two dice
+                if (defenderDice.length == 1){
+                    if (topAttackerDie > topDefenderDie)
+                        defenderArmiesLost++;
+                    else
+                        attackerArmiesLost++;
+                    }
+            //TODO to finish
+                break;
+            case 3: //when attacker has three dice
+
+                break;
+        }
+
+        //TODO write test!!!!
 }

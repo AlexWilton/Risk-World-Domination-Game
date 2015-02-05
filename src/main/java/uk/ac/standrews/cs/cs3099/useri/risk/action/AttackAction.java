@@ -115,8 +115,9 @@ public class AttackAction extends Action {
         // calculate number of armies lost by each player, depending on the dice rolls.
         calculateArmiesLost();
 
-        if (defenderArmiesLost == defenderDice.length){ //Attacker won!
+        if (defenderArmiesLost == defendingCountry.getTroops()){ //Attacker won!
             //change owners
+            state.winning();
             defendingCountry.getOwner().removeCountry(defendingCountry);
             defendingCountry.setOwner(player);
             player.addCountry(defendingCountry);

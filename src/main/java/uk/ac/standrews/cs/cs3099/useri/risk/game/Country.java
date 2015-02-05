@@ -8,11 +8,11 @@ import java.util.ArrayList;
  */
 public class Country {
 
-	private String countryName;
+	private String countryName = null;
     private int countryId;
-	private CountrySet linkedCountries;
-	private int troops;
-	private Player owner;
+	private CountrySet linkedCountries = new CountrySet();
+	private int troops = -1;
+	private Player owner =null;
 
     public Country( int countryId, String countryName){
         this(countryId);
@@ -20,9 +20,7 @@ public class Country {
     }
 
     public Country(int countryId){
-
         this.countryId = countryId;
-        this.linkedCountries = new CountrySet();
     }
 
     public void addOneWayLinkToCountry(Country otherCountry){

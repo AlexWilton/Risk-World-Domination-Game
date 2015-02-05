@@ -3,8 +3,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-
 import static org.junit.Assert.*;
 
 

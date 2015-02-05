@@ -5,6 +5,9 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 /**
  * Attacking players. This is optional.
  * Created by bs44 on 30/01/15.
@@ -19,7 +22,8 @@ public class AttackAction extends Action {
     private Country defendingCountry;
     private int[] attackerDice;
     private int[] defenderDice;
-    private int attackerLost = -99, defenderLost = -99;
+    private int attackerArmiesLost = 0;
+    private int defenderArmiesLost = 0;
 
 
     public AttackAction (Player player, Country attackingCountry, Country defendingCountry, int[] attackerDice, int[] defenderDice) {
@@ -108,41 +112,89 @@ public class AttackAction extends Action {
      */
     @Override
     public void performOnState(State state) {
-        int attackerArmiesLost = 0;
-        int defenderArmiesLost = 0;
+        // calculate number of armies lost by each player, depending on the dice rolls.
+        calculateArmiesLost();
 
-        //compute battle result from dice comparison
+        if (defenderArmiesLost == defenderDice.length){ //Attacker won!
+            //change owners
+            defendingCountry.getOwner().removeCountry(defendingCountry);
+            defendingCountry.setOwner(player);
+            player.addCountry(defendingCountry);
 
-        int topDefenderDie = 0;
-        for(int dieValue : defenderDice){
-            if(dieValue > topDefenderDie)
-                topDefenderDie = dieValue;
+            //set the number of troops on each country.
+            attackingCountry.setTroops(attackingCountry.getTroops() - attackerDice.length);
+            defendingCountry.setTroops(attackerDice.length - attackerArmiesLost);
         }
-        int topAttackerDie = 0;
-        for(int dieValue : attackerDice){
-            if(dieValue > topAttackerDie)
-                topAttackerDie = dieValue;
+        else {
+            //decrease number of armies on each country, but don't change owner.
+            defendingCountry.setTroops(defendingCountry.getTroops() - defenderArmiesLost);
+            attackingCountry.setTroops(attackingCountry.getTroops() - attackerArmiesLost);
         }
-        switch(attackerDice.length) {
-            case 1: //when attacker has one die
-                if (topAttackerDie > topDefenderDie) {
-                    defenderArmiesLost++;
-                } else
-                    attackerArmiesLost++;
-                break;
-            case 2: //when attacker has two dice
-                if (defenderDice.length == 1){
-                    if (topAttackerDie > topDefenderDie)
+    }
+
+    /**
+     * Calculate the number of armies lost by each player depending on the outcome of the dice rolls. For more
+     * information on how exactly this is calculated, look at the slightly obscure code or the risk rules.
+     * The dice rolls generally favour the defending player.
+     */
+    private void calculateArmiesLost() {
+        //Sort the arrays in descending order.
+        sortDescending(attackerDice);
+        sortDescending(defenderDice);
+        //if attacker has only one die, see what that was enough for.
+        if (attackerDice.length == 1){
+            if (attackerDice[0] > defenderDice[0])
+                defenderArmiesLost++;
+            else
+                attackerArmiesLost++;
+        }
+        //otherwise, the bottleneck is defenderDice.length, so switch on that.
+        else {
+            switch (defenderDice.length) {
+                case 2: //when defender has two dice
+                    if (attackerDice[1] > defenderDice[1])
                         defenderArmiesLost++;
                     else
                         attackerArmiesLost++;
-                    }
-            //TODO to finish
-                break;
-            case 3: //when attacker has three dice
-
-                break;
+                    //the missing break here is deliberate.
+                case 1: //when defender has one die
+                    if (attackerDice[0] > defenderDice[0]) {
+                        defenderArmiesLost++;
+                    } else
+                        attackerArmiesLost++;
+                    break;
+            }
         }
+    }
 
-        //TODO write test!!!!
+    /**
+     * A very silly sorting algorithm just because java only allows ascending sort on primitive types
+     * (and really, we only have 3 elements at most)
+     * @param array the array to be sorted.
+     */
+    private void sortDescending(int[] array) {
+        switch(array.length){
+            case 0: case 1: break;
+            case 2: {
+                if (array[0] < array[1]) {
+                    int temp = array[0];
+                    array[0] = array[1];
+                    array[1] = temp;
+                }
+            } break;
+            default: {
+                for (int i = 0; i<array.length - 1; i++){
+                    for (int j = i; j<array.length; j++){
+                        if (array[i] < array[j]){
+                            int temp = array[i];
+                            array[i] = array[j];
+                            array[j] = temp;
+                        }
+                    }
+                }
+            } break;
+        }
+    }
+
+    //TODO write test!!!!
 }

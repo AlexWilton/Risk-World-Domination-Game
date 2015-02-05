@@ -87,4 +87,8 @@ public class State {
     public Country getCountryByID(int id) {
         return map.getAllCountries().get(id);
     }
+
+    public ArrayList<Player> getPlayers (){
+        return players;
+    }
 }

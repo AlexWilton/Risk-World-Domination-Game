@@ -11,6 +11,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
  */
 public abstract class Client {
 
+
     State gameState;
 
     /**
@@ -24,5 +25,7 @@ public abstract class Client {
     public abstract void pushGameState();
 
     public abstract int getDefenders(Country attacker, Country objective, int attackingArmies);
+
+    public abstract int[] getSeedComponent();
 
 }

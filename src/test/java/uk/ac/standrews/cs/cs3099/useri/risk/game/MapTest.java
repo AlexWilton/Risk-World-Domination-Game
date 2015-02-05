@@ -53,11 +53,11 @@ public class MapTest {
 
     @Test
     public void correctConnectionsPresentInDefault(){
-        //check Alaska(1)-Kamichatka(29) connection exists both ways
-        Country alaska = defaultCountries.get(1);
+        //check Alaska(0)-Kamichatka(29) connection exists both ways
+        Country alaska = defaultCountries.get(0);
         assertTrue(alaska.getNeighbours().contains(new Country(29)));
         Country kamichatka = defaultCountries.get(29);
-        assertTrue(kamichatka.getNeighbours().contains(new Country(1)));
+        assertTrue(kamichatka.getNeighbours().contains(new Country(0)));
 
 
         //check Madagaskar(25)-Great Britain(16) doesn't exist

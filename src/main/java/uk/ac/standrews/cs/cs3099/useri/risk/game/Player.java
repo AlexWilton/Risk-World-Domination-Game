@@ -79,4 +79,14 @@ public class Player{
         c.setTroops(troops);
         occupiedCountries.add(c);
     }
+
+    public boolean equals(Object obj){
+        return obj instanceof Player && equals( (Player) obj);
+    }
+    
+    public boolean equals(Player player){
+        if(player.getID() == ID)
+            return true;
+        return false;
+    }
 }

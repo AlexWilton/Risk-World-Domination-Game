@@ -14,8 +14,5 @@ public class App {
 
         State gameState = TestGameStateFactory.getTestGameState();
 
-        GameEngine gameEngine = new GameEngine();
-        gameEngine.initialise(gameState);
-        gameEngine.gameLoop();
     }
 }

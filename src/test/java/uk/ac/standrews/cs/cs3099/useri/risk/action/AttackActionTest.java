@@ -15,7 +15,7 @@ public class AttackActionTest{
 
     private State testState;
     private CountrySet countries;
-    private Country indonesia, newGuinea, westernAustralia, easternAustralia;
+    private Country indonesia, newGuinea, westernAustralia, siam;
     private Player playerA, playerB;
 
     @Before
@@ -33,7 +33,7 @@ public class AttackActionTest{
         indonesia = testState.getCountryByID(38);
         newGuinea = testState.getCountryByID(39);
         westernAustralia = testState.getCountryByID(40);
-        easternAustralia = testState.getCountryByID(41);
+        siam = testState.getCountryByID(37);
 
         //PlayerA has indonesia with 3 armies and PlayerB has WesternAustralia with 1 army
         playerA.addCountry(indonesia);
@@ -47,6 +47,11 @@ public class AttackActionTest{
         playerA.addCountry(newGuinea);
         newGuinea.setOwner(playerA);
         newGuinea.setTroops(1);
+
+        //PlayerB has Siam with 2 armies
+        playerB.addCountry(siam);
+        siam.setTroops(2);
+        siam.setOwner(playerB);
     }
 
 
@@ -83,6 +88,24 @@ public class AttackActionTest{
         assertTrue(playerB.getOccupiedCountries().contains(westernAustralia));
         assertFalse(playerA.getOccupiedCountries().contains(westernAustralia));
         assertTrue(westernAustralia.getTroops() == 1);
+        assertTrue(indonesia.getTroops() == 2);
+    }
+
+    @Test
+    public void testBothPlayersLoseArmies(){
+        //Test that both players lose one army when player A attacks from indonesia to siam.
+        int[] playerADice = {6,3};
+        int[] playerBDice = {4,3};
+        AttackAction attack = new AttackAction(playerA, indonesia, siam, playerADice, playerBDice);
+
+        assertTrue(attack.validateAgainstState(testState));
+
+        attack.performOnState(testState);
+
+        assertTrue(siam.getOwner().equals(playerB));
+        assertTrue(playerB.getOccupiedCountries().contains(siam));
+        assertFalse(playerA.getOccupiedCountries().contains(siam));
+        assertTrue(siam.getTroops() == 1);
         assertTrue(indonesia.getTroops() == 2);
     }
 

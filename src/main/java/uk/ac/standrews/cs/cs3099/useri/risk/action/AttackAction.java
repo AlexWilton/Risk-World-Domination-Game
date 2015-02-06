@@ -6,7 +6,6 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * Attacking players. This is optional.

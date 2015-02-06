@@ -51,7 +51,7 @@ public class TradeAction extends Action {
         }
 
         player.removeCards(list);
-        state.nextAction();
+        state.nextStage();
     }
 
     /**

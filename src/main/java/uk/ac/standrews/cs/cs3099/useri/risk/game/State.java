@@ -37,7 +37,7 @@ public class State {
         return false;
     }
 
-    public void nextAction(){
+    public void nextStage(){
         stage = stage.next();
     }
 

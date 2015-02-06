@@ -11,12 +11,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.lang.reflect.Array;
-import java.util.*;
-
-/**
- * Created by po26 on 30/01/15.
- */
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Random;
+import java.util.Scanner;
 
 public class CLIClient extends Client {
 
@@ -76,7 +74,7 @@ public class CLIClient extends Client {
                 //TODO create trade action
                 break;
             case 2:
-                gameState.nextAction();
+                gameState.nextStage();
                 ret = deployMenu();break;
         }
 
@@ -102,7 +100,7 @@ public class CLIClient extends Client {
         }
         else {
             out.println("Skipping deployment - no unassigned armies");
-            gameState.nextAction();
+            gameState.nextStage();
             ret = attackMenu();
         }
 
@@ -173,7 +171,7 @@ public class CLIClient extends Client {
 
         else {
 
-            gameState.nextAction();
+            gameState.nextStage();
             ret = fortifyMenu();
         }
 
@@ -205,8 +203,8 @@ public class CLIClient extends Client {
                 ret = fortifyMenu();
             }
         }
-        else{
-            gameState.nextAction();
+        else {
+            gameState.nextStage();
             ret = new EndTurnAction(gameState.getCurrentPlayer());
         }
 

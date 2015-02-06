@@ -58,6 +58,6 @@ public class FortifyAction extends Action {
     public void performOnState(State state) {
         from.setTroops(from.getTroops() - armies);
         to.setTroops(to.getTroops() + armies);
-        state.nextAction();
+        state.nextStage();
     }
 }

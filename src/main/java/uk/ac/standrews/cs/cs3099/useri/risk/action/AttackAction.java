@@ -180,6 +180,4 @@ public class AttackAction extends Action {
         for(int i=0; i<array.length; i++)
             array[i] = - array[i];
     }
-
-    //TODO write test!!!!
 }

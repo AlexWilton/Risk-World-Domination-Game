@@ -168,33 +168,17 @@ public class AttackAction extends Action {
         }
     }
 
-    /**
-     * A very silly sorting algorithm just because java only allows ascending sort on primitive types
-     * (and really, we only have 3 elements at most)
-     * @param array the array to be sorted.
-     */
+
     private void sortDescending(int[] array) {
-        switch(array.length){
-            case 0: case 1: break;
-            case 2: {
-                if (array[0] < array[1]) {
-                    int temp = array[0];
-                    array[0] = array[1];
-                    array[1] = temp;
-                }
-            } break;
-            default: {
-                for (int i = 0; i<array.length - 1; i++){
-                    for (int j = i; j<array.length; j++){
-                        if (array[i] < array[j]){
-                            int temp = array[i];
-                            array[i] = array[j];
-                            array[j] = temp;
-                        }
-                    }
-                }
-            } break;
-        }
+        //negate
+        for(int i=0; i<array.length; i++)
+            array[i] = - array[i];
+
+        Arrays.sort(array);
+
+        //negate
+        for(int i=0; i<array.length; i++)
+            array[i] = - array[i];
     }
 
     //TODO write test!!!!

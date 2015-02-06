@@ -49,6 +49,30 @@ public class Country {
 
     public CountrySet getNeighbours() { return linkedCountries;}
 
+    public CountrySet getSamePlayerNeighbours() {
+
+        CountrySet ret = new CountrySet();
+        for (Country c : linkedCountries){
+            if (this.getOwner() == c.getOwner()){
+                ret.add(c);
+            }
+        }
+
+        return ret;
+    }
+
+    public CountrySet getEnemyNeighbours() {
+
+        CountrySet ret = new CountrySet();
+        for (Country c : linkedCountries){
+            if (this.getOwner() != c.getOwner()){
+                ret.add(c);
+            }
+        }
+
+        return ret;
+    }
+
     public int getCountryId(){
         return countryId;
     }

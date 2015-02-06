@@ -11,10 +11,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Random;
-import java.util.Scanner;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Created by po26 on 30/01/15.
@@ -103,6 +101,7 @@ public class CLIClient extends Client {
             ret = new DeployArmyAction(gameState.getCurrentPlayer(),target,amount);
         }
         else {
+            out.println("Skipping deployment - no unassigned armies");
             gameState.nextAction();
             ret = attackMenu();
         }
@@ -126,7 +125,7 @@ public class CLIClient extends Client {
 
             out.println("Select objective for attack. In brackets you see (armies). select 0 for cancelling attack");
 
-            Country objective = selectCountry(origin.getNeighbours(),false,true,false);
+            Country objective = selectCountry(origin.getEnemyNeighbours(),false,true,false);
 
             if (objective != null){
 
@@ -151,6 +150,16 @@ public class CLIClient extends Client {
                 int [] atkDiceRolls = dice.getBattleDiceRolls(0,3);
                 int [] defDiceRolls = dice.getBattleDiceRolls(3,5);
 
+                Arrays.sort(atkDiceRolls);
+                Arrays.sort(defDiceRolls);
+
+
+
+                out.println("Battle protocol: ");
+                out.println("Attacker ( armies ) : " + origin.getCountryName() + " ( " + armies + " )");
+                out.println("Defender ( armies ) : " + objective.getCountryName() + " ( " + defenders + " )");
+                out.println("Attacker dice rolls  : " + Arrays.toString(atkDiceRolls));
+                out.println("Defender dice rolls  : " + Arrays.toString(defDiceRolls));
 
                 ret = new AttackAction(gameState.getCurrentPlayer(),origin,objective,atkDiceRolls,defDiceRolls);
 
@@ -230,42 +239,54 @@ public class CLIClient extends Client {
 
     private Country selectCountry(CountrySet countries, boolean showEnemyNeighbours, boolean showCountriesWithoutAttackableNeighbours, boolean showOwnNeighbours) {
 
-        ArrayList<Integer> countryMapping = new ArrayList<Integer>();
-        countryMapping.add(-1);
-        int selector = 1;
-        int countryIndex = 0;
+        out.println("-1 - none");
+        ArrayList<Integer> sortedKeys = countries.getIDList();
+        Collections.sort(sortedKeys);
+        for (int key : sortedKeys) {
 
-        for (Country c : countries) {
-
-            //construct neighbours string
             String enemyNeighbours = "";
             String ownNeighbours = "";
-            for (Country t : c.getNeighbours()) {
 
-                if (t.getOwner() != c.getOwner())
-                    enemyNeighbours += ", " + t.getCountryName();
-                else
-                    ownNeighbours += ", " + t.getCountryName();
-            }
-            if (enemyNeighbours.length() > 0)
-                enemyNeighbours = enemyNeighbours.substring(2);
-            if (ownNeighbours.length() > 0)
-                ownNeighbours = ownNeighbours.substring(2);
+            Country c = countries.get(key);
 
-            if (enemyNeighbours.length() > 0 || showCountriesWithoutAttackableNeighbours) {
-                out.println("" + selector++ + " - " + c.getCountryName() + " (" + c.getTroops() + (showEnemyNeighbours ? ", " + enemyNeighbours : "") + (showOwnNeighbours ? ", " + ownNeighbours : "") + ")");
-                countryMapping.add(countryIndex);
+            boolean firstItem = true;
+
+            for (Country n : c.getEnemyNeighbours()) {
+                if (!firstItem) {
+                    enemyNeighbours += ", ";
+                } else {
+                    firstItem = false;
+                }
+                enemyNeighbours += n.getCountryName();
             }
 
-            countryIndex++;
+            firstItem = true;
+
+            for (Country n : c.getSamePlayerNeighbours()) {
+                if (!firstItem) {
+                    ownNeighbours += ", ";
+                } else {
+                    firstItem = false;
+                }
+                ownNeighbours += n.getCountryName();
+            }
+
+            if (showCountriesWithoutAttackableNeighbours || c.getEnemyNeighbours().size() > 0)
+                out.println("" + key + " - " + c.getCountryName() + " (" + c.getTroops() + (showEnemyNeighbours ? ", " + enemyNeighbours : "") + (showOwnNeighbours ? ", " + ownNeighbours : "") + ")");
+
+
         }
 
-        int choice = getChoice(0, selector - 1);
+        int choice = getChoice(-1, 50);
 
-        if (choice == 0)
+        if (choice == -1) {
             return null;
-        else
-            return countries.get(countryMapping.get(choice));
+        }
+        else if (!sortedKeys.contains(choice)){
+            out.println("Choose from the list!");
+            return selectCountry(countries,showEnemyNeighbours,showCountriesWithoutAttackableNeighbours,showOwnNeighbours);
+        }
+            return countries.get(choice);
     }
 
     public void setStreams(InputStream in, PrintStream out){

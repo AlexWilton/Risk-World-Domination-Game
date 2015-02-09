@@ -38,9 +38,6 @@ public class ObtainRiskCardAction extends Action {
      */
     @Override
     public void performOnState(State state) {
-        getPlayer().addCard(state.getCard());
-        //TODO consistency needed in using nextStage().
-        // This is a singular action, and can only take place once.
-        state.nextStage();
+        player.addCard(state.getCard());
     }
 }

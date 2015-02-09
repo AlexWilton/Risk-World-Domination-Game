@@ -61,6 +61,8 @@ public class Player{
         return client;
     }
 
+    public ArrayList<RiskCard> getCards() { return cards; }
+
     /**
      * Choose between countries to place 2 extra armies on when trading in risk cards.
      * @param occ

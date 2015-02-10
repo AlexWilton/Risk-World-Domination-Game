@@ -33,6 +33,7 @@ public class State {
 
     public boolean winConditionsMet() {
         //TODO if there is a winner, set winner and return true
+        //TODO Testing needed
         for(Player p : this.players){
             if(p.getOccupiedCountries().size()
                 == this.map.getAllCountries().size()){

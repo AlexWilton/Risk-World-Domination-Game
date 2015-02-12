@@ -34,6 +34,7 @@ public class State {
     public boolean winConditionsMet() {
         //TODO if there is a winner, set winner and return true
         //TODO Testing needed
+        //TODO Consider: Extra tests to be on the safe side? making sure nobody is breaking the rule?
         for(Player p : this.players){
             if(p.getOccupiedCountries().size()
                 == this.map.getAllCountries().size()){

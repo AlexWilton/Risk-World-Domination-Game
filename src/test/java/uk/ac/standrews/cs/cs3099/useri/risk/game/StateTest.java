@@ -14,8 +14,23 @@ public class StateTest {
     public void setup(){
         testState = TestGameStateFactory.getTestGameState();
     }
+
+
     @Test
-    public void detectNotWinCondTest(){
-        assertFalse(testState.winConditionsMet());
+    public void winConditionsMetTest(){
+        assertTrue(!detectNotWinCondTest()
+                &&detectWinCondTest());
+    }
+    //test for non winning case
+    public boolean detectNotWinCondTest(){
+        System.out.println("Not winning case:");
+        return testState.winConditionsMet();
+    }
+
+    //test for detecting winning case
+    public boolean detectWinCondTest(){
+        System.out.println("Winning case:");
+        State winState = TestGameStateFactory.createWinCond();
+        return winState.winConditionsMet();
     }
 }

@@ -142,7 +142,7 @@ public class CLIClient extends Client {
                     dice.addSeedComponent(p.getClient().getSeedComponent());
                 }
 
-                int [] atkDiceRolls = dice.getBattleDiceRolls(0,10);
+                int [] atkDiceRolls = dice.getBattleDiceRolls(0,armies);
                 int [] defDiceRolls = dice.getBattleDiceRolls(armies,defenders);
 
                 Arrays.sort(atkDiceRolls);

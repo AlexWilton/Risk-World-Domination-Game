@@ -90,6 +90,7 @@ public class TradeAction extends Action {
         int cavalry = 0;
         int artillery = 0;
         int infantry = 0;
+        int wild = 0;
         for (RiskCard card:list){
             switch (card.getType()){
                 case TYPE_CAVALRY:
@@ -101,13 +102,17 @@ public class TradeAction extends Action {
                 case TYPE_INFANTRY:
                     infantry++;
                     break;
+                case TYPE_WILDCARD:
+                    wild++;
+                    break;
             }
         }
         if (
                 (cavalry == 1 && artillery == 1 && infantry == 1) ||
                 cavalry == 3 ||
                 infantry == 3 ||
-                artillery == 3
+                artillery == 3 ||
+                (wild==1 && ((cavalry==2) || (artillery==2) || (infantry==2)))
         ) {
             // Increase number of sets traded in.
             state.cardSettradedIn();

@@ -22,12 +22,14 @@ public class StateTest {
                 &&detectWinCondTest());
     }
     //test for non winning case
+    @Test
     public boolean detectNotWinCondTest(){
         System.out.println("Not winning case:");
         return testState.winConditionsMet();
     }
 
     //test for detecting winning case
+    @Test
     public boolean detectWinCondTest(){
         System.out.println("Winning case:");
         State winState = TestGameStateFactory.createWinCond();

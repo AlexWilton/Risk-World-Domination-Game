@@ -15,24 +15,12 @@ public class StateTest {
         testState = TestGameStateFactory.getTestGameState();
     }
 
-
     @Test
     public void winConditionsMetTest(){
-        assertTrue(!detectNotWinCondTest()
-                &&detectWinCondTest());
-    }
-    //test for non winning case
-    @Test
-    public boolean detectNotWinCondTest(){
-        System.out.println("Not winning case:");
-        return testState.winConditionsMet();
-    }
+        //inital state does not have win conditions met
+        assertFalse(testState.winConditionsMet());
 
-    //test for detecting winning case
-    @Test
-    public boolean detectWinCondTest(){
-        System.out.println("Winning case:");
         State winState = TestGameStateFactory.createWinCond();
-        return winState.winConditionsMet();
+        assertTrue(winState.winConditionsMet());
     }
 }

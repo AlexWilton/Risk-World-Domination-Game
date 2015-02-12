@@ -35,18 +35,19 @@ public class RiskDice {
 
     }
 
-    public int[] getBattleDiceRolls(int from, int to){
+    public int[] getBattleDiceRolls(int first, int amount){
 
-        int ret[] = new int[to-from];
+        int ret[] = new int[amount];
 
         int[] seed = calculateSeed();
 
         MersenneTwisterFast twister = new MersenneTwisterFast();
         twister.setSeed(seed);
 
-        for (int i = 0; i < to; i++){
-            if (i-from >= 0){
-                ret[i-from] = twister.nextInt(faces - 1) + 1;
+        for (int i = 0; i < first+amount; i++){
+            int roll = twister.nextInt(faces - 1) + 1;
+            if (i>=first){
+                ret[i-first] = roll;
             }
 
         }

@@ -127,7 +127,10 @@ public class Map {
         }
     }
 
+    //TODO implement method to parse cards
+    private void parseCountryCards(JSONObject mapData){
 
+    }
 
 
     public ContinentSet getContinents() {

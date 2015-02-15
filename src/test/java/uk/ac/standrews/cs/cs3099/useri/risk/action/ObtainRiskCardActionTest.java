@@ -5,6 +5,7 @@ import org.junit.Test;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -19,7 +20,7 @@ public class ObtainRiskCardActionTest {
     public void setup(){
         testState = new State();
 
-        ArrayList<RiskCard> riskCards = new ArrayList<RiskCard>();
+        Stack<RiskCard> riskCards = new Stack<RiskCard>();
         riskCards.add(new RiskCard(RiskCardType.TYPE_ARTILLERY,0));
         riskCards.add(new RiskCard(RiskCardType.TYPE_ARTILLERY,1));
         riskCards.add(new RiskCard(RiskCardType.TYPE_CAVALRY,2));

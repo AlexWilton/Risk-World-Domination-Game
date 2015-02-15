@@ -21,10 +21,12 @@ public class Map {
     private CountrySet countries;
     private boolean validMap = true;
 
+    //uses default map'
     public Map(){
         this(FILEPATH_DEFAULT_MAP);
     }
 
+    //uses given filename
     public Map(String MAP_FILE_PATH){
         JSONObject mapData = null;
         try {

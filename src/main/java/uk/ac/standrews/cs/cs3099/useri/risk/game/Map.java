@@ -10,7 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.util.Stack;
 
 
 public class Map {
@@ -128,8 +128,8 @@ public class Map {
     }
 
     //TODO implement method to parse cards
-    private void parseCountryCards(JSONObject mapData){
-
+    private Stack<RiskCard> parseCountryCards(JSONObject mapData){
+        return null;
     }
 
 

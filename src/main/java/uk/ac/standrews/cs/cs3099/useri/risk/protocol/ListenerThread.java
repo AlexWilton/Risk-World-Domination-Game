@@ -1,14 +1,8 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.AcceptJoinGame;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Acknowledgement;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.RejectJoinGame;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,23 +42,13 @@ public class ListenerThread implements Runnable {
      * @throws IOException
      */
     private boolean initialiseConnection() throws IOException {
-        while (true){
-            try {
-                JSONObject msg = (JSONObject) parser.parse(input.readLine());
-                System.out.println(msg);
-                if ( msg.get("command").equals("join_game") ){
-                    reply(new AcceptJoinGame(ACK_TIMEOUT,MOVE_TIMEOUT,ID));
-
-                } else {
-                    throw new ParseException(0);
-                }
-
-            } catch (ParseException e) {
-                e.printStackTrace();
-                reply(new Acknowledgement(32768, 200, null));
-                purgeConnection();
-            }
+        if(JoinGame.parse(input.readLine()) == null){
+            reply(new Acknowledgement(32768, 200, null));
+            purgeConnection();
+            return false;
         }
+        reply(new AcceptJoinGame(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
+        return true;
     }
 
     private void purgeConnection() throws IOException {
@@ -80,20 +64,14 @@ public class ListenerThread implements Runnable {
     }
 
     private void rejectGame() throws IOException {
-        try {
-            JSONObject msg = (JSONObject) parser.parse(input.readLine());
-            System.out.println(msg);
-            if ( msg.get("command").equals("join_game") ){
-                reply(new RejectJoinGame("Game in progress"));
-            } else {
-                throw new ParseException(0);
-            }
-        } catch (ParseException e) {
+        if (JoinGame.parse(input.readLine()) == null)
             reply(new Acknowledgement(32768, 200, null));
-        }
+        else
+            reply(new AcceptJoinGame(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
 
         purgeConnection();
     }
+
 
 
     /**

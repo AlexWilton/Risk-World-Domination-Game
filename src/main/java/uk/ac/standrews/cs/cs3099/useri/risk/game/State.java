@@ -1,6 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * holds the game state inclusive map, players and currently active player.
@@ -11,14 +12,15 @@ public class State {
 	private Map map;
 	private ArrayList<Player> players;
     //TODO set this to be a queue or something.
-    private ArrayList<RiskCard> cardsDeck;
+    //TODO: Data structure changed from ArrayList to Stack -> Adjust other part of codes to work with Stack
+    private Stack<RiskCard> cardsDeck;
 	private Player currentPlayer;
     private Player winner = null;
     private TurnStage stage;
     private boolean wonBattle;
     private int cardSetstradedIn = 0;
 
-    public void setup(Map map, ArrayList<Player> players, ArrayList<RiskCard> cardsDeck){
+    public void setup(Map map, ArrayList<Player> players, Stack<RiskCard> cardsDeck){
         this.map = map;
         this.players = players;
         this.cardsDeck = cardsDeck;
@@ -32,8 +34,6 @@ public class State {
     }
 
     public boolean winConditionsMet() {
-        //TODO if there is a winner, set winner and return true
-        //TODO Testing needed
         //TODO Consider: Extra tests to be on the safe side? making sure nobody is breaking the rule?
         for(Player p : this.players){
             if(p.getOccupiedCountries().size()

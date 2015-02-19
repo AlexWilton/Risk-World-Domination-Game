@@ -6,6 +6,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Stack;
 
 /**
  * Created by po26 on 03/02/15.
@@ -21,7 +22,7 @@ public class TestGameStateFactory {
         Map map = new Map();
 
         //setup a few risk cards in the deck
-        ArrayList<RiskCard> riskCards = new ArrayList<RiskCard>();
+        Stack<RiskCard> riskCards = new Stack<RiskCard>();
         riskCards.add(new RiskCard(RiskCardType.TYPE_ARTILLERY,0));
         riskCards.add(new RiskCard(RiskCardType.TYPE_ARTILLERY,1));
         riskCards.add(new RiskCard(RiskCardType.TYPE_CAVALRY,2));
@@ -67,7 +68,7 @@ public class TestGameStateFactory {
         Map map = new Map();
 
         //setup a few risk cards in the deck
-        ArrayList<RiskCard> riskCards = new ArrayList<RiskCard>();
+        Stack<RiskCard> riskCards = new Stack<RiskCard>();
         riskCards.add(new RiskCard(RiskCardType.TYPE_ARTILLERY,0));
         riskCards.add(new RiskCard(RiskCardType.TYPE_ARTILLERY,1));
         riskCards.add(new RiskCard(RiskCardType.TYPE_CAVALRY,2));

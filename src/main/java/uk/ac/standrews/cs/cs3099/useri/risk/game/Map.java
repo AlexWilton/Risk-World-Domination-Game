@@ -132,15 +132,14 @@ public class Map {
     private Stack<RiskCard> parseCountryCards(){
         Stack<RiskCard> cards = new Stack<RiskCard>();
         if(mapData==null){
-
             return null;
         }else{
             JSONObject cardObject = (JSONObject) mapData.get("country_card");
             for(Object key: cardObject.keySet()){
                 RiskCard tempCard = null;
                 int country_id = Integer.parseInt(key.toString());
-                int card_type = Integer.parseInt(cardObject.get(key).toString());
-                switch(card_type){
+                int cardtype_id = Integer.parseInt(cardObject.get(key).toString());
+                switch(cardtype_id){
                     case 0: tempCard = new RiskCard(RiskCardType.TYPE_INFANTRY, country_id);
                             break;
                     case 1: tempCard = new RiskCard(RiskCardType.TYPE_CAVALRY, country_id);

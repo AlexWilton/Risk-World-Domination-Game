@@ -27,7 +27,7 @@ public class TradeAction extends Action {
      */
     @Override
     public boolean validateAgainstState(State state) {
-        if (super.validateAgainstState(state)){
+        if (super.validateAgainstState(state)) {
             if (calculateArmies(state) != 0) {
                 return true;
             }

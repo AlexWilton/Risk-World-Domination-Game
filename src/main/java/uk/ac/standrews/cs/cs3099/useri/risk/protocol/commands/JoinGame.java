@@ -1,6 +1,5 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 
-import org.eclipse.jetty.util.ajax.JSON;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

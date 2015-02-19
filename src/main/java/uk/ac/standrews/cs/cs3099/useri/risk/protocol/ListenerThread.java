@@ -67,7 +67,7 @@ public class ListenerThread implements Runnable {
         if (JoinGame.parse(input.readLine()) == null)
             reply(new Acknowledgement(32768, 200, null));
         else
-            reply(new AcceptJoinGame(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
+            reply(new RejectJoinGame("Game already in progress"));
 
         purgeConnection();
     }

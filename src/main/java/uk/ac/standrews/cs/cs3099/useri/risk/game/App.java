@@ -11,14 +11,14 @@ public class App {
 
        // System.out.println("Hello World");
 
-        State gameState = TestGameStateFactory.getTestGameState();
+        /*State gameState = TestGameStateFactory.getTestGameState();
 
         GameEngine gameEngine = new GameEngine();
         gameEngine.initialise(gameState);
-        gameEngine.gameLoop();
+        gameEngine.gameLoop();*/
 
-        /*ClientSocketDistributor d = new ClientSocketDistributor("localhost",1234,null);
-        new Thread(d).start();*/
+        ClientSocketDistributor d = new ClientSocketDistributor("localhost",1234,null);
+        new Thread(d).start();
 
     }
 }

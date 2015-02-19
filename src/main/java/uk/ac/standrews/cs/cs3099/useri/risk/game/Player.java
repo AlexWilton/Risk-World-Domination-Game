@@ -91,4 +91,13 @@ public class Player{
             return true;
         return false;
     }
+
+    public RiskCard getRiskCardById(int id){
+        for (RiskCard r : cards) {
+            if (r.getCardID() == id) {
+                return r;
+            }
+        }
+        return null;
+    }
 }

@@ -7,8 +7,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.DeployArmyAction;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 
@@ -85,7 +87,10 @@ public class ClientSocketDistributor implements Runnable{
             interpretTradeCommand(messageObject, player);
         }
         else if (command.equals(Commands.DEPLOY_COMMAND)){
-            interpretDeployCommand(messageObject,player);
+            interpretDeployCommand(messageObject, player);
+        }
+        else if (command.equals(Commands.ATTACK_COMMAND)){
+            interpretAttackCommand(messageObject, player);
         }
         else {
             System.out.println("NOT IMPLEMENTED COMMAND: " + command);
@@ -93,8 +98,39 @@ public class ClientSocketDistributor implements Runnable{
         }
     }
 
+
+    private void interpretAttackCommand(JSONObject commandObject, int player){
+        /*{
+            "command": "attack",
+            "payload": [1,2,1],
+            "player_id" : 1
+        }*/
+
+
+
+
+    }
+
     private void interpretTradeCommand(JSONObject commandObject, int player){
-        System.out.println("trade action by player " + player);
+        /*{
+            "command": "trade_in_cards",
+            "payload": [1,2,3],
+            "player_id" : 1
+        }*/
+
+        ArrayList<RiskCard> cards = new ArrayList<RiskCard>();
+
+        JSONArray cardIds = (JSONArray)(commandObject.get("payload"));
+
+        for (Object id : cardIds){
+            cards.add(gameState.getPlayers().get(player).getRiskCardById(Integer.parseInt(id.toString())));
+        }
+
+        TradeAction ac = new TradeAction(gameState.getPlayers().get(player),cards);
+
+        //push to client
+
+        //clients.get(player).pushAction(ac);
     }
     private void interpretDeployCommand(JSONObject commandObject, int player) {
 

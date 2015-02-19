@@ -20,6 +20,7 @@ public class Map {
 	private ContinentSet continents;
     private CountrySet countries;
     private boolean validMap = true;
+    private JSONObject mapData;
 
     //uses default map'
     public Map(){
@@ -28,7 +29,7 @@ public class Map {
 
     //uses given filename
     public Map(String MAP_FILE_PATH){
-        JSONObject mapData = null;
+        mapData = null;
         try {
             mapData = (JSONObject) JSONValue.parse(new FileReader(MAP_FILE_PATH));
         } catch (FileNotFoundException e) {
@@ -128,8 +129,33 @@ public class Map {
     }
 
     //TODO implement method to parse cards
-    private Stack<RiskCard> parseCountryCards(JSONObject mapData){
-        return null;
+    private Stack<RiskCard> parseCountryCards(){
+        Stack<RiskCard> cards = new Stack<RiskCard>();
+        if(mapData==null){
+
+            return null;
+        }else{
+            JSONObject cardObject = (JSONObject) mapData.get("country_card");
+            for(Object key: cardObject.keySet()){
+                RiskCard tempCard = null;
+                int country_id = Integer.parseInt(key.toString());
+                int card_type = Integer.parseInt(cardObject.get(key).toString());
+                switch(card_type){
+                    case 0: tempCard = new RiskCard(RiskCardType.TYPE_INFANTRY, country_id);
+                            break;
+                    case 1: tempCard = new RiskCard(RiskCardType.TYPE_CAVALRY, country_id);
+                            break;
+                    case 2: tempCard = new RiskCard(RiskCardType.TYPE_ARTILLERY, country_id);
+                            break;
+                }
+                if(tempCard!=null) {
+                    cards.push(tempCard);
+                }else{
+                    System.err.println("Invalid Card Type identifier");
+                }
+            }
+        }
+        return cards;
     }
 
 

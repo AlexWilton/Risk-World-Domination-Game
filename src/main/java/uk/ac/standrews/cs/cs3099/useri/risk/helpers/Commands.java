@@ -6,4 +6,5 @@ package uk.ac.standrews.cs.cs3099.useri.risk.helpers;
 public class Commands {
     public static final String DEPLOY_COMMAND = "deploy";
     public static final String TRADE_COMMAND = "trade_in_cards";
+    public static final String ATTACK_COMMAND = "attack";
 }

@@ -6,10 +6,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.AttackAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.DeployArmyAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.ObtainRiskCardAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
@@ -35,13 +32,12 @@ public class ClientSocketDistributor implements Runnable{
 
     private State gameState;
 
-    private ArrayList<AttackActionBuilder> builders;
+    private AttackActionBuilder builder;
 
 
     public ClientSocketDistributor(Socket clientSocket, ArrayList<NetworkClient> clients){
         this.clients = clients;
         this.clientSocket = clientSocket;
-        this.builders = new ArrayList<AttackActionBuilder>();
     }
 
     public ClientSocketDistributor(String host, int port, ArrayList<NetworkClient> clients){
@@ -106,13 +102,13 @@ public class ClientSocketDistributor implements Runnable{
             interpretDrawCardCommand(messageObject, player);
         }
         else if (command.equals(Commands.DEFEND_COMMAND)){
-            //interpretDefendCommand(messageObject, player);
+            interpretDefendCommand(messageObject, player);
         }
         else if (command.equals(Commands.ATTACK_CAPTURE_COMMAND)){
             //interpretCaptureCommand(messageObject, player);
         }
         else if (command.equals(Commands.FORTIFY_COMMAND)){
-            //interpretFortifyCommand(messageObject, player);
+            interpretFortifyCommand(messageObject, player);
         }
         else {
             System.out.println("NOT IMPLEMENTED COMMAND: " + command);
@@ -183,8 +179,34 @@ public class ClientSocketDistributor implements Runnable{
         builder.setAttackerArmies(attackArmies);
         builder.setObjectiveId(objectiveId);
         builder.setOriginId(originId);
-        builders.add(builder);
+        this.builder =builder;
         System.out.println("Interpreted attack command");
+
+
+
+
+    }
+
+    private void interpretFortifyCommand(JSONObject commandObject, int player){
+        /*
+        {
+            "command": "fortify",
+            "payload": [1, 2, 5],
+            "player_id": 0,
+            "ack_id": 1
+        }
+        */
+
+        JSONArray fortification = (JSONArray)(commandObject.get("payload"));
+
+        int originId = Integer.parseInt(attackPlan.get(0).toString());
+
+        int objectiveId = Integer.parseInt(attackPlan.get(1).toString());
+
+        int armies = Integer.parseInt(attackPlan.get(2).toString());
+
+        //FortifyAction ac = new FortifyAction(gameState.getPlayers().get(player),gameState.getCountryByID(originId),gameState.getCountryByID(objectiveId),armies);
+        System.out.println("Interpreted fortify command");
 
 
 
@@ -202,6 +224,23 @@ public class ClientSocketDistributor implements Runnable{
 
         //ObtainRiskCardAction ac = new ObtainRiskCardAction(gameState.getPlayers().get(player));
         System.out.println("Interpreted draw command");
+
+
+
+
+    }
+
+    private void interpretDefendCommand (JSONObject commandObject, int player){
+        /*{
+            "command": "defend",
+            "payload": 2,
+            "player_id": 0,
+            "ack_id": 1
+        }*/
+
+        int amount = Integer.parseInt(commandObject.get("payload").toString());
+        builder.setDefenderArmies(amount);
+        System.out.println("Interpreted defend command");
 
 
 

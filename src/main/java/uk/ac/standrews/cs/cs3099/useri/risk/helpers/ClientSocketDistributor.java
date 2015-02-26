@@ -6,6 +6,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.AttackAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.DeployArmyAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
@@ -15,8 +16,10 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 /**
@@ -31,10 +34,13 @@ public class ClientSocketDistributor implements Runnable{
 
     private State gameState;
 
+    private ArrayList<AttackActionBuilder> builders;
+
 
     public ClientSocketDistributor(Socket clientSocket, ArrayList<NetworkClient> clients){
         this.clients = clients;
         this.clientSocket = clientSocket;
+        this.builders = new ArrayList<AttackActionBuilder>();
     }
 
     public ClientSocketDistributor(String host, int port, ArrayList<NetworkClient> clients){
@@ -92,10 +98,66 @@ public class ClientSocketDistributor implements Runnable{
         else if (command.equals(Commands.ATTACK_COMMAND)){
             interpretAttackCommand(messageObject, player);
         }
+        else if (command.equals(Commands.PLAY_CARDS_COMMAND)){
+            interpretPlayCardsCommand(messageObject, player);
+        }
+        else if (command.equals(Commands.DRAW_CARD_COMMAND)){
+            //interpretDrawCardCommand(messageObject, player);
+        }
+        else if (command.equals(Commands.DEFEND_COMMAND)){
+            //interpretDefendCommand(messageObject, player);
+        }
+        else if (command.equals(Commands.ATTACK_CAPTURE_COMMAND)){
+            //interpretCaptureCommand(messageObject, player);
+        }
+        else if (command.equals(Commands.FORTIFY_COMMAND)){
+            //interpretFortifyCommand(messageObject, player);
+        }
         else {
             System.out.println("NOT IMPLEMENTED COMMAND: " + command);
             System.out.println(message);
         }
+    }
+
+    private void interpretPlayCardsCommand(JSONObject commandObject, int player){
+        /*{
+            "command": "play_cards",
+            "payload": {
+                "cards": [
+                    [1, 2, 3],
+                    [4, 5, 6]
+                ],
+                "armies": 3
+            },
+            "player_id": 0,
+            "ack_id": 1
+        }*/
+
+        JSONObject payload = (JSONObject)(commandObject.get("payload"));
+
+        JSONArray cards = (JSONArray)(payload.get("cards"));
+
+        ArrayList<ArrayList<RiskCard>> triplets = new ArrayList<ArrayList<RiskCard>>();
+        for (Object tripletObject : cards) {
+            JSONArray tripletJSON = (JSONArray) tripletObject;
+            ArrayList<RiskCard> triplet = new ArrayList<RiskCard>();
+            for (int i = 0; i<tripletJSON.size();i++){
+                int cardId = Integer.parseInt(tripletJSON.get(i).toString());
+                triplet.add(gameState.getPlayers().get(player).getRiskCardById(cardId));
+            }
+            triplets.add(triplet);
+        }
+
+        for (ArrayList<RiskCard> triplet : triplets){
+            TradeAction ac = new TradeAction(gameState.getPlayers().get(player),triplet);
+            //TODO push
+            System.out.println("Interpreted trade command");
+        }
+
+
+
+
+
     }
 
 
@@ -105,6 +167,23 @@ public class ClientSocketDistributor implements Runnable{
             "payload": [1,2,1],
             "player_id" : 1
         }*/
+
+        JSONArray attackPlan = (JSONArray)(commandObject.get("payload"));
+
+        int originId = Integer.parseInt(attackPlan.get(0).toString());
+
+        int objectiveId = Integer.parseInt(attackPlan.get(1).toString());
+
+        int attackArmies = Integer.parseInt(attackPlan.get(2).toString());
+
+        AttackActionBuilder builder = new AttackActionBuilder();
+
+        builder.setAttackerId(player);
+        builder.setAttackerArmies(attackArmies);
+        builder.setObjectiveId(objectiveId);
+        builder.setOriginId(originId);
+        builders.add(builder);
+        System.out.println("Interpreted attack command");
 
 
 

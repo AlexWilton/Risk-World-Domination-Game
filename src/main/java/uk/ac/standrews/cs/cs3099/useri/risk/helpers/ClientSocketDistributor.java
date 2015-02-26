@@ -8,6 +8,7 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.AttackAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.DeployArmyAction;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.ObtainRiskCardAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
@@ -102,7 +103,7 @@ public class ClientSocketDistributor implements Runnable{
             interpretPlayCardsCommand(messageObject, player);
         }
         else if (command.equals(Commands.DRAW_CARD_COMMAND)){
-            //interpretDrawCardCommand(messageObject, player);
+            interpretDrawCardCommand(messageObject, player);
         }
         else if (command.equals(Commands.DEFEND_COMMAND)){
             //interpretDefendCommand(messageObject, player);
@@ -143,13 +144,13 @@ public class ClientSocketDistributor implements Runnable{
             ArrayList<RiskCard> triplet = new ArrayList<RiskCard>();
             for (int i = 0; i<tripletJSON.size();i++){
                 int cardId = Integer.parseInt(tripletJSON.get(i).toString());
-                triplet.add(gameState.getPlayers().get(player).getRiskCardById(cardId));
+//                triplet.add(gameState.getPlayers().get(player).getRiskCardById(cardId));
             }
             triplets.add(triplet);
         }
 
         for (ArrayList<RiskCard> triplet : triplets){
-            TradeAction ac = new TradeAction(gameState.getPlayers().get(player),triplet);
+            //TradeAction ac = new TradeAction(gameState.getPlayers().get(player),triplet);
             //TODO push
             System.out.println("Interpreted trade command");
         }
@@ -184,6 +185,23 @@ public class ClientSocketDistributor implements Runnable{
         builder.setOriginId(originId);
         builders.add(builder);
         System.out.println("Interpreted attack command");
+
+
+
+
+    }
+
+    private void interpretDrawCardCommand(JSONObject commandObject, int player){
+        /*{
+            "command": "draw_card",
+            "payload": 12,
+            "player_id": 0,
+            "ack_id": 1
+        }*/
+
+
+        //ObtainRiskCardAction ac = new ObtainRiskCardAction(gameState.getPlayers().get(player));
+        System.out.println("Interpreted draw command");
 
 
 

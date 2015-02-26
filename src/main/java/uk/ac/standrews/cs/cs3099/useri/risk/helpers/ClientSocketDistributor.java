@@ -199,11 +199,11 @@ public class ClientSocketDistributor implements Runnable{
 
         JSONArray fortification = (JSONArray)(commandObject.get("payload"));
 
-        int originId = Integer.parseInt(attackPlan.get(0).toString());
+        int originId = Integer.parseInt(fortification.get(0).toString());
 
-        int objectiveId = Integer.parseInt(attackPlan.get(1).toString());
+        int objectiveId = Integer.parseInt(fortification.get(1).toString());
 
-        int armies = Integer.parseInt(attackPlan.get(2).toString());
+        int armies = Integer.parseInt(fortification.get(2).toString());
 
         //FortifyAction ac = new FortifyAction(gameState.getPlayers().get(player),gameState.getCountryByID(originId),gameState.getCountryByID(objectiveId),armies);
         System.out.println("Interpreted fortify command");

@@ -3,19 +3,15 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
-
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Stack;
 
 
 public class Map {
 
-    private static final String FILEPATH_DEFAULT_MAP = "data/default.map";
+    private static final String FILEPATH_DEFAULT_MAP = "src/res/defaultMap.json";
 
 	private ContinentSet continents;
     private CountrySet countries;
@@ -132,10 +128,11 @@ public class Map {
     private Stack<RiskCard> parseCountryCards(){
         Stack<RiskCard> cards = new Stack<RiskCard>();
         if(mapData==null){
+            System.err.println("MapData not initialised;");
             return null;
         }else{
             JSONObject cardObject = (JSONObject) mapData.get("country_card");
-            for(Object key: cardObject.keySet()){
+            for(Object key : cardObject.keySet()){
                 RiskCard tempCard = null;
                 int country_id = Integer.parseInt(key.toString());
                 int cardtype_id = Integer.parseInt(cardObject.get(key).toString());
@@ -164,6 +161,10 @@ public class Map {
 
     public CountrySet getAllCountries(){
         return countries;
+    }
+
+    public Stack<RiskCard> getCardsFromMapData(){
+        return parseCountryCards();
     }
 
     public boolean isValidMap() {

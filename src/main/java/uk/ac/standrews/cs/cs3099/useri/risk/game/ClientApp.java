@@ -1,7 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
-import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.JoinGame;
 
 import java.io.BufferedReader;
@@ -10,16 +10,13 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-/**
- * Created by po26 on 05/03/15.
- */
 public class ClientApp {
 
 
     public static final int SUCCESS = 0;
     public static final int BAD_ADDRESS = -1;
 
-    public static int run (String address, int port) {
+    public static int run (String address, int port, WebClient webClient) {
         //make join command
         JSONArray versions = new JSONArray();
         JSONArray features = new JSONArray();

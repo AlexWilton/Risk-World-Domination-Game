@@ -22,7 +22,7 @@ public abstract class Client {
     public abstract Action getAction();
 
     /**
-     * notify player of the
+     * notify player that game state has changed
      */
     public abstract void pushGameState();
 

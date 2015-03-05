@@ -1,5 +1,95 @@
-Hello World
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Risk - Junior Honours Team Project</title>
+
+    <!-- Bootstrap -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+
+</head>
+<body>
 
 
 
-<b>Let's get this party started!</b>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <div class="jumbotron">
+                <h1>
+                    World Domination (Risk)
+                </h1>
+                <p>
+                    A World Domination Game based on the board game called Risk.
+                </p>
+            </div>
+            <div class="row clearfix">
+                <div class="col-md-6 column">
+                    <h3>
+                       Host Game
+                    </h3>
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Game Setup Panel
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>What settings are needed for game hosting?</p>
+                            <form class="form-inline form-center" style="text-align:center;" action="/RiskMap/">
+                                <div class="form-group">
+                                    <label for="connectIPAddress">IP: </label>
+                                    <input type="text" class="form-control" id="connectIPAddress" placeholder="xxx.xxx.xxx.xxx" style="width:130px;">
+                                </div>
+                                <div class="form-group">
+                                    <label for="connectPortNumber" style="margin-left: 20px;">Port Number:</label>
+                                    <input type="number" class="form-control" id="connectPortNumber" placeholder="00000" style="width : 90px;">
+                                </div>
+                                <br/><br/><br/>
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">Host Game!</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 column">
+                    <h3>
+                        Connect to somebody else's game
+                    </h3>
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Game Connection Panel
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <form class="form-inline form-center" style="text-align:center;" action="/RiskMap/">
+                                <div class="form-group">
+                                    <label for="connectIPAddress">IP: </label>
+                                    <input type="text" class="form-control" id="connectIPAddress" placeholder="xxx.xxx.xxx.xxx" style="width:130px;">
+                                </div>
+                                <div class="form-group">
+                                    <label for="connectPortNumber" style="margin-left: 20px;">Port Number:</label>
+                                    <input type="number" class="form-control" id="connectPortNumber" placeholder="00000" style="width : 90px;">
+                                </div>
+                                <br/><br/><br/>
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">Connect To Game!</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="js/bootstrap.min.js"></script>
+</body>
+</html>

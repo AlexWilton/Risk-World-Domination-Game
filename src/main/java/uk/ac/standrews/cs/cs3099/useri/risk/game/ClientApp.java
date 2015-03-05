@@ -55,7 +55,7 @@ public class ClientApp {
         String address = "localhost";
 
         //try to connect to server
-        run(address,port);
+        run(address,port, new WebClient());
 
 
     }

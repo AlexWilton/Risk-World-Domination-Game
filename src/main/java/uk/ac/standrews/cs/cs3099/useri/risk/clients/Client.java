@@ -30,6 +30,10 @@ public abstract class Client {
 
     public abstract int[] getSeedComponent();
 
+    public void setPlayerId(int playerId){
+        this.playerId = playerId;
+    }
+
     public int getPlayerId(){
         return playerId;
     }

@@ -10,6 +10,6 @@ public class Acknowledgement extends Command {
         payload.put("ack_id", id);
         payload.put("response", response_code);
         payload.put("data", data);
-        this.put("paylaod", payload);
+        this.put("payload", payload);
     }
 }

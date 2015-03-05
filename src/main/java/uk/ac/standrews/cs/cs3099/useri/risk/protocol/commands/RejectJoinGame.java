@@ -6,4 +6,8 @@ public class RejectJoinGame extends Command {
         super("reject_join_game");
         this.put("payload", payload);
     }
+
+    public static RejectJoinGame parse(String JSONString){
+        return null;
+    }
 }

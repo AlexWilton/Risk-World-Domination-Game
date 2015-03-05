@@ -14,7 +14,7 @@ public class JoinGame extends Command {
         super("join_game");
     }
 
-    public static JoinGame parse(String parseable){
+    public static Command parse(String parseable) {
         try{
             JSONParser parser = new JSONParser();
             JSONObject obj = (JSONObject) parser.parse(parseable);

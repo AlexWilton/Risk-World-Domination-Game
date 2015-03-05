@@ -6,11 +6,14 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
+import sun.net.NetProperties;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.JoinGame;
 
 
 import java.io.*;
@@ -34,6 +37,11 @@ public class ClientSocketDistributor implements Runnable{
 
     private AttackActionBuilder builder;
 
+    private PrintWriter out;
+
+    private BufferedReader in;
+
+
 
     public ClientSocketDistributor(Socket clientSocket, ArrayList<NetworkClient> clients){
         this.clients = clients;
@@ -45,7 +53,12 @@ public class ClientSocketDistributor implements Runnable{
 
         try{
             clientSocket = new Socket(host, port);
-
+            //make the writers/Readers
+            out =
+                    new PrintWriter(clientSocket.getOutputStream(), true);
+            in =
+                    new BufferedReader(
+                            new InputStreamReader(clientSocket.getInputStream()));
 
         }
         catch (IOException e){
@@ -56,30 +69,51 @@ public class ClientSocketDistributor implements Runnable{
     }
 
     public void run (){
-
+        float[] versions = null;
+        String[] features = null;
         try{
-            PrintWriter out =
-                    new PrintWriter(clientSocket.getOutputStream(), true);
-            BufferedReader in =
-                    new BufferedReader(
-                            new InputStreamReader(clientSocket.getInputStream()));
+            //send join message
+            JSONArray versionsJSON = new JSONArray();
+            for (float version : versions){
+                versionsJSON.add(version);
+            }
+            JSONArray featuresJSON = new JSONArray();
+            for (String feature : features){
+                featuresJSON.add(feature);
+            }
+            JoinGame joinCommand = new JoinGame(versionsJSON,featuresJSON);
+
+            sendCommand(joinCommand);
+
+
+            //wait for accept or join
+            //run as long as connection is up
             while(true){
-                String currentIn = "";
-                while (StringUtils.countMatches(currentIn,"{") != StringUtils.countMatches(currentIn,"}") || StringUtils.countMatches(currentIn,"{") == 0){
-                    currentIn += in.readLine();
-                }
-                interpretJSONMessage(currentIn);
+                interpretJSONMessage(getNextCommand());
             }
         }
         catch (IOException e){
+            e.printStackTrace();
             System.out.println("wrong");
         }
 
     }
 
-    private void interpretJSONMessage(String message){
+    public void sendCommand (Command command){
+        out.print(command.toJSONString());
+
+    }
+    public JSONObject getNextCommand () throws IOException{
+        String currentIn = "";
+        while (StringUtils.countMatches(currentIn,"{") != StringUtils.countMatches(currentIn,"}") || StringUtils.countMatches(currentIn,"{") == 0){
+            currentIn += in.readLine();
+        }
         JSONObject messageObject;
-        messageObject = (JSONObject) JSONValue.parse(message);
+        messageObject = (JSONObject) JSONValue.parse(currentIn);
+        return messageObject;
+    }
+
+    private Command interpretJSONMessage(JSONObject messageObject){
 
         String command = messageObject.get("command").toString();
         int player = Integer.parseInt(messageObject.get(("player_id")).toString());
@@ -112,8 +146,10 @@ public class ClientSocketDistributor implements Runnable{
         }
         else {
             System.out.println("NOT IMPLEMENTED COMMAND: " + command);
-            System.out.println(message);
+            System.out.println(command);
         }
+
+        return null;
     }
 
     private void interpretPlayCardsCommand(JSONObject commandObject, int player){

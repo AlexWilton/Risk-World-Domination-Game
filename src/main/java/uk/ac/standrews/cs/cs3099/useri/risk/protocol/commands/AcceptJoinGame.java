@@ -12,4 +12,9 @@ public class AcceptJoinGame extends Command {
         payload.put("move_timeout", move_timeout);
         this.put("payload", payload);
     }
+
+
+    public static Command parse(String JSONString) {
+        return null;
+    } //TODO
 }

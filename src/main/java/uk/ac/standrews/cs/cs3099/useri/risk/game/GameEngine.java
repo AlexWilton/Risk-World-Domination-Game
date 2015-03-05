@@ -54,4 +54,8 @@ public class GameEngine {
         this.state = state;
 
     }
+    public void initialise(){
+        //take the data and parse them
+
+    }
 }

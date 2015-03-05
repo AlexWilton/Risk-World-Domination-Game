@@ -3,23 +3,20 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
-
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-
+import java.util.Stack;
 
 
 public class Map {
 
-    private static final String FILEPATH_DEFAULT_MAP = "data/default.map";
+    private static final String FILEPATH_DEFAULT_MAP = "src/res/defaultMap.json";
 
 	private ContinentSet continents;
     private CountrySet countries;
     private boolean validMap = true;
+    private JSONObject mapData;
 
     //uses default map'
     public Map(){
@@ -28,7 +25,7 @@ public class Map {
 
     //uses given filename
     public Map(String MAP_FILE_PATH){
-        JSONObject mapData = null;
+        mapData = null;
         try {
             mapData = (JSONObject) JSONValue.parse(new FileReader(MAP_FILE_PATH));
         } catch (FileNotFoundException e) {
@@ -128,8 +125,33 @@ public class Map {
     }
 
     //TODO implement method to parse cards
-    private void parseCountryCards(JSONObject mapData){
-
+    private Stack<RiskCard> parseCountryCards(){
+        Stack<RiskCard> cards = new Stack<RiskCard>();
+        if(mapData==null){
+            System.err.println("MapData not initialised;");
+            return null;
+        }else{
+            JSONObject cardObject = (JSONObject) mapData.get("country_card");
+            for(Object key : cardObject.keySet()){
+                RiskCard tempCard = null;
+                int country_id = Integer.parseInt(key.toString());
+                int cardtype_id = Integer.parseInt(cardObject.get(key).toString());
+                switch(cardtype_id){
+                    case 0: tempCard = new RiskCard(RiskCardType.TYPE_INFANTRY, country_id);
+                            break;
+                    case 1: tempCard = new RiskCard(RiskCardType.TYPE_CAVALRY, country_id);
+                            break;
+                    case 2: tempCard = new RiskCard(RiskCardType.TYPE_ARTILLERY, country_id);
+                            break;
+                }
+                if(tempCard!=null) {
+                    cards.push(tempCard);
+                }else{
+                    System.err.println("Invalid Card Type identifier");
+                }
+            }
+        }
+        return cards;
     }
 
 
@@ -139,6 +161,10 @@ public class Map {
 
     public CountrySet getAllCountries(){
         return countries;
+    }
+
+    public Stack<RiskCard> getCardsFromMapData(){
+        return parseCountryCards();
     }
 
     public boolean isValidMap() {

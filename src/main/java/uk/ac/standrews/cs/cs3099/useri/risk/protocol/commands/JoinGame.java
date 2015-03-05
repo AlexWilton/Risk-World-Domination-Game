@@ -5,9 +5,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-/**
- * Created by bs44 on 19/02/15.
- */
 public class JoinGame extends Command {
 
     JSONArray versions;

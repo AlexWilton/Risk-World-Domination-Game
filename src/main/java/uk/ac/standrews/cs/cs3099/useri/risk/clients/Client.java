@@ -26,7 +26,7 @@ public abstract class Client {
      */
     public abstract void pushGameState();
 
-    public abstract int getDefenders(Country attacker, Country objective, int attackingArmies);
+    public abstract int getDefenders(Country attackingCountry, Country defendingCountry, int attackingArmies);
 
     public abstract int[] getSeedComponent();
 

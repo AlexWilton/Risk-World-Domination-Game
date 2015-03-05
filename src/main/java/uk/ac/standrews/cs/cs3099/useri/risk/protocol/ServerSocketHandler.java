@@ -9,9 +9,6 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
-/**
- * Created by bs44 on 19/02/15.
- */
 public class ServerSocketHandler {
     private final int PORT, ACK_TIMEOUT, MOVE_TIMEOUT;
 

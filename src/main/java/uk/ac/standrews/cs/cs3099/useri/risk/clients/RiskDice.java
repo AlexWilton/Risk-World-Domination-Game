@@ -4,9 +4,6 @@ import ec.util.MersenneTwisterFast;
 
 import java.util.ArrayList;
 
-/**
- * Created by po26 on 05/02/15.
- */
 public class RiskDice {
 
     public static final int SEED_ARRAY_LENGTH = 8; //32 byte

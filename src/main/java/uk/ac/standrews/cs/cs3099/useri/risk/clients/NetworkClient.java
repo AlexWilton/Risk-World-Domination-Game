@@ -5,9 +5,6 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 
 import java.util.Queue;
 
-/**
- * Created by po26 on 12/02/15.
- */
 public class NetworkClient extends Client {
 
 

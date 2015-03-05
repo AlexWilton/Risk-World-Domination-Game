@@ -1,10 +1,10 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
+
 public class ServerTester {
 
     public static void main(String[] args) {
-        JettyServer jettyServer = new JettyServer();
-        System.out.println("Server starting...");
-        jettyServer.run();
+        WebClient webClient = new WebClient();
     }
 }

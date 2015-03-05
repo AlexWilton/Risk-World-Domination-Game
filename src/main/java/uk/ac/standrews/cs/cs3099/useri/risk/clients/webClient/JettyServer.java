@@ -1,24 +1,18 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient;
 
 import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.NCSARequestLog;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 
-import java.io.File;
-import java.io.IOException;
+import java.net.BindException;
 
 public class JettyServer implements Runnable {
     private static final String WEB_CLIENT_FILEPATH = "web_client";
     private Server server = null;
-    private int serverPort = 5555;
 
     public JettyServer(){
-        server = new Server(serverPort);
+        server = new Server(0); //find random open port on runtime
 
         // create the handlers
         Handler dataRequestHandler = new ParamHandler();
@@ -37,12 +31,9 @@ public class JettyServer implements Runnable {
 
 
     public int getServerPort(){
-        return serverPort;
+        return server.getURI().getPort();
     }
 
-    public void start() throws Exception{
-        server.start();
-    }
 
     public void stop() throws Exception {
         server.stop();
@@ -59,10 +50,12 @@ public class JettyServer implements Runnable {
 
     @Override
     public void run() {
-        try {
-            start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        do{
+            try {
+                server.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }while(!isStarted());
     }
 }

@@ -35,10 +35,10 @@ public class State {
 
     public boolean winConditionsMet() {
         //TODO Consider: Extra tests to be on the safe side? making sure nobody is breaking the rule?
-        for(Player p : this.players){
+        for(Player p : players){
             if(p.getOccupiedCountries().size()
-                == this.map.getAllCountries().size()){
-                this.winner = p;
+                == map.getAllCountries().size()){
+                winner = p;
                 return true;
             }
         }

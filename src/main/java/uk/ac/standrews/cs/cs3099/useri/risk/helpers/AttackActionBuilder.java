@@ -3,9 +3,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.helpers;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.AttackAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
-/**
- * Created by po26 on 26/02/15.
- */
 public class AttackActionBuilder {
 
     int attackerId;

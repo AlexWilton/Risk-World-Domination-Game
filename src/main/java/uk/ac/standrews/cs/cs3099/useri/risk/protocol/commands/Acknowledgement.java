@@ -2,9 +2,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 
 import org.json.simple.JSONObject;
 
-/**
- * Created by bs44 on 19/02/15.
- */
 public class Acknowledgement extends Command {
 
     public Acknowledgement(int id, int response_code, JSONObject data) {

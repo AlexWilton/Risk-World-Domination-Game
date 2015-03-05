@@ -3,7 +3,10 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.util.Stack;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 
@@ -65,4 +68,10 @@ public class MapTest {
         assertFalse(gb.getNeighbours().contains(25));
 
     }
+
+    @Test
+    public void testCardParsing(){
+        Stack<RiskCard> riskCards = defaultMap.getCardsFromMapData();
+    }
+
 }

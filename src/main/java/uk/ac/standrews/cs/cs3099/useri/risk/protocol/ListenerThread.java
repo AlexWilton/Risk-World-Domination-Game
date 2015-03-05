@@ -13,7 +13,6 @@ import java.net.Socket;
 /**
  * Wrapper class for each client socket. This class is used by the server to keep track of connections to clients.
  * All fields are final and protected.
- * Created by bs44 on 19/02/15.
  */
 public class ListenerThread implements Runnable {
     private final int ACK_TIMEOUT, MOVE_TIMEOUT;

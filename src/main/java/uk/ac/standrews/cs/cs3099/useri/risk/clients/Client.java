@@ -22,11 +22,11 @@ public abstract class Client {
     public abstract Action getAction();
 
     /**
-     * notify player of the
+     * notify player that game state has changed
      */
     public abstract void pushGameState();
 
-    public abstract int getDefenders(Country attacker, Country objective, int attackingArmies);
+    public abstract int getDefenders(Country attackingCountry, Country defendingCountry, int attackingArmies);
 
     public abstract int[] getSeedComponent();
 

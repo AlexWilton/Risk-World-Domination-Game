@@ -1,16 +1,9 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient;
 
 import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.NCSARequestLog;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
-
-import java.io.File;
-import java.io.IOException;
 
 public class JettyServer implements Runnable {
     private static final String WEB_CLIENT_FILEPATH = "web_client";

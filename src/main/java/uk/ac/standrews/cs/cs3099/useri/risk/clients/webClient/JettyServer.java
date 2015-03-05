@@ -2,10 +2,8 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 public class JettyServer implements Runnable {
     private static final String WEB_CLIENT_FILEPATH = "web_client";
@@ -13,25 +11,23 @@ public class JettyServer implements Runnable {
     private int serverPort = 5555;
 
     public JettyServer(){
-        setupServer();
-    }
+        server = new Server(serverPort);
 
-    private void setupServer() {
-        server = new Server();
-        SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(serverPort);
-        server.addConnector(connector);
+        // create the handlers
+        Handler dataRequestHandler = new ParamHandler();
 
-        ResourceHandler resource_handler = new ResourceHandler();
-        resource_handler.setDirectoriesListed(true);
-        resource_handler.setWelcomeFiles(new String[]{"index.html"});
+        WebAppContext fileHandler = new WebAppContext();
+        fileHandler.setContextPath("/");
+        fileHandler.setResourceBase(WEB_CLIENT_FILEPATH);
 
-        resource_handler.setResourceBase(WEB_CLIENT_FILEPATH);
-
-        HandlerList handlers = new HandlerList();
-        handlers.setHandlers(new Handler[] { resource_handler, new DefaultHandler() });
+        // create the handler collections
+        HandlerCollection handlers = new HandlerCollection();
+        handlers.setHandlers(new Handler[] { dataRequestHandler, fileHandler });
         server.setHandler(handlers);
+
+
     }
+
 
     public int getServerPort(){
         return serverPort;

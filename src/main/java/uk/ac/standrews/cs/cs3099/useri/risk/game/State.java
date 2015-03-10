@@ -99,4 +99,12 @@ public class State {
     public ArrayList<Player> getPlayers (){
         return players;
     }
+
+    public Player getPlayer(int playerId) {
+        for (Player p:players){
+            if (p.getID() == playerId)
+                return p;
+        }
+        return null;
+    }
 }

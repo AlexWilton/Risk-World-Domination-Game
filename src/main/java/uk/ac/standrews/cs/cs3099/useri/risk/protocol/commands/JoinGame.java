@@ -12,23 +12,28 @@ public class JoinGame extends Command {
 
     public JoinGame(JSONArray versions, JSONArray features){
         super("join_game");
+        this.versions = versions;
+        this.features = features;
     }
 
     public static Command parse(String parseable) {
         try{
             JSONParser parser = new JSONParser();
             JSONObject obj = (JSONObject) parser.parse(parseable);
-            if (!obj.get("command").equals("join_game"))
+            if (!obj.get("command").equals("join_game")) {
                 return null;
+            }
             JSONObject payload = (JSONObject) obj.get("payload");
             JSONArray versions = (JSONArray) payload.get("supported_versions");
             JSONArray features = (JSONArray) payload.get("supported_features");
-            if (versions == null)
+            if (versions == null) {
                 return null;
+            }
 
             return new JoinGame(versions, features);
 
         } catch(ParseException e){
+            System.out.println(parseable);
             return null;
         }
 

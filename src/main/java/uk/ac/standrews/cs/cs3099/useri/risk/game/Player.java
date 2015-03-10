@@ -11,6 +11,7 @@ import java.util.ArrayList;
  */
 public class Player{
     private Client client;
+    private String name;
     private int ID;
 	private CountrySet occupiedCountries;
 	private ArrayList<RiskCard> cards;
@@ -19,10 +20,15 @@ public class Player{
 	private boolean inactive;
 
     public Player(int ID, Client client){
+        this(ID, client, null);
+    }
+
+    public Player(int ID, Client client, String name){
         this.ID = ID;
         this.client = client;
         this.occupiedCountries = new CountrySet();
         this.cards = new ArrayList<RiskCard>();
+        this.name = name;
     }
 
     public int getID(){
@@ -99,5 +105,9 @@ public class Player{
             }
         }
         return null;
+    }
+
+    public String getName() {
+        return name;
     }
 }

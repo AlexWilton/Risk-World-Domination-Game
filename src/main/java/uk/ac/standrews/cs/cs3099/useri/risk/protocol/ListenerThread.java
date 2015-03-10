@@ -15,6 +15,7 @@ import java.net.Socket;
  * All fields are final and protected.
  */
 public class ListenerThread implements Runnable {
+    private SignalJoinedPlayer stuff;
     private final int ACK_TIMEOUT, MOVE_TIMEOUT;
     protected final Socket sock;
     protected final int ID;
@@ -25,7 +26,8 @@ public class ListenerThread implements Runnable {
     private JSONParser parser;
 
 
-    public ListenerThread(Socket sock, int id, Client client, boolean gameInProgress, int ack_timeout, int move_timeout) {
+    public ListenerThread(Socket sock, int id, Client client, boolean gameInProgress, int ack_timeout, int move_timeout, SignalJoinedPlayer s) {
+        this.stuff = s;
         this.sock = sock;
         this.ID = id;
         this.client = client;
@@ -40,13 +42,15 @@ public class ListenerThread implements Runnable {
      * Initialises the connection and returns whether it was successful.
      * @throws IOException
      */
-    private boolean initialiseConnection() throws IOException {
+    private synchronized boolean initialiseConnection() throws IOException {
         if(JoinGame.parse(input.readLine()) == null){
             reply(new Acknowledgement(32768, 200, null));
             purgeConnection();
             return false;
         }
         reply(new AcceptJoinGame(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
+        stuff.send();
+        reply(stuff.signal());
         return true;
     }
 
@@ -88,10 +92,22 @@ public class ListenerThread implements Runnable {
             } else {
                 initialiseConnection();
             }
+            //wait for other threads to join game.
+            while(true) {
+                reply(stuff.signal());
+            }
+
+
         } catch(IOException e){
             //TODO don't leave the miserable exceptions alone... :(
         }
 
+    }
+
+    private synchronized void forwardMessage() throws InterruptedException {
+        stuff.forward();
+        output.println("New Client connected!");
+        output.flush();
     }
 
 

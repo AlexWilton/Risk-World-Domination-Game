@@ -3,7 +3,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.helpers;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.CLIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
@@ -37,8 +36,8 @@ public class TestGameStateFactory {
 
         //setup two players, just assign all the countries alternating with two armies in each
         ArrayList<Player> players = new ArrayList<Player>();
-        players.add(new Player(0,c0));
-        players.add(new Player(1,c1));
+        players.add(new Player(0,c0, ""));
+        players.add(new Player(1,c1, ""));
 
         //go through all countries
         Iterator<Player> p = players.iterator();
@@ -83,8 +82,8 @@ public class TestGameStateFactory {
 
         //setup two players, just assign all the countries alternating with two armies in each
         ArrayList<Player> players = new ArrayList<Player>();
-        players.add(new Player(0,c0));
-        players.add(new Player(1,c1));
+        players.add(new Player(0,c0, ""));
+        players.add(new Player(1,c1, ""));
 
         //go through all countries
         Iterator<Player> p = players.iterator();

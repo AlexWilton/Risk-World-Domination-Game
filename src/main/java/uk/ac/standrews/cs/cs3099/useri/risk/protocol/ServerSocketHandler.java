@@ -8,16 +8,17 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class ServerSocketHandler {
-    private final int PORT, ACK_TIMEOUT, MOVE_TIMEOUT;
+    private final int PORT, ACK_TIMEOUT, MOVE_TIMEOUT, MAX_PLAYER_COUNT = 6, MIN_PLAYER_COUNT = 3;
 
     private ServerSocket server;
     private ArrayList<ListenerThread> clientSocketPool;
     private ArrayList<Action> actionPool;
 
     private byte[] buffer;
-    private boolean gameInProgress;
+    private boolean gameInProgress = false;
 
 
     public ServerSocketHandler(int port, int ack_timeout, int move_timeout) {
@@ -37,22 +38,29 @@ public class ServerSocketHandler {
     public void startServer(boolean playing) {
         int i = playing? 1 : 0;         //If the server is playing, first client gets ID 1, otherwise 0.
         clientSocketPool = new ArrayList<ListenerThread>();
+        SignalJoinedPlayer s = new SignalJoinedPlayer(clientSocketPool);
         while (true) {
             try {
+                // TODO set up the initial game state.
                 Socket temp = server.accept();
                 System.out.println("New client connected");
-                ListenerThread client = new ListenerThread(temp, i++, new NetworkClient(), gameInProgress, ACK_TIMEOUT, MOVE_TIMEOUT);
-                clientSocketPool.add(client);
+                ListenerThread client = new ListenerThread(temp, i, new NetworkClient(), gameInProgress, ACK_TIMEOUT, MOVE_TIMEOUT, s);
+                clientSocketPool.add(i++, client);
                 // Make new Thread for client.
-                client.run();
+                Thread t = new Thread(client);
+                t.start();
 
-                if (i>=1){
+                // Decide whether we want to start the game already, partially randomly.
+                Random r = new Random(System.nanoTime());
+                if (i == MAX_PLAYER_COUNT - 1)
                     gameInProgress = true;
-                }
+                //if (i>MIN_PLAYER_COUNT && r.nextDouble()>=0.5)
+                    //gameInProgress = true;
 
             } catch (SocketTimeoutException timeout) {
                 // No more clients wanted to connect, so just carry on working.
-                gameInProgress = true;
+                // TODO Probably not final here.
+                //gameInProgress = true;
                 //break;
             } catch (IOException e) {
 

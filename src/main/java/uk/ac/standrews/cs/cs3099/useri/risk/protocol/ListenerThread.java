@@ -103,12 +103,4 @@ public class ListenerThread implements Runnable {
         }
 
     }
-
-    private synchronized void forwardMessage() throws InterruptedException {
-        stuff.forward();
-        output.println("New Client connected!");
-        output.flush();
-    }
-
-
 }

@@ -44,18 +44,4 @@ public class SignalJoinedPlayer {
         flag = true;
         notify();
     }
-
-    public synchronized void forward() {
-        if (!flag) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        //System.out.println(msg);
-        flag = false;
-        notify();
-    }
 }

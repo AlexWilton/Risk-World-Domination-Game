@@ -43,15 +43,21 @@ public class ListenerThread implements Runnable {
      * @throws IOException
      */
     private synchronized boolean initialiseConnection() throws IOException {
-        if(JoinGame.parse(input.readLine()) == null){
+        Command command = JoinGame.parse(input.readLine());
+        if(command == null) {
             reply(new Acknowledgement(32768, 200, null));
             purgeConnection();
             return false;
         }
-        reply(new AcceptJoinGame(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
-        stuff.send();
-        reply(stuff.signal());
-        return true;
+        else if (command instanceof JoinGame) {
+            reply(new AcceptJoinGame(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
+            if (((JoinGame) command).hasName()) {
+                stuff.send();
+                reply(stuff.signal());
+            }
+            return true;
+        }
+        return false;
     }
 
     private void purgeConnection() throws IOException {

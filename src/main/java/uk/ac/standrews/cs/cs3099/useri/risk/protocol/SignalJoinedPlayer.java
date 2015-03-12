@@ -39,8 +39,6 @@ public class SignalJoinedPlayer {
                 e.printStackTrace();
             }
         }
-
-        //System.out.println(msg);
         flag = true;
         notify();
     }

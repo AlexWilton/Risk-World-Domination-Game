@@ -63,5 +63,4 @@ public class Command extends JSONObject {
 
         return ret;
     }
-
 }

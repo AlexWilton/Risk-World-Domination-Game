@@ -1,6 +1,5 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.action.Action;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
 
 import java.io.IOException;
@@ -11,13 +10,11 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class ServerSocketHandler {
-    private final int PORT, ACK_TIMEOUT, MOVE_TIMEOUT, MAX_PLAYER_COUNT = 6, MIN_PLAYER_COUNT = 3;
+    private final int PORT, ACK_TIMEOUT, MOVE_TIMEOUT, MAX_PLAYER_COUNT = 3, MIN_PLAYER_COUNT = 3;
 
     private ServerSocket server;
     private ArrayList<ListenerThread> clientSocketPool;
-    private ArrayList<Action> actionPool;
 
-    private byte[] buffer;
     private boolean gameInProgress = false;
 
 
@@ -37,9 +34,9 @@ public class ServerSocketHandler {
 
     public void startServer(boolean playing) {
         int i = playing? 1 : 0;         //If the server is playing, first client gets ID 1, otherwise 0.
-        clientSocketPool = new ArrayList<ListenerThread>();
-        SignalJoinedPlayer s = new SignalJoinedPlayer(clientSocketPool);
-        while (true) {
+        clientSocketPool = new ArrayList<>();
+        SignalJoinedPlayer s = new SignalJoinedPlayer(2);
+        while (!gameInProgress) {
             try {
                 // TODO set up the initial game state.
                 Socket temp = server.accept();
@@ -52,8 +49,10 @@ public class ServerSocketHandler {
 
                 // Decide whether we want to start the game already, partially randomly.
                 Random r = new Random(System.nanoTime());
-                if (i == MAX_PLAYER_COUNT - 1)
+                if (i == MAX_PLAYER_COUNT - 1) {
+
                     gameInProgress = true;
+                }
                 //if (i>MIN_PLAYER_COUNT && r.nextDouble()>=0.5)
                     //gameInProgress = true;
 
@@ -66,6 +65,31 @@ public class ServerSocketHandler {
 
             }
         }
+
+        while (!allInitialised());
+        s.sendGameStarted(playing? 0:null, i);
+
+        while (true) {
+            try {
+                Socket temp = server.accept();
+                System.out.println("New client connected");
+                ListenerThread client = new ListenerThread(temp, i, new NetworkClient(), gameInProgress, ACK_TIMEOUT, MOVE_TIMEOUT, s);
+                // Make new Thread for client.
+                Thread t = new Thread(client);
+                t.start();
+            } catch (IOException e) {
+                //e.printStackTrace();
+            }
+        }
+    }
+
+    private boolean allInitialised() {
+        for (ListenerThread t : clientSocketPool){
+            if (!t.initialised()){
+                return false;
+            }
+        }
+        return true;
     }
 
 

@@ -28,6 +28,7 @@ public class ListenerThread implements Runnable {
     private BufferedReader input;
     private JSONParser parser;
     private String playerName;
+    private boolean initialised;
 
 
     public ListenerThread(Socket sock, int id, Client client, boolean gameInProgress, int ack_timeout, int move_timeout, SignalJoinedPlayer s) {
@@ -61,10 +62,9 @@ public class ListenerThread implements Runnable {
             if (playerName != null) {
                 // Send player list to all connected players.
                 stuff.send(players);
-                reply(stuff.signal());
+                reply(stuff.signal(players.size()));
             }
             //TODO Now that the player is added, what happens?
-
             return true;
         }
         return false;
@@ -106,11 +106,11 @@ public class ListenerThread implements Runnable {
             if (gameInProgress) {
                 rejectGame();
             } else {
-                initialiseConnection();
+                initialised = initialiseConnection();
             }
             //wait for other threads to join game.
             while(true) {
-                reply(stuff.signal());
+                reply(stuff.signal(players.size()));
             }
 
 
@@ -118,5 +118,9 @@ public class ListenerThread implements Runnable {
             //TODO don't leave the miserable exceptions alone... :(
         }
 
+    }
+
+    public boolean initialised() {
+        return initialised;
     }
 }

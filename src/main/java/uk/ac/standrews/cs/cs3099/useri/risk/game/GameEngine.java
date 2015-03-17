@@ -52,8 +52,12 @@ public class GameEngine {
 
 	public void initialise(State state){
         this.state = state;
-
     }
+
+    public void initialise(State state, ArrayList<Client> clients){
+        this.state=state;
+    }
+
     public void initialise(){
         //take the data and parse them
 

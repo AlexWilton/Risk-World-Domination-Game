@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import org.json.simple.parser.JSONParser;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
 import java.io.BufferedReader;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * Wrapper class for each client socket. This class is used by the server to keep track of connections to clients.
@@ -16,6 +18,7 @@ import java.net.Socket;
  */
 public class ListenerThread implements Runnable {
     private SignalJoinedPlayer stuff;
+    private static ArrayList<Player> players = new ArrayList<>();
     private final int ACK_TIMEOUT, MOVE_TIMEOUT;
     protected final Socket sock;
     protected final int ID;
@@ -24,6 +27,7 @@ public class ListenerThread implements Runnable {
     private PrintWriter output;
     private BufferedReader input;
     private JSONParser parser;
+    private String playerName;
 
 
     public ListenerThread(Socket sock, int id, Client client, boolean gameInProgress, int ack_timeout, int move_timeout, SignalJoinedPlayer s) {
@@ -51,10 +55,16 @@ public class ListenerThread implements Runnable {
         }
         else if (command instanceof JoinGame) {
             reply(new AcceptJoinGame(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
-            if (((JoinGame) command).hasName()) {
-                stuff.send();
+            client.setPlayerId(ID);
+            playerName = ((JoinGame) command).getName();
+            players.add(new Player(ID, client, playerName));
+            if (playerName != null) {
+                // Send player list to all connected players.
+                stuff.send(players);
                 reply(stuff.signal());
             }
+            //TODO Now that the player is added, what happens?
+
             return true;
         }
         return false;

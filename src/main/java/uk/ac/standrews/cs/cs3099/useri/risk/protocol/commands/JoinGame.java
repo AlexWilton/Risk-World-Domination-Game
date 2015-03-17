@@ -11,10 +11,15 @@ public class JoinGame extends Command {
     JSONArray features;
     String name;
 
-    public JoinGame(JSONArray versions, JSONArray features, String name){
+    public JoinGame(JSONArray versions, JSONArray features){
         super("join_game");
         this.versions = versions;
         this.features = features;
+
+    }
+
+    public JoinGame(JSONArray versions, JSONArray features, String name){
+        this(versions, features);
         this.name = name;
     }
 
@@ -42,7 +47,7 @@ public class JoinGame extends Command {
 
     }
 
-    public boolean hasName() {
-        return name == null;
+    public String getName() {
+        return name;
     }
 }

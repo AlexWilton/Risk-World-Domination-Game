@@ -1,6 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.PlayersJoined;
 
 import java.util.ArrayList;
@@ -8,12 +9,13 @@ import java.util.ArrayList;
 public class SignalJoinedPlayer {
     boolean flag = false;
     private ArrayList<ListenerThread> clientSocketPool;
+    private static Command command;
 
     public SignalJoinedPlayer(ArrayList<ListenerThread> clientSocketPool) {
         this.clientSocketPool = clientSocketPool;
     }
 
-    public synchronized PlayersJoined signal() {
+    public synchronized Command signal() {
         if (!flag) {
             try {
                 wait();
@@ -21,17 +23,13 @@ public class SignalJoinedPlayer {
                 e.printStackTrace();
             }
         }
-        Player[] arr = new Player[clientSocketPool.size()];
-        int i = 0;
-        for (ListenerThread l : clientSocketPool) {
-            arr[i++] = l.client.getPlayer();
-        }
         flag = false;
+        System.out.println("Sending...");
         notifyAll();
-        return new PlayersJoined(arr);
+        return command;
     }
 
-    public synchronized void send(){
+    public synchronized void send(ArrayList<Player> players){
         if (flag) {
             try {
                 wait();
@@ -39,7 +37,9 @@ public class SignalJoinedPlayer {
                 e.printStackTrace();
             }
         }
+        System.out.println("Creating message");
+        command = new PlayersJoined(players);
         flag = true;
-        notify();
+        notifyAll();
     }
 }

@@ -117,6 +117,7 @@ public class ListenerThread implements Runnable {
                 }
                 reply(comm);
             }
+            initialised = false;    // Init is false now
             Command reply = Command.parseCommand(input.readLine());
             // From this stage on, every command received has to be sent to all members.
             stuff.sendAll(reply);

@@ -2,7 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
 import org.json.simple.JSONArray;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.JoinGame;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.JoinGameCommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,7 +21,7 @@ public class ClientApp {
         JSONArray versions = new JSONArray();
         JSONArray features = new JSONArray();
         versions.add(0.1f);
-        JoinGame joinCommand = new JoinGame(versions,features);
+        JoinGameCommand joinCommand = new JoinGameCommand(versions,features);
         String joinCommandJSON = joinCommand.toJSONString();
 
         //make the socket

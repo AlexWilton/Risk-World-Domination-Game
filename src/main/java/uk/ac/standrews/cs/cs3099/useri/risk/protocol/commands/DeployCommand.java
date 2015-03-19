@@ -3,13 +3,14 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 /**
  * Created by po26 on 05/03/15.
  */
-public class Defend extends Command {
+public class DeployCommand extends Command{
 
-    public Defend(String command) {
+
+    public DeployCommand(String command) {
         super(command);
     }
 
-    public static Command parse (String JSONString){
+    public static DeployCommand parse(String JSONString) {
         return null;
     }
 }

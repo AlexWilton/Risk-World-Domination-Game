@@ -5,22 +5,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
-import sun.net.NetProperties;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.JoinGame;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.JoinGameCommand;
 
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 /**
@@ -81,7 +76,7 @@ public class ClientSocketDistributor implements Runnable{
             for (String feature : features){
                 featuresJSON.add(feature);
             }
-            JoinGame joinCommand = new JoinGame(versionsJSON,featuresJSON);
+            JoinGameCommand joinCommand = new JoinGameCommand(versionsJSON,featuresJSON);
 
             sendCommand(joinCommand);
 

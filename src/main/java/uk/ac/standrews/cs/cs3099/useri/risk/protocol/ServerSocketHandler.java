@@ -35,7 +35,7 @@ public class ServerSocketHandler {
     public void startServer(boolean playing) {
         int i = playing? 1 : 0;         //If the server is playing, first client gets ID 1, otherwise 0.
         clientSocketPool = new ArrayList<>();
-        SignalJoinedPlayer s = new SignalJoinedPlayer(2);
+        MessageQueue s = new MessageQueue(2, playing);
         while (!gameInProgress) {
             try {
                 // TODO set up the initial game state.
@@ -66,8 +66,10 @@ public class ServerSocketHandler {
             }
         }
 
-        while (!allInitialised());
-        s.sendGameStarted(playing? 0:null, i);
+        while (!allInitialised());  //wait for all clients to pass the init stage.
+        s.sendPing(i);
+        while (!allInitialised());  //wait on ping commands to be received.
+        s.sendReady();
 
         while (true) {
             try {

@@ -5,20 +5,20 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class JoinGame extends Command {
+public class JoinGameCommand extends Command {
 
     JSONArray versions;
     JSONArray features;
     String name;
 
-    public JoinGame(JSONArray versions, JSONArray features){
+    public JoinGameCommand(JSONArray versions, JSONArray features){
         super("join_game");
         this.versions = versions;
         this.features = features;
 
     }
 
-    public JoinGame(JSONArray versions, JSONArray features, String name){
+    public JoinGameCommand(JSONArray versions, JSONArray features, String name){
         this(versions, features);
         this.name = name;
     }
@@ -38,7 +38,7 @@ public class JoinGame extends Command {
                 return null;
             }
 
-            return new JoinGame(versions, features, name);
+            return new JoinGameCommand(versions, features, name);
 
         } catch(ParseException e){
             System.out.println(parseable);

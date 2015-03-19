@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * All fields are final and protected.
  */
 public class ListenerThread implements Runnable {
-    private SignalJoinedPlayer stuff;
+    private MessageQueue stuff;
     private static ArrayList<Player> players = new ArrayList<>();
     private final int ACK_TIMEOUT, MOVE_TIMEOUT;
     protected final Socket sock;
@@ -31,7 +31,7 @@ public class ListenerThread implements Runnable {
     private boolean initialised;
 
 
-    public ListenerThread(Socket sock, int id, Client client, boolean gameInProgress, int ack_timeout, int move_timeout, SignalJoinedPlayer s) {
+    public ListenerThread(Socket sock, int id, Client client, boolean gameInProgress, int ack_timeout, int move_timeout, MessageQueue s) {
         this.stuff = s;
         this.sock = sock;
         this.ID = id;
@@ -48,21 +48,21 @@ public class ListenerThread implements Runnable {
      * @throws IOException
      */
     private synchronized boolean initialiseConnection() throws IOException {
-        Command command = JoinGame.parse(input.readLine());
+        Command command = JoinGameCommand.parse(input.readLine());
         if(command == null) {
-            reply(new Acknowledgement(32768, 200, null));
+            reply(new AcknowledgementCommand(32768, 200, null));
             purgeConnection();
             return false;
         }
-        else if (command instanceof JoinGame) {
-            reply(new AcceptJoinGame(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
+        else if (command instanceof JoinGameCommand) {
+            reply(new AcceptJoinGameCommand(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
             client.setPlayerId(ID);
-            playerName = ((JoinGame) command).getName();
+            playerName = ((JoinGameCommand) command).getName();
             players.add(new Player(ID, client, playerName));
             if (playerName != null) {
                 // Send player list to all connected players.
-                stuff.send(players);
-                reply(stuff.signal(players.size()));
+                stuff.sendPlayerList(players);
+                reply(stuff.getMessage(players.size()));
             }
             //TODO Now that the player is added, what happens?
             return true;
@@ -83,10 +83,10 @@ public class ListenerThread implements Runnable {
     }
 
     private void rejectGame() throws IOException {
-        if (JoinGame.parse(input.readLine()) == null)
-            reply(new Acknowledgement(32768, 200, null));
+        if (JoinGameCommand.parse(input.readLine()) == null)
+            reply(new AcknowledgementCommand(32768, 200, null));
         else
-            reply(new RejectJoinGame("Game already in progress"));
+            reply(new RejectJoinGameCommand("Game already in progress"));
 
         purgeConnection();
     }
@@ -109,9 +109,21 @@ public class ListenerThread implements Runnable {
                 initialised = initialiseConnection();
             }
             //wait for other threads to join game.
-            while(true) {
-                reply(stuff.signal(players.size()));
+            boolean waiting = true;
+            while(waiting) {
+                Command comm = stuff.getMessage(players.size());
+                if (comm instanceof PingCommand){
+                    waiting = false;    //The host decided to start the game.
+                }
+                reply(comm);
             }
+            Command reply = Command.parseCommand(input.readLine());
+            // From this stage on, every command received has to be sent to all members.
+            stuff.sendAll(reply);
+            if (reply instanceof PingCommand){
+                //wait, whaaattt?
+            }
+
 
 
         } catch(IOException e){

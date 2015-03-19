@@ -25,37 +25,37 @@ public class Command extends JSONObject {
 
         switch (command) {
             case "deploy":
-                ret = Deploy.parse(commandJSON);
+                ret = DeployCommand.parse(commandJSON);
                 break;
             case "trade_in_cards":
-                ret = TradeInCards.parse(commandJSON);
+                ret = TradeInCardsCommand.parse(commandJSON);
                 break;
             case "attack":
-                ret = Attack.parse(commandJSON);
+                ret = AttackCommand.parse(commandJSON);
                 break;
             case "play_cards":
-                ret = PlayCards.parse(commandJSON);
+                ret = PlayCardsCommand.parse(commandJSON);
                 break;
             case "draw_card":
-                ret = DrawCard.parse(commandJSON);
+                ret = DrawCardCommand.parse(commandJSON);
                 break;
             case "defend":
-                ret = Defend.parse(commandJSON);
+                ret = DefendCommand.parse(commandJSON);
                 break;
             case "attack_capture":
-                ret = AttackCapture.parse(commandJSON);
+                ret = AttackCaptureCommand.parse(commandJSON);
                 break;
             case "fortify":
-                ret = Fortify.parse(commandJSON);
+                ret = FortifyCommand.parse(commandJSON);
                 break;
             case "join_game":
-                ret = JoinGame.parse(commandJSON);
+                ret = JoinGameCommand.parse(commandJSON);
                 break;
             case "accept_join_game":
-                ret = AcceptJoinGame.parse(commandJSON);
+                ret = AcceptJoinGameCommand.parse(commandJSON);
                 break;
             case "reject_join_game":
-                ret = RejectJoinGame.parse(commandJSON);
+                ret = RejectJoinGameCommand.parse(commandJSON);
                 break;
             default:
                 ret = null;

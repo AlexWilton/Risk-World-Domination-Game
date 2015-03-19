@@ -6,9 +6,9 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 
 import java.util.ArrayList;
 
-public class PlayersJoined extends Command {
+public class PlayersJoinedCommand extends Command {
 
-    public PlayersJoined(ArrayList<Player> list) {
+    public PlayersJoinedCommand(ArrayList<Player> list) {
         super("players_joined");
         JSONArray payload = new JSONArray();
         for (Player p:list){

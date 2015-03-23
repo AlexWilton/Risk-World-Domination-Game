@@ -70,6 +70,8 @@ public class ServerSocketHandler {
         s.sendPing(i);
         while (!allInitialised());  //wait on ping commands to be received.
         s.sendReady();
+        while (!allInitialised());  //wait on acknowledgements
+        System.out.println("Stuff seems to be working");
 
         while (true) {
             try {

@@ -108,29 +108,54 @@ public class ListenerThread implements Runnable {
             } else {
                 initialised = initialiseConnection();
             }
-            //wait for other threads to join game.
-            boolean waiting = true;
-            while(waiting) {
-                Command comm = stuff.getMessage(players.size());
-                if (comm instanceof PingCommand){
-                    waiting = false;    //The host decided to start the game.
-                }
-                reply(comm);
-            }
-            initialised = false;    // Init is false now
-            Command reply = Command.parseCommand(input.readLine());
-            // From this stage on, every command received has to be sent to all members.
-            stuff.sendAll(reply);
-            if (reply instanceof PingCommand){
-                //wait, whaaattt?
-            }
 
+            Command reply = waitingOn(PingCommand.class);
+
+            if (!(reply instanceof PingCommand)){
+                //error here
+            }
+            initialised = true;     // Ping reply received
+
+            reply = waitingOn(ReadyCommand.class);
+
+            if (!(reply instanceof AcknowledgementCommand) || !reply.get("ack_id").equals(1)){
+                //error here
+            }
+            initialised = true;     // Ready acknowledgement received
+            stuff.sendAll(reply);
+
+            // here, the game is initialised with a final list of players.
+            while (true){
+                Command comm = stuff.getMessage(players.size());
+                if (comm.getClass().equals(InitialiseGameCommand.class)){
+                    reply(comm);
+                    break;
+                }
+            }
 
 
         } catch(IOException e){
             //TODO don't leave the miserable exceptions alone... :(
         }
 
+    }
+
+    private Command waitingOn(Class<?> c){
+        while(true){
+            Command comm = stuff.getMessage(players.size());
+            if (comm.getClass().equals(c)) {
+                reply(comm);
+                initialised = false;
+                try {
+                    Command reply = Command.parseCommand(input.readLine());
+                    stuff.sendAll(reply);
+                    return reply;
+                } catch (IOException e){
+
+                }
+
+            }
+        }
     }
 
     public boolean initialised() {

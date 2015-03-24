@@ -93,6 +93,7 @@ public class ServerSocketHandler {
                 return false;
             }
         }
+        System.out.println("All initialised, advancing to next stage");
         return true;
     }
 

@@ -112,6 +112,7 @@ public class ListenerThread implements Runnable {
             Command reply = waitingOn(PingCommand.class);
 
             if (!(reply instanceof PingCommand)){
+                System.out.println("Error, no ping command received");
                 //error here
             }
             initialised = true;     // Ping reply received
@@ -143,8 +144,8 @@ public class ListenerThread implements Runnable {
     private Command waitingOn(Class<?> c){
         while(true){
             Command comm = stuff.getMessage(players.size());
+            reply(comm);
             if (comm.getClass().equals(c)) {
-                reply(comm);
                 initialised = false;
                 try {
                     Command reply = Command.parseCommand(input.readLine());

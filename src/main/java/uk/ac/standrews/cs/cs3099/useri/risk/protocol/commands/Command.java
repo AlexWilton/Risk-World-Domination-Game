@@ -57,6 +57,12 @@ public class Command extends JSONObject {
             case "reject_join_game":
                 ret = RejectJoinGameCommand.parse(commandJSON);
                 break;
+            case "ping":
+                ret = PingCommand.parse(commandJSON);
+                break;
+            case "acknowledgement":
+                ret = AcknowledgementCommand.parse(commandJSON);
+                break;
             default:
                 ret = null;
         }

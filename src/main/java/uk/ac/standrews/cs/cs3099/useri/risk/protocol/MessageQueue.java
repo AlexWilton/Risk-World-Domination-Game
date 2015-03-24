@@ -30,11 +30,11 @@ public class MessageQueue {
             }
         }
         sent++;
-        if (players == sent || sent == this.players) {
+        if (sent == players) {
             flag = false;
             sent = 0;
         }
-        System.out.println("Sending...");
+        System.out.println("Sending " + command.toJSONString());
         notifyAll();
         return command;
     }
@@ -47,11 +47,11 @@ public class MessageQueue {
         sendAll(new PingCommand(ID, payload));
     }
 
-    public void sendReady() {
+    public synchronized void sendReady() {
         sendAll(new ReadyCommand(ID, 1));
     }
 
-    public void sendAll(Command command) {
+    public synchronized void sendAll(Command command) {
         if (flag){
             try {
                 wait();

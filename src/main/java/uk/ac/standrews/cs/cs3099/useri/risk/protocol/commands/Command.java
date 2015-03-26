@@ -24,38 +24,50 @@ public class Command extends JSONObject {
         Command ret;
 
         switch (command) {
-            case "deploy":
-                ret = DeployCommand.parse(commandJSON);
+            case DeployCommand.COMMAND_STRING:
+                ret = new DeployCommand(messageObject);
                 break;
-            case "trade_in_cards":
-                ret = TradeInCardsCommand.parse(commandJSON);
+            case AttackCommand.COMMAND_STRING:
+                ret = new AttackCommand(messageObject);
                 break;
-            case "attack":
-                ret = AttackCommand.parse(commandJSON);
+            case PlayCardsCommand.COMMAND_STRING:
+                ret = new PlayCardsCommand(messageObject);
                 break;
-            case "play_cards":
-                ret = PlayCardsCommand.parse(commandJSON);
+            case DrawCardCommand.COMMAND_STRING:
+                ret = new DrawCardCommand(messageObject);
                 break;
-            case "draw_card":
-                ret = DrawCardCommand.parse(commandJSON);
+            case DefendCommand.COMMAND_STRING:
+                ret = new DefendCommand(messageObject);
                 break;
-            case "defend":
-                ret = DefendCommand.parse(commandJSON);
+            case AttackCaptureCommand.COMMAND_STRING:
+                ret = new AttackCaptureCommand(messageObject);
                 break;
-            case "attack_capture":
-                ret = AttackCaptureCommand.parse(commandJSON);
+            case FortifyCommand.COMMAND_STRING:
+                ret = new FortifyCommand(messageObject);
                 break;
-            case "fortify":
-                ret = FortifyCommand.parse(commandJSON);
+            case JoinGameCommand.COMMAND_STRING:
+                ret = new JoinGameCommand(messageObject);
                 break;
-            case "join_game":
-                ret = JoinGameCommand.parse(commandJSON);
+            case AcceptJoinGameCommand.COMMAND_STRING:
+                ret = new AcceptJoinGameCommand(messageObject);
                 break;
-            case "accept_join_game":
-                ret = AcceptJoinGameCommand.parse(commandJSON);
+            case RejectJoinGameCommand.COMMAND_STRING:
+                ret = new RejectJoinGameCommand(messageObject);
                 break;
-            case "reject_join_game":
-                ret = RejectJoinGameCommand.parse(commandJSON);
+            case AcknowledgementCommand.COMMAND_STRING:
+                ret = new AcknowledgementCommand(messageObject);
+                break;
+            case InitialiseGameCommand.COMMAND_STRING:
+                ret = new InitialiseGameCommand(messageObject);
+                break;
+            case PingCommand.COMMAND_STRING:
+                ret = new PingCommand(messageObject);
+                break;
+            case PlayersJoinedCommand.COMMAND_STRING:
+                ret = new PlayersJoinedCommand(messageObject);
+                break;
+            case ReadyCommand.COMMAND_STRING:
+                ret = new ReadyCommand(messageObject);
                 break;
             default:
                 ret = null;

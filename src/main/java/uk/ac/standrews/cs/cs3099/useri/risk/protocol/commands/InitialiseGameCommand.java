@@ -8,6 +8,8 @@ import org.json.simple.JSONObject;
  */
 public class InitialiseGameCommand extends Command{
 
+    public static final String COMMAND_STRING = "initialise_game";
+
     public InitialiseGameCommand(int version, JSONArray features) {
         super("initialise_game");
 
@@ -15,5 +17,9 @@ public class InitialiseGameCommand extends Command{
         payload.put("version", version);
         payload.put("supported_features", features);
         this.put("payload", payload);
+    }
+
+    public InitialiseGameCommand(JSONObject object){
+        super(object);
     }
 }

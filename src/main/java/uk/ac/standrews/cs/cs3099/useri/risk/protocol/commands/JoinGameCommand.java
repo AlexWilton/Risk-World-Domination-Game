@@ -7,6 +7,8 @@ import org.json.simple.parser.ParseException;
 
 public class JoinGameCommand extends Command {
 
+    public static final String COMMAND_STRING = "join_game";
+
     JSONArray versions;
     JSONArray features;
     String name;
@@ -49,5 +51,9 @@ public class JoinGameCommand extends Command {
 
     public String getName() {
         return name;
+    }
+
+    public JoinGameCommand(JSONObject object){
+        super(object);
     }
 }

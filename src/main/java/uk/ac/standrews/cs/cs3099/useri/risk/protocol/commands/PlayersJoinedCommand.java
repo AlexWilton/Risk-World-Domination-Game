@@ -2,11 +2,14 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 
 import java.util.ArrayList;
 
 public class PlayersJoinedCommand extends Command {
+
+    public static final String COMMAND_STRING = "players_joined";
 
     public PlayersJoinedCommand(ArrayList<Player> list) {
         super("players_joined");
@@ -18,5 +21,8 @@ public class PlayersJoinedCommand extends Command {
             payload.add(arr);
         }
         this.put("payload", payload);
+    }
+    public PlayersJoinedCommand(JSONObject object){
+        super(object);
     }
 }

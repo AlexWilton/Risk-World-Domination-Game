@@ -3,6 +3,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.exceptions.InitialisationException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,7 +26,6 @@ public class ListenerThread implements Runnable {
     private final boolean gameInProgress;
     private PrintWriter output;
     private BufferedReader input;
-    private String playerName;
     private InitState state = InitState.STAGE_CONNECTING;
     private int version;
     private ArrayList<String> customs;
@@ -56,7 +56,7 @@ public class ListenerThread implements Runnable {
             reply(new AcceptJoinGameCommand(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
             stuff.addPlayer(ID);
             client.setPlayerId(ID);
-            playerName = ((JoinGameCommand) command).getName();
+            String playerName = ((JoinGameCommand) command).getName();
             players.add(new Player(ID, client, playerName));
             customs = ((JoinGameCommand) command).getFeatures();
             version = ((JoinGameCommand) command).getVersion();
@@ -65,7 +65,6 @@ public class ListenerThread implements Runnable {
                 stuff.sendPlayerList(players);
                 reply(stuff.getMessage(ID));
             }
-            //TODO Now that the player is added, what happens?
             return true;
         }
         return false;
@@ -118,13 +117,12 @@ public class ListenerThread implements Runnable {
                 //error here
             }
             System.out.println("Ping reply received: "+ ID);
-            //TODO reaches this stage too early, therefore sending ready command prematurely.
             state = state.next();     // Ping reply received
 
             reply = waitingOn(ReadyCommand.class);
 
-            if (!(reply instanceof AcknowledgementCommand) || ((AcknowledgementCommand)reply).getACKID() != 1){
-                //error here
+            if (!(reply instanceof AcknowledgementCommand) || ((AcknowledgementCommand)reply).getAcknowledgementId() != 1){
+                throw new InitialisationException("Acknowledgement error");
             }
             state = state.next();    // Ready acknowledgement received
 
@@ -140,7 +138,9 @@ public class ListenerThread implements Runnable {
 
 
         } catch(IOException e){
-            //TODO don't leave the miserable exceptions alone... :(
+            e.printStackTrace();
+        } catch(InitialisationException f) {
+            //TODO send error message and remove this player.
         }
 
     }
@@ -155,13 +155,12 @@ public class ListenerThread implements Runnable {
             if (comm.getClass().equals(c)) {
                 try {
                     reply = Command.parseCommand(input.readLine());
-                    //TODO deadlock!!!
                     reply(stuff.probablygetMessage(ID));
                     stuff.sendAll(reply);
                     System.out.println("Stuff " + ID);
                     break;
                 } catch (IOException e){
-
+                    e.printStackTrace();
                 }
 
             }

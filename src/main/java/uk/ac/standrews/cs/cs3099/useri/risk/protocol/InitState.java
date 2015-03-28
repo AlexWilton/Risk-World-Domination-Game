@@ -1,7 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 /**
- * Created by bentlor on 28/03/15.
+ * Game initialisation state enum.
  */
 public enum InitState {
     STAGE_CONNECTING,
@@ -12,9 +12,7 @@ public enum InitState {
     private static InitState[] vals = values();
 
     /**
-     * Gives the next stage. The FINISH stage would wrap to the first stage. Implementation seen at
-     * http://stackoverflow.com/questions/17006239/whats-the-best-way-to-implement-next-and-previous-on-an-enum-type
-     * @return
+     * Gives the next stage. Playing.next keeps the stage at playing, forever.
      */
     public InitState next() {
         return vals[ordinal()<vals.length-1? (ordinal() + 1): ordinal()];

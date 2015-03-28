@@ -1,10 +1,8 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 
 public class AcknowledgementCommand extends Command {
 
@@ -13,11 +11,11 @@ public class AcknowledgementCommand extends Command {
     public AcknowledgementCommand(int id, int response_code, JSONObject data) {
         super("acknowledgement");
         JSONObject payload = new JSONObject();
-        this.ACK_ID = id;
+        ACK_ID = id;
         payload.put("ack_id", id);
         payload.put("response", response_code);
         payload.put("data", data);
-        this.put("payload", payload);
+        put("payload", payload);
     }
 
 
@@ -43,7 +41,7 @@ public class AcknowledgementCommand extends Command {
         }
     }
 
-    public int getACKID() {
+    public int getAcknowledgementId() {
     return ACK_ID;
     }
 }

@@ -21,9 +21,9 @@ public class ServerSocketHandler {
 
 
     public ServerSocketHandler(int port, int ack_timeout, int move_timeout) {
-        this.PORT = port;
-        this.ACK_TIMEOUT = ack_timeout;
-        this.MOVE_TIMEOUT = move_timeout;
+        PORT = port;
+        ACK_TIMEOUT = ack_timeout;
+        MOVE_TIMEOUT = move_timeout;
         try {
             this.server = new ServerSocket(PORT);
             // Initially, the socket timeout would be 1s.
@@ -50,7 +50,7 @@ public class ServerSocketHandler {
                 t.start();
 
                 // Decide whether we want to start the game already, partially randomly.
-                Random r = new Random(System.nanoTime());
+                //Random r = new Random(System.nanoTime());
                 if (i == MAX_PLAYER_COUNT - 1) {
 
                     gameInProgress = true;
@@ -64,7 +64,7 @@ public class ServerSocketHandler {
                 //gameInProgress = true;
                 //break;
             } catch (IOException e) {
-
+                e.printStackTrace();
             }
         }
 

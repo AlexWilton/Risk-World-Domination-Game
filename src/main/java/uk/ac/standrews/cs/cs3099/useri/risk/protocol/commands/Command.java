@@ -3,6 +3,8 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import java.text.ParseException;
+
 
 public class Command extends JSONObject {
 
@@ -15,7 +17,11 @@ public class Command extends JSONObject {
     }
 
     public static Command parseCommand(String commandJSON){
-
+        if (commandJSON==null){
+            //TODO throw exception
+            System.out.println("received string empty");
+            return null;
+        }
         JSONObject messageObject;
         messageObject = (JSONObject) JSONValue.parse(commandJSON);
 

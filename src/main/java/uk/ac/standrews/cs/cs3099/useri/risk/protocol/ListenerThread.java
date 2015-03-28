@@ -26,7 +26,6 @@ public class ListenerThread implements Runnable {
     private final boolean gameInProgress;
     private PrintWriter output;
     private BufferedReader input;
-    private JSONParser parser;
     private String playerName;
     private boolean initialised;
 
@@ -39,8 +38,6 @@ public class ListenerThread implements Runnable {
         this.gameInProgress = gameInProgress;
         this.ACK_TIMEOUT = ack_timeout;
         this.MOVE_TIMEOUT = move_timeout;
-
-        this.parser = new JSONParser();
     }
 
     /**
@@ -56,13 +53,14 @@ public class ListenerThread implements Runnable {
         }
         else if (command instanceof JoinGameCommand) {
             reply(new AcceptJoinGameCommand(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
+            stuff.addPlayer(ID);
             client.setPlayerId(ID);
             playerName = ((JoinGameCommand) command).getName();
             players.add(new Player(ID, client, playerName));
             if (playerName != null) {
                 // Send player list to all connected players.
                 stuff.sendPlayerList(players);
-                reply(stuff.getMessage(players.size()));
+                reply(stuff.getMessage(ID));
             }
             //TODO Now that the player is added, what happens?
             return true;
@@ -78,6 +76,8 @@ public class ListenerThread implements Runnable {
     }
 
     private void reply(Command command) {
+        if (command == null)
+            return;
         output.println(command);
         output.flush();
     }
@@ -110,11 +110,12 @@ public class ListenerThread implements Runnable {
             }
 
             Command reply = waitingOn(PingCommand.class);
-
             if (!(reply instanceof PingCommand)){
                 System.out.println("Error, no ping command received");
                 //error here
             }
+            System.out.println("Ping reply received: "+ ID);
+            //TODO reaches this stage too early, therefore sending ready command prematurely.
             initialised = true;     // Ping reply received
 
             reply = waitingOn(ReadyCommand.class);
@@ -127,7 +128,7 @@ public class ListenerThread implements Runnable {
 
             // here, the game is initialised with a final list of players.
             while (true){
-                Command comm = stuff.getMessage(players.size());
+                Command comm = stuff.getMessage(ID);
                 if (comm.getClass().equals(InitialiseGameCommand.class)){
                     reply(comm);
                     break;
@@ -141,22 +142,29 @@ public class ListenerThread implements Runnable {
 
     }
 
-    private Command waitingOn(Class<?> c){
+    private synchronized Command waitingOn(Class<?> c){
+        Command reply = null;
         while(true){
-            Command comm = stuff.getMessage(players.size());
+            Command comm = stuff.getMessage(ID);
             reply(comm);
+            if (comm == null)
+                continue;
             if (comm.getClass().equals(c)) {
                 initialised = false;
                 try {
-                    Command reply = Command.parseCommand(input.readLine());
+                    reply = Command.parseCommand(input.readLine());
+                    //TODO deadlock!!!
+                    reply(stuff.probablygetMessage(ID));
                     stuff.sendAll(reply);
-                    return reply;
+                    System.out.println("Stuff " + ID);
+                    break;
                 } catch (IOException e){
 
                 }
 
             }
         }
+        return reply;
     }
 
     public boolean initialised() {

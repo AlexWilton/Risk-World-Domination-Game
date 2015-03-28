@@ -7,7 +7,7 @@ import org.json.simple.parser.ParseException;
 
 public class PingCommand extends Command {
 
-    public PingCommand(Integer id, int payload) {
+    public PingCommand(Integer id, Integer payload) {
         super("ping");
         this.put("player_id", id);
         this.put("payload", payload);
@@ -18,12 +18,16 @@ public class PingCommand extends Command {
         try{
             JSONParser parser = new JSONParser();
             JSONObject obj = (JSONObject) parser.parse(commandJSON);
-            if (!obj.get("command").equals("join_game")) {
+            if (!obj.get("command").equals("ping")) {
                 return null;
             }
-            Integer id = (Integer) obj.get("player_id");
-            int payload = Integer.parseInt((String) obj.get("payload"));
+            Long id_str = (Long) obj.get("player_id");
+            Integer id = id_str==null? null:id_str.intValue();
 
+            Long payload_str = (Long) obj.get("payload");
+            Integer payload = payload_str==null? null: payload_str.intValue();
+
+            System.out.println("PingCommand parsed: id: " + id + ", payload: " + payload);
             return new PingCommand(id, payload);
 
         } catch(ParseException e){

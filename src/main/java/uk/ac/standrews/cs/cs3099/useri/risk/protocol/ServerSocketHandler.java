@@ -66,11 +66,12 @@ public class ServerSocketHandler {
             }
         }
 
-        while (!allInitialised());  //wait for all clients to pass the init stage.
+        while (!allInitialised(InitState.STAGE_PING));  //wait for all clients to pass the init stage.
         s.sendPing(i);
-        while (!allInitialised());  //wait on ping commands to be received.
+        while (!allInitialised(InitState.STAGE_READY));  //wait on ping commands to be received.
         s.sendReady();
-        while (!allInitialised());  //wait on acknowledgements
+        while (!allInitialised(InitState.STAGE_PLAYING));  //wait on acknowledgements
+        //TODO s.sendInitGame();
         System.out.println("Stuff seems to be working");
 
         while (true) {
@@ -87,9 +88,9 @@ public class ServerSocketHandler {
         }
     }
 
-    private boolean allInitialised() {
+    private boolean allInitialised(InitState state) {
         for (ListenerThread t : clientSocketPool){
-            if (!t.initialised()){
+            if (!t.initialised(state)){
                 return false;
             }
         }

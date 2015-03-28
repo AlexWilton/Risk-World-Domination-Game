@@ -27,7 +27,7 @@ public class ListenerThread implements Runnable {
     private PrintWriter output;
     private BufferedReader input;
     private String playerName;
-    private boolean initialised;
+    private InitState state = InitState.STAGE_CONNECTING;
 
 
     public ListenerThread(Socket sock, int id, Client client, boolean gameInProgress, int ack_timeout, int move_timeout, MessageQueue s) {
@@ -106,7 +106,7 @@ public class ListenerThread implements Runnable {
             if (gameInProgress) {
                 rejectGame();
             } else {
-                initialised = initialiseConnection();
+                if(initialiseConnection()) state = state.next();
             }
 
             Command reply = waitingOn(PingCommand.class);
@@ -116,21 +116,21 @@ public class ListenerThread implements Runnable {
             }
             System.out.println("Ping reply received: "+ ID);
             //TODO reaches this stage too early, therefore sending ready command prematurely.
-            initialised = true;     // Ping reply received
+            state = state.next();     // Ping reply received
 
             reply = waitingOn(ReadyCommand.class);
 
-            if (!(reply instanceof AcknowledgementCommand) || !reply.get("ack_id").equals(1)){
+            if (!(reply instanceof AcknowledgementCommand) || ((AcknowledgementCommand)reply).getACKID() != 1){
                 //error here
             }
-            initialised = true;     // Ready acknowledgement received
-            stuff.sendAll(reply);
+            state = state.next();    // Ready acknowledgement received
 
             // here, the game is initialised with a final list of players.
             while (true){
                 Command comm = stuff.getMessage(ID);
+                reply(comm);
+                if (comm == null) continue;
                 if (comm.getClass().equals(InitialiseGameCommand.class)){
-                    reply(comm);
                     break;
                 }
             }
@@ -142,15 +142,14 @@ public class ListenerThread implements Runnable {
 
     }
 
-    private synchronized Command waitingOn(Class<?> c){
-        Command reply = null;
+    private Command waitingOn(Class<?> c){
+        Command reply;
         while(true){
             Command comm = stuff.getMessage(ID);
             reply(comm);
             if (comm == null)
                 continue;
             if (comm.getClass().equals(c)) {
-                initialised = false;
                 try {
                     reply = Command.parseCommand(input.readLine());
                     //TODO deadlock!!!
@@ -164,10 +163,11 @@ public class ListenerThread implements Runnable {
 
             }
         }
+        System.out.println("reply");
         return reply;
     }
 
-    public boolean initialised() {
-        return initialised;
+    public boolean initialised(InitState instate) {
+        return state.equals(instate);
     }
 }

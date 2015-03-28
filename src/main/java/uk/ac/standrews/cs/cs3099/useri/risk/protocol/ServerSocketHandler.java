@@ -1,6 +1,8 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
+import org.json.simple.JSONArray;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.InitialiseGameCommand;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -67,12 +69,15 @@ public class ServerSocketHandler {
         }
 
         while (!allInitialised(InitState.STAGE_PING));  //wait for all clients to pass the init stage.
+
         s.sendPing(i);
         while (!allInitialised(InitState.STAGE_READY));  //wait on ping commands to be received.
         s.sendReady();
         while (!allInitialised(InitState.STAGE_PLAYING));  //wait on acknowledgements
-        //TODO s.sendInitGame();
-        System.out.println("Stuff seems to be working");
+        InitialiseGameCommand command = generateInitGame();
+        //System.out.println(command);
+        s.sendAll(command);
+        //System.out.println("Stuff seems to be working");
 
         while (true) {
             try {
@@ -86,6 +91,24 @@ public class ServerSocketHandler {
                 //e.printStackTrace();
             }
         }
+    }
+
+    private InitialiseGameCommand generateInitGame() {
+        ArrayList<String> customisations = clientSocketPool.get(0).getCustoms();
+        int version = 1;
+        for(ListenerThread t : clientSocketPool){
+            int this_version = t.getVersion();
+            ArrayList<String> customs = t.getCustoms();
+
+            if (this_version<version){
+                version = this_version;
+            }
+            customisations.retainAll(customs);
+        }
+        JSONArray arr = new JSONArray();
+        arr.addAll(customisations);
+        return new InitialiseGameCommand(version, arr);
+
     }
 
     private boolean allInitialised(InitState state) {

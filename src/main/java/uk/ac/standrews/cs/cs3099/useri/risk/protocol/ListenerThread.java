@@ -1,6 +1,5 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
-import org.json.simple.parser.JSONParser;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
@@ -28,6 +27,8 @@ public class ListenerThread implements Runnable {
     private BufferedReader input;
     private String playerName;
     private InitState state = InitState.STAGE_CONNECTING;
+    private int version;
+    private ArrayList<String> customs;
 
 
     public ListenerThread(Socket sock, int id, Client client, boolean gameInProgress, int ack_timeout, int move_timeout, MessageQueue s) {
@@ -57,6 +58,8 @@ public class ListenerThread implements Runnable {
             client.setPlayerId(ID);
             playerName = ((JoinGameCommand) command).getName();
             players.add(new Player(ID, client, playerName));
+            customs = ((JoinGameCommand) command).getFeatures();
+            version = ((JoinGameCommand) command).getVersion();
             if (playerName != null) {
                 // Send player list to all connected players.
                 stuff.sendPlayerList(players);
@@ -169,5 +172,13 @@ public class ListenerThread implements Runnable {
 
     public boolean initialised(InitState instate) {
         return state.equals(instate);
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public ArrayList<String> getCustoms() {
+        return customs;
     }
 }

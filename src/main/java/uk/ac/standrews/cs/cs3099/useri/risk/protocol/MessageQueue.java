@@ -97,6 +97,4 @@ public class MessageQueue {
     public synchronized void addPlayer(int id){
         player_connected[id] = true;
     }
-
-
 }

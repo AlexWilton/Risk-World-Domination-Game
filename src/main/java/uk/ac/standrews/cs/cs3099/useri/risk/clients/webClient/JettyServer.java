@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.webapp.WebAppContext;
 
@@ -31,7 +32,7 @@ public class JettyServer implements Runnable {
 
 
     public int getServerPort(){
-        return server.getURI().getPort();
+        return ((ServerConnector)server.getConnectors()[0]).getLocalPort();
     }
 
 

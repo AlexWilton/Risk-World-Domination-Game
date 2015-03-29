@@ -18,7 +18,7 @@ public enum TurnStage {
     /**
      * Gives the next stage. The FINISH stage would wrap to the first stage. Implementation seen at
      * http://stackoverflow.com/questions/17006239/whats-the-best-way-to-implement-next-and-previous-on-an-enum-type
-     * @return
+     * @return next stage.
      */
     public TurnStage next() {
         return vals[(ordinal() + 1) % vals.length];

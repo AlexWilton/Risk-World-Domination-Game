@@ -4,7 +4,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * Created by bentlor on 23/03/15.
+ *
  */
 public class InitialiseGameCommand extends Command{
 
@@ -16,7 +16,7 @@ public class InitialiseGameCommand extends Command{
         JSONObject payload = new JSONObject();
         payload.put("version", version);
         payload.put("supported_features", features);
-        this.put("payload", payload);
+        put("payload", payload);
     }
 
     public InitialiseGameCommand(JSONObject object){

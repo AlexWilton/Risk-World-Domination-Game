@@ -2,6 +2,9 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
+
+import java.text.ParseException;
 
 
 public class Command extends JSONObject {
@@ -15,7 +18,11 @@ public class Command extends JSONObject {
     }
 
     public static Command parseCommand(String commandJSON){
-
+        if (commandJSON==null){
+            //TODO throw exception
+            System.out.println("received string empty");
+            return null;
+        }
         JSONObject messageObject;
         messageObject = (JSONObject) JSONValue.parse(commandJSON);
 
@@ -68,6 +75,12 @@ public class Command extends JSONObject {
                 break;
             case ReadyCommand.COMMAND_STRING:
                 ret = new ReadyCommand(messageObject);
+                break;
+            case "ping":
+                ret = PingCommand.parse(commandJSON);
+                break;
+            case "acknowledgement":
+                ret = AcknowledgementCommand.parse(commandJSON);
                 break;
             default:
                 ret = null;

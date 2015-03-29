@@ -1,6 +1,8 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
+import org.json.simple.JSONArray;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.InitialiseGameCommand;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -19,9 +21,9 @@ public class ServerSocketHandler {
 
 
     public ServerSocketHandler(int port, int ack_timeout, int move_timeout) {
-        this.PORT = port;
-        this.ACK_TIMEOUT = ack_timeout;
-        this.MOVE_TIMEOUT = move_timeout;
+        PORT = port;
+        ACK_TIMEOUT = ack_timeout;
+        MOVE_TIMEOUT = move_timeout;
         try {
             this.server = new ServerSocket(PORT);
             // Initially, the socket timeout would be 1s.
@@ -48,7 +50,7 @@ public class ServerSocketHandler {
                 t.start();
 
                 // Decide whether we want to start the game already, partially randomly.
-                Random r = new Random(System.nanoTime());
+                //Random r = new Random(System.nanoTime());
                 if (i == MAX_PLAYER_COUNT - 1) {
 
                     gameInProgress = true;
@@ -62,16 +64,20 @@ public class ServerSocketHandler {
                 //gameInProgress = true;
                 //break;
             } catch (IOException e) {
-
+                e.printStackTrace();
             }
         }
 
-        while (!allInitialised());  //wait for all clients to pass the init stage.
+        while (!allInitialised(InitState.STAGE_PING));  //wait for all clients to pass the init stage.
+
         s.sendPing(i);
-        while (!allInitialised());  //wait on ping commands to be received.
+        while (!allInitialised(InitState.STAGE_READY));  //wait on ping commands to be received.
         s.sendReady();
-        while (!allInitialised());  //wait on acknowledgements
-        System.out.println("Stuff seems to be working");
+        while (!allInitialised(InitState.STAGE_PLAYING));  //wait on acknowledgements
+        InitialiseGameCommand command = generateInitGame();
+        //System.out.println(command);
+        s.sendAll(command);
+        //System.out.println("Stuff seems to be working");
 
         while (true) {
             try {
@@ -87,12 +93,31 @@ public class ServerSocketHandler {
         }
     }
 
-    private boolean allInitialised() {
+    private InitialiseGameCommand generateInitGame() {
+        ArrayList<String> customisations = clientSocketPool.get(0).getCustoms();
+        int version = 1;
+        for(ListenerThread t : clientSocketPool){
+            int this_version = t.getVersion();
+            ArrayList<String> customs = t.getCustoms();
+
+            if (this_version<version){
+                version = this_version;
+            }
+            customisations.retainAll(customs);
+        }
+        JSONArray arr = new JSONArray();
+        arr.addAll(customisations);
+        return new InitialiseGameCommand(version, arr);
+
+    }
+
+    private boolean allInitialised(InitState state) {
         for (ListenerThread t : clientSocketPool){
-            if (!t.initialised()){
+            if (!t.initialised(state)){
                 return false;
             }
         }
+        System.out.println("All initialised, advancing to next stage");
         return true;
     }
 

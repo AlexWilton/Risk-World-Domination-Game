@@ -1,9 +1,9 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
-import org.json.simple.parser.JSONParser;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.exceptions.InitialisationException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,9 +26,9 @@ public class ListenerThread implements Runnable {
     private final boolean gameInProgress;
     private PrintWriter output;
     private BufferedReader input;
-    private JSONParser parser;
-    private String playerName;
-    private boolean initialised;
+    private InitState state = InitState.STAGE_CONNECTING;
+    private int version;
+    private ArrayList<String> customs;
 
 
     public ListenerThread(Socket sock, int id, Client client, boolean gameInProgress, int ack_timeout, int move_timeout, MessageQueue s) {
@@ -39,8 +39,6 @@ public class ListenerThread implements Runnable {
         this.gameInProgress = gameInProgress;
         this.ACK_TIMEOUT = ack_timeout;
         this.MOVE_TIMEOUT = move_timeout;
-
-        this.parser = new JSONParser();
     }
 
     /**
@@ -56,15 +54,17 @@ public class ListenerThread implements Runnable {
         }
         else if (command instanceof JoinGameCommand) {
             reply(new AcceptJoinGameCommand(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
+            stuff.addPlayer(ID);
             client.setPlayerId(ID);
-            playerName = ((JoinGameCommand) command).getName();
+            String playerName = ((JoinGameCommand) command).getName();
             players.add(new Player(ID, client, playerName));
+            customs = ((JoinGameCommand) command).getFeatures();
+            version = ((JoinGameCommand) command).getVersion();
             if (playerName != null) {
                 // Send player list to all connected players.
                 stuff.sendPlayerList(players);
-                reply(stuff.getMessage(players.size()));
+                reply(stuff.getMessage(ID));
             }
-            //TODO Now that the player is added, what happens?
             return true;
         }
         return false;
@@ -78,6 +78,8 @@ public class ListenerThread implements Runnable {
     }
 
     private void reply(Command command) {
+        if (command == null)
+            return;
         output.println(command);
         output.flush();
     }
@@ -106,59 +108,76 @@ public class ListenerThread implements Runnable {
             if (gameInProgress) {
                 rejectGame();
             } else {
-                initialised = initialiseConnection();
+                if(initialiseConnection()) state = state.next();
             }
 
             Command reply = waitingOn(PingCommand.class);
-
             if (!(reply instanceof PingCommand)){
+                System.out.println("Error, no ping command received");
                 //error here
             }
-            initialised = true;     // Ping reply received
+            System.out.println("Ping reply received: "+ ID);
+            state = state.next();     // Ping reply received
 
             reply = waitingOn(ReadyCommand.class);
 
-            if (!(reply instanceof AcknowledgementCommand) || !reply.get("ack_id").equals(1)){
-                //error here
+            if (!(reply instanceof AcknowledgementCommand) || ((AcknowledgementCommand)reply).getAcknowledgementId() != 1){
+                throw new InitialisationException("Acknowledgement error");
             }
-            initialised = true;     // Ready acknowledgement received
-            stuff.sendAll(reply);
+            state = state.next();    // Ready acknowledgement received
 
             // here, the game is initialised with a final list of players.
             while (true){
-                Command comm = stuff.getMessage(players.size());
+                Command comm = stuff.getMessage(ID);
+                reply(comm);
+                if (comm == null) continue;
                 if (comm.getClass().equals(InitialiseGameCommand.class)){
-                    reply(comm);
                     break;
                 }
             }
 
 
         } catch(IOException e){
-            //TODO don't leave the miserable exceptions alone... :(
+            e.printStackTrace();
+        } catch(InitialisationException f) {
+            //TODO send error message and remove this player.
         }
 
     }
 
     private Command waitingOn(Class<?> c){
+        Command reply;
         while(true){
-            Command comm = stuff.getMessage(players.size());
+            Command comm = stuff.getMessage(ID);
+            reply(comm);
+            if (comm == null)
+                continue;
             if (comm.getClass().equals(c)) {
-                reply(comm);
-                initialised = false;
                 try {
-                    Command reply = Command.parseCommand(input.readLine());
+                    reply = Command.parseCommand(input.readLine());
+                    reply(stuff.probablygetMessage(ID));
                     stuff.sendAll(reply);
-                    return reply;
+                    System.out.println("Stuff " + ID);
+                    break;
                 } catch (IOException e){
-
+                    e.printStackTrace();
                 }
 
             }
         }
+        System.out.println("reply");
+        return reply;
     }
 
-    public boolean initialised() {
-        return initialised;
+    public boolean initialised(InitState instate) {
+        return state.equals(instate);
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public ArrayList<String> getCustoms() {
+        return customs;
     }
 }

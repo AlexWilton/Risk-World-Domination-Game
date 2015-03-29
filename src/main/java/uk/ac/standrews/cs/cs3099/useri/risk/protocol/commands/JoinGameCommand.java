@@ -56,4 +56,26 @@ public class JoinGameCommand extends Command {
     public JoinGameCommand(JSONObject object){
         super(object);
     }
+
+    public ArrayList<String> getFeatures() {
+        ArrayList<String> list = new ArrayList<>();
+        for (Object a : features){
+            list.add((String) a);
+            System.out.println(a);
+
+        }
+        return list;
+    }
+
+    public int getVersion() {
+        int i = 0;
+        for (Object a : versions){
+            if (a instanceof Long){
+                if (((Long) a).intValue() > i){
+                    i = (((Long) a).intValue());
+                }
+            }
+        }
+        return i;
+    }
 }

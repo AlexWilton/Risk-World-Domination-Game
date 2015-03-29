@@ -69,4 +69,9 @@ public class WebClient extends Client {
     public int[] getSeedComponent() {
         return new int[0];
     }
+
+    @Override
+    public boolean isReady(){
+        return true;
+    }
 }

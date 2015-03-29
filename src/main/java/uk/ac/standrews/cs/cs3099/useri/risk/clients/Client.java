@@ -42,4 +42,7 @@ public abstract class Client {
     public Player getPlayer() {
         return (gameState == null)? null : gameState.getPlayer(playerId);
     }
+
+    public abstract boolean isReady();
+
 }

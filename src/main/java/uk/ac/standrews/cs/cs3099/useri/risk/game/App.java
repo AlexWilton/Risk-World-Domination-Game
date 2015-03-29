@@ -1,7 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketDistributor;
-import uk.ac.standrews.cs.cs3099.useri.risk.helpers.TestGameStateFactory;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
 
 /**
  * Hello world!!!
@@ -17,8 +16,8 @@ public class App {
         gameEngine.initialise(gameState);
         gameEngine.gameLoop();*/
 
-        ClientSocketDistributor d = new ClientSocketDistributor("localhost",1234,null);
-        new Thread(d).start();
+        //ClientSocketHandler d = new ClientSocketHandler("localhost",1234,null);
+        //new Thread(d).start();
 
     }
 

@@ -17,12 +17,15 @@ public class Command extends JSONObject {
         super(object);
     }
 
+
+
     public static Command parseCommand(String commandJSON){
         if (commandJSON==null){
             //TODO throw exception
             System.out.println("received string empty");
             return null;
         }
+        System.out.println(commandJSON);
         JSONObject messageObject;
         messageObject = (JSONObject) JSONValue.parse(commandJSON);
 
@@ -62,25 +65,19 @@ public class Command extends JSONObject {
                 ret = new RejectJoinGameCommand(messageObject);
                 break;
             case AcknowledgementCommand.COMMAND_STRING:
-                ret = new AcknowledgementCommand(messageObject);
+                ret = AcknowledgementCommand.parse(commandJSON);
                 break;
             case InitialiseGameCommand.COMMAND_STRING:
                 ret = new InitialiseGameCommand(messageObject);
                 break;
             case PingCommand.COMMAND_STRING:
-                ret = new PingCommand(messageObject);
+                ret = PingCommand.parse(commandJSON);
                 break;
             case PlayersJoinedCommand.COMMAND_STRING:
                 ret = new PlayersJoinedCommand(messageObject);
                 break;
             case ReadyCommand.COMMAND_STRING:
                 ret = new ReadyCommand(messageObject);
-                break;
-            case "ping":
-                ret = PingCommand.parse(commandJSON);
-                break;
-            case "acknowledgement":
-                ret = AcknowledgementCommand.parse(commandJSON);
                 break;
             default:
                 ret = null;

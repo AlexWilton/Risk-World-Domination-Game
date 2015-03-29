@@ -10,6 +10,12 @@ public class NetworkClient extends Client {
 
     private Queue<Action> actionQueue;
 
+    private boolean ready;
+
+    public NetworkClient(){
+        ready = false;
+    }
+
     @Override
     public Action getAction () {
         //wait until an action is in the queue
@@ -36,6 +42,15 @@ public class NetworkClient extends Client {
 
     public void pushAction(Action action){
         actionQueue.add(action);
+    }
+
+    @Override
+    public boolean isReady(){
+        return ready;
+    }
+
+    public void setReady (boolean set){
+        ready = set;
     }
 
 }

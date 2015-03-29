@@ -5,6 +5,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.util.ArrayList;
+
 public class JoinGameCommand extends Command {
 
     public static final String COMMAND_STRING = "join_game";

@@ -299,4 +299,9 @@ public class CLIClient extends Client {
 
         return seedComponent;
     }
+
+    @Override
+    public boolean isReady(){
+        return true;
+    }
 }

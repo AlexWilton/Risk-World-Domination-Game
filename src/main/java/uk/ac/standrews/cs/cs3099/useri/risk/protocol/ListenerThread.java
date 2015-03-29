@@ -48,7 +48,7 @@ public class ListenerThread implements Runnable {
     private synchronized boolean initialiseConnection() throws IOException {
         Command command = JoinGameCommand.parse(input.readLine());
         if(command == null) {
-            reply(new AcknowledgementCommand(32768, 200, null));
+            reply(new AcknowledgementCommand(32768, 200, null,0));//TODO added hardcoded player id to make it work
             purgeConnection();
             return false;
         }
@@ -86,7 +86,7 @@ public class ListenerThread implements Runnable {
 
     private void rejectGame() throws IOException {
         if (JoinGameCommand.parse(input.readLine()) == null)
-            reply(new AcknowledgementCommand(32768, 200, null));
+            reply(new AcknowledgementCommand(32768, 200, null,0));//TODO added hardcoded player id to make it work
         else
             reply(new RejectJoinGameCommand("Game already in progress"));
 

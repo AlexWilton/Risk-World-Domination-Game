@@ -28,6 +28,7 @@ public class PingCommand extends Command {
             }
             Long id_str = (Long) obj.get("player_id");
             Integer id = id_str==null? null:id_str.intValue();
+            if(id == null) id = ((Long) obj.get("playerId")).intValue();
 
             Long payload_str = (Long) obj.get("payload");
             Integer payload = payload_str==null? null: payload_str.intValue();

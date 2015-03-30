@@ -22,13 +22,9 @@ public class ClientApp {
 
     public static int run (String address, int port, WebClient webClient) {
         ClientSocketHandler socketHandler = new ClientSocketHandler();
-        float[] versions = {0.1f};
+        float[] versions = {1};
         String[] features = {};
-        socketHandler.initialise(address,port,webClient,versions,features);
-
-
-
-        return SUCCESS;
+        return socketHandler.initialise(address,port,webClient,versions,features);
     }
     public static void main(String argv[]){
         //hardcode port and address for now

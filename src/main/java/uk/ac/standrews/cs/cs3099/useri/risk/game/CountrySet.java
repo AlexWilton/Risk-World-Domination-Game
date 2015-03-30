@@ -1,9 +1,12 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONAware;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class CountrySet extends HashSet<Country>{
+public class CountrySet extends HashSet<Country> implements JSONAware{
 
     public boolean contains(Object obj){
         if(obj instanceof Country)
@@ -32,5 +35,14 @@ public class CountrySet extends HashSet<Country>{
             ids.add(c.getCountryId());
         }
         return ids;
+    }
+
+    @Override
+    public String toJSONString() {
+        JSONArray countries = new JSONArray();
+        for(Country c : this) {
+            countries.add(c);
+        }
+        return countries.toJSONString();
     }
 }

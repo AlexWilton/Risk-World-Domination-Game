@@ -1,5 +1,8 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
+import org.json.simple.JSONAware;
+import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -7,7 +10,7 @@ import java.util.Stack;
  * holds the game state inclusive map, players and currently active player.
  *
  */
-public class State {
+public class State implements JSONAware{
 
 	private Map map;
 	private ArrayList<Player> players;
@@ -106,5 +109,13 @@ public class State {
                 return p;
         }
         return null;
+    }
+
+    @Override
+    public String toJSONString() {
+        JSONObject state = new JSONObject();
+        state.put("map", map);
+
+        return state.toJSONString();
     }
 }

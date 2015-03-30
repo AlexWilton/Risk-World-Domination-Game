@@ -5,16 +5,11 @@ $( window ).load(setup);
 
 function setup(){
     //get state
-    $.ajax( "example.php" )
-        .done(function() {
-            alert( "success" );
+    $.ajax( "/?operation=get_state" )
+        .done(function(data) {
+            console.log(JSON.parse(data));
         })
         .fail(function() {
             alert( "error" );
-        })
-        .always(function() {
-            alert( "complete" );
         });
-
-// Pe
 }

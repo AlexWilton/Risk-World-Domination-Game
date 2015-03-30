@@ -4,6 +4,8 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.Action;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.JettyServer;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.TestGameStateFactory;
 
 import java.awt.*;
 import java.net.URI;
@@ -73,5 +75,13 @@ public class WebClient extends Client {
     @Override
     public boolean isReady(){
         return true;
+    }
+
+    public void setState(State gameState){
+        this.gameState = gameState;
+    }
+
+    public State getState(){
+        return gameState;
     }
 }

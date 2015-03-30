@@ -1,6 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -9,7 +10,7 @@ import java.io.FileReader;
 import java.util.Stack;
 
 
-public class Map {
+public class Map implements JSONAware{
 
     private static final String FILEPATH_DEFAULT_MAP = "src/res/defaultMap.json";
 
@@ -169,5 +170,13 @@ public class Map {
 
     public boolean isValidMap() {
         return validMap;
+    }
+
+    @Override
+    public String toJSONString() {
+        JSONObject map = new JSONObject();
+        map.put("countries", countries);
+        map.put("continents", continents);
+        return map.toJSONString();
     }
 }

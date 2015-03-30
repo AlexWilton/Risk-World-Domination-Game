@@ -3,8 +3,12 @@ var Risk = {
 	/**
 	 * Settings Object, holding application wide settings
 	 */
+	GlobalScale: function(){
+		return ($("#map").width() / 1696.0);
+	},
+
 	Settings :{
-		globalScale: ((window.innerHeight - 3) / 1080),
+		//globalScale: 1,
 		colors: {yellow: '#ff0', green: '#0f0', blue: '#00f', red: '#f00', purple: '#f0f', cyan: '#00ffe4'}
 	},
 
@@ -29,17 +33,17 @@ var Risk = {
 
 		//Initiate a Kinetic stage
 		Risk.stage = new Kinetic.Stage({
-			container: 'map', //1920/1080
-			width: (window.innerHeight - 3) * 1920/1080,
-            height: window.innerHeight - 5
+			container: 'map', //1696/1080
+			width: $("#map").width(),
+            height: $("#map").width() * 1080/1696
 		});
 
 		Risk.mapLayer = new Kinetic.Layer({
-			scale: Risk.Settings.globalScale
+			scale: Risk.GlobalScale()
 		});
 
 		Risk.topLayer = new Kinetic.Layer({
-			scale: Risk.Settings.globalScale
+			scale: Risk.GlobalScale()
 		});
 
 		Risk.drawBackgroundImg();
@@ -55,7 +59,7 @@ var Risk = {
 	},
 
 	/**
-	 * Initiate the  Risk.Territories Object, this will contain essential informations about the territories 
+	 * Initiate the  Risk.Territories Object, this will contain essential informations about the territories
 	 */
 	setUpTerritoriesObj: function() {
 		for(id in TerritoryNames) {
@@ -68,12 +72,12 @@ var Risk = {
 			//Using a sprite image for territory names
 			//see: drawImage() -- https://developer.mozilla.org/en-US/docs/Canvas_tutorial/Using_images , and see Kinetic.Image() docs for more
 			var sprite = new Image();
-			sprite.src = 'names.png';
+			sprite.src = 'resources/names.png';
 			var territoryNameImg = new Kinetic.Image({
 				image: sprite,
 				x: FontDestinationCoords[id].x,
 				y: FontDestinationCoords[id].y,
-				width: FontSpriteCoords[id].sWidth, //'destiantion Width' 
+				width: FontSpriteCoords[id].sWidth, //'destiantion Width'
 				height: FontSpriteCoords[id].sHeight, //'destination Height'
 				crop: [FontSpriteCoords[id].sx, FontSpriteCoords[id].sy, FontSpriteCoords[id].sWidth, FontSpriteCoords[id].sHeight]
 
@@ -88,15 +92,15 @@ var Risk = {
 				armyNum: null
 			};
 		}
-		
+
 	},
 
 	drawBackgroundImg: function() {
 		Risk.backgroundLayer = new Kinetic.Layer({
-			scale: Risk.Settings.globalScale
+			scale: Risk.GlobalScale()
 		});
 		var imgObj = new Image();
-		imgObj.src = 'map_grey.jpg';
+		imgObj.src = 'resources/map_grey_new.jpg';
 		
 		var img = new Kinetic.Image({
 			image: imgObj,

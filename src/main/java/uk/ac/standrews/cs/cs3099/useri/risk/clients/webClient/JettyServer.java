@@ -5,6 +5,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.webapp.WebAppContext;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 
 import java.net.BindException;
 
@@ -12,11 +13,11 @@ public class JettyServer implements Runnable {
     private static final String WEB_CLIENT_FILEPATH = "web_client";
     private Server server = null;
 
-    public JettyServer(){
+    public JettyServer(WebClient webClient){
         server = new Server(0); //find random open port on runtime
 
         // create the handlers
-        Handler dataRequestHandler = new ParamHandler();
+        Handler dataRequestHandler = new ParamHandler(webClient);
 
         WebAppContext fileHandler = new WebAppContext();
         fileHandler.setContextPath("/");
@@ -26,7 +27,6 @@ public class JettyServer implements Runnable {
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers(new Handler[] { dataRequestHandler, fileHandler });
         server.setHandler(handlers);
-
 
     }
 

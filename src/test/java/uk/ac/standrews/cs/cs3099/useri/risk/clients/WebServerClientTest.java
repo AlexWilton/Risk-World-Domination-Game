@@ -12,7 +12,7 @@ public class WebServerClientTest {
 
     @Before
     public void setup(){
-        jettyServer = new JettyServer();
+        jettyServer = new JettyServer(null);
     }
 
     @Test

@@ -14,7 +14,7 @@ public class WebClient extends Client {
     JettyServer jettyServer;
     public WebClient(){
         //Launch Jetty Web Server
-        jettyServer = new JettyServer();
+        jettyServer = new JettyServer(this);
         jettyServer.run();
 
         //Wait for it to be ready

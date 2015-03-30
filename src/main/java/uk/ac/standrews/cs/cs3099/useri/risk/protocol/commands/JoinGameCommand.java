@@ -19,7 +19,10 @@ public class JoinGameCommand extends Command {
         super("join_game");
         this.versions = versions;
         this.features = features;
-
+        JSONObject payload = new JSONObject();
+        payload.put("supported_versions", versions);
+        payload.put("supported_features", features);
+        this.put("payload", payload);
     }
 
     public JoinGameCommand(JSONArray versions, JSONArray features, String name){

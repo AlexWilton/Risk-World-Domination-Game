@@ -47,7 +47,7 @@ public class DeployArmyActionTest{
     @Test
     public void testSuccessfulDeploy(){
         //Test that Player A successfully adds armies to Indonesia
-        playerA.setUnassignedArmy(5);
+        playerA.setUnassignedArmies(5);
         DeployArmyAction deploy = new DeployArmyAction(playerA, indonesia, 3);
 
         assertTrue(deploy.validateAgainstState(testState));
@@ -55,13 +55,13 @@ public class DeployArmyActionTest{
         deploy.performOnState(testState);
 
         assertEquals(6, indonesia.getTroops());
-        assertEquals(2, playerA.getUnassignedArmy());
+        assertEquals(2, playerA.getUnassignedArmies());
     }
 
     @Test
     public void testNotEnoughResources(){
         //Test that deployment fails when the player has less resources than he wants to deploy.
-        playerA.setUnassignedArmy(2);
+        playerA.setUnassignedArmies(2);
 
         DeployArmyAction deploy = new DeployArmyAction(playerA, indonesia, 3);
 
@@ -71,7 +71,7 @@ public class DeployArmyActionTest{
     @Test
     public void testNotYourCountry(){
         //Test that deployment fails when the player does not have the country they want to deploy to.
-        playerA.setUnassignedArmy(4);
+        playerA.setUnassignedArmies(4);
 
         DeployArmyAction deploy = new DeployArmyAction(playerA, westernAustralia, 3);
 

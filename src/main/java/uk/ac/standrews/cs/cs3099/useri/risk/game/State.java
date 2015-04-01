@@ -1,5 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
@@ -115,6 +116,10 @@ public class State implements JSONAware{
     public String toJSONString() {
         JSONObject state = new JSONObject();
         state.put("map", map);
+        JSONArray playerJson = new JSONArray();
+        for(Player p : players)
+            playerJson.add(p);
+        state.put("players", playerJson);
 
         return state.toJSONString();
     }

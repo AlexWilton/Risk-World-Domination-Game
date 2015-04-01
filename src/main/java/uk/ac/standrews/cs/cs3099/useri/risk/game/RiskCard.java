@@ -1,6 +1,9 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
-public class RiskCard {
+import org.json.simple.JSONAware;
+import org.json.simple.JSONObject;
+
+public class RiskCard implements JSONAware{
 	private RiskCardType cardType;
 	private int cardID;
 
@@ -11,4 +14,12 @@ public class RiskCard {
 
     public RiskCardType getType(){return cardType;}
     public int getCardID(){return cardID;}
+
+    @Override
+    public String toJSONString() {
+        JSONObject card = new JSONObject();
+        card.put("type", cardType);
+        card.put("card_id", cardID);
+        return card.toJSONString();
+    }
 }

@@ -1,5 +1,8 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONAware;
+import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.Action;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 
@@ -9,13 +12,13 @@ import java.util.ArrayList;
  * represents a player in the game, and keeps track of the occupied countries and risk cards
  *
  */
-public class Player{
+public class Player implements JSONAware{
     private Client client;
     private String name;
     private int ID;
 	private CountrySet occupiedCountries;
 	private ArrayList<RiskCard> cards;
-	private int unassignedArmy;
+	private int unassignedArmies;
 	///enable if a player is disconnected to skip his turn
 	private boolean inactive;
 
@@ -47,12 +50,12 @@ public class Player{
         return client.getAction();
     }
 
-    public int getUnassignedArmy (){
-        return unassignedArmy;
+    public int getUnassignedArmies(){
+        return unassignedArmies;
     }
 
-    public void setUnassignedArmy(int value){
-        unassignedArmy = value;
+    public void setUnassignedArmies(int value){
+        unassignedArmies = value;
     }
 
     public CountrySet getOccupiedCountries(){
@@ -109,5 +112,20 @@ public class Player{
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String toJSONString() {
+        JSONObject player = new JSONObject();
+        player.put("name", name);
+        player.put("ID", ID);
+        player.put("occupiedCountries", occupiedCountries);
+        JSONArray cardArray = new JSONArray();
+        for(RiskCard c : cards)
+            cardArray.add(c);
+        player.put("cards", cardArray);
+        player.put("unassignedArmies", unassignedArmies);
+        player.put("inactive", inactive);
+        return player.toJSONString();
     }
 }

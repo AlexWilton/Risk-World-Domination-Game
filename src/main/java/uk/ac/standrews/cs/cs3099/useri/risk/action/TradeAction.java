@@ -42,7 +42,7 @@ public class TradeAction extends Action {
      */
     @Override
     public void performOnState(State state) {
-        player.setUnassignedArmy(player.getUnassignedArmy() + calculateArmies(state));
+        player.setUnassignedArmies(player.getUnassignedArmies() + calculateArmies(state));
 
         ArrayList<Country> occ;
         if ((occ = occupied(state)) != null){

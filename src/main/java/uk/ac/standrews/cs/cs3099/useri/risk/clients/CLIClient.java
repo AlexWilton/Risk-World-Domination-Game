@@ -8,8 +8,6 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.*;
 
@@ -83,14 +81,14 @@ public class CLIClient extends Client {
 
         Action ret;
 
-        if (gameState.getCurrentPlayer().getUnassignedArmy() > 0) {
-            out.println("You have " + gameState.getCurrentPlayer().getUnassignedArmy() + " unassigned armies. Assign to which country?");
+        if (gameState.getCurrentPlayer().getUnassignedArmies() > 0) {
+            out.println("You have " + gameState.getCurrentPlayer().getUnassignedArmies() + " unassigned armies. Assign to which country?");
 
             Country target = selectCountry(gameState.getCurrentPlayer().getOccupiedCountries(),false,true,false);
 
             out.println("How many armies to deploy to " + target.getCountryName());
 
-            int amount = getChoice(0, gameState.getCurrentPlayer().getUnassignedArmy());
+            int amount = getChoice(0, gameState.getCurrentPlayer().getUnassignedArmies());
 
 
             ret = new DeployArmyAction(gameState.getCurrentPlayer(),target,amount);

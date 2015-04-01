@@ -31,7 +31,7 @@ public class DeployArmyAction extends Action{
     public boolean validateAgainstState(State state) {
         if (super.validateAgainstState(state)) {
             if (country.getOwner().equals(player)) {
-                if (player.getUnassignedArmy() >= armies) {
+                if (player.getUnassignedArmies() >= armies) {
                     return true;
                 }
             }
@@ -47,7 +47,7 @@ public class DeployArmyAction extends Action{
     @Override
     public void performOnState(State state) {
         country.setTroops(country.getTroops() + armies);
-        player.setUnassignedArmy(getPlayer().getUnassignedArmy() - armies);
+        player.setUnassignedArmies(getPlayer().getUnassignedArmies() - armies);
 
         //TODO although, still needs TESTS!!!
     }

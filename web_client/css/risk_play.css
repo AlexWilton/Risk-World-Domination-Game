@@ -16,3 +16,8 @@ html,body {
 #map {
     margin: auto;
 }
+
+.currentPlayer{
+    color: #4cae4c;
+    font-size: larger;
+}

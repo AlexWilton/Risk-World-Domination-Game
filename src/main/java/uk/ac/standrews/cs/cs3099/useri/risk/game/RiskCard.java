@@ -18,7 +18,7 @@ public class RiskCard implements JSONAware{
     @Override
     public String toJSONString() {
         JSONObject card = new JSONObject();
-        card.put("type", cardType);
+        card.put("type", cardType.toString());
         card.put("card_id", cardID);
         return card.toJSONString();
     }

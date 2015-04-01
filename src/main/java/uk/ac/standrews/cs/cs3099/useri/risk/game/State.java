@@ -120,7 +120,14 @@ public class State implements JSONAware{
         for(Player p : players)
             playerJson.add(p);
         state.put("players", playerJson);
-
+        state.put("currentPlayer", currentPlayer);
+        JSONArray deckArray = new JSONArray();
+        for(RiskCard card : cardsDeck)
+            deckArray.add(card);
+        state.put("cardDeck", deckArray);
+        state.put("winner", winner);
+        state.put("turn_stage", stage.toString());
+        state.put("wonBattle", wonBattle);
         return state.toJSONString();
     }
 }

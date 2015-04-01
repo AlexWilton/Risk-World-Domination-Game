@@ -5,7 +5,7 @@
  */
 var TerritoryNames = {	
 	Alaska: 'Alaska',
-	NorthWestTerritory: 'North West Territory',
+	NorthWestTerritory: 'Northwest territory',
 	Alberta: 'Alberta',
 	Ontario: 'Ontario',
 	Greenland: 'Greenland',
@@ -28,7 +28,7 @@ var TerritoryNames = {
 	NorthernEurope: 'Northern Europe',
 	SouthernEurope: 'Southern Europe',
 	Scandinavia: 'Scandinavia',
-	Madagascar: 'Madagascar',
+	Madagascar: 'Madagaskar',
 	Ukraine: 'Ukraine',
 	MiddleEast: 'Middle East',
 	Afghanistan: 'Afghanistan',
@@ -40,7 +40,7 @@ var TerritoryNames = {
 	Irkutsk: 'Irkutsk',
 	Yakutsk: 'Yakutsk',
 	Siberia: 'Siberia',
-	Kamchatka: 'Kamchatka',
+	Kamchatka: 'Kamichatka',
 	Japan: 'Japan',
 	Indonesia: 'Indonesia',
 	NewGuinea: 'New Guinea',

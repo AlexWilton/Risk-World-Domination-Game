@@ -14,6 +14,8 @@ import java.net.URL;
 public class WebClient extends Client {
 
     JettyServer jettyServer;
+    Action action = null;
+
     public WebClient(){
         //Launch Jetty Web Server
         jettyServer = new JettyServer(this);
@@ -43,14 +45,18 @@ public class WebClient extends Client {
         }
     }
 
+    public void setAction(Action action){
+        this.action = action;
+    }
 
     /**
      * @return the next action this player takes based on current game state
      */
     @Override
     public Action getAction() {
-
-        return null;
+        Action current = action;
+        action = null;
+        return current;
     }
 
     /**
@@ -74,7 +80,10 @@ public class WebClient extends Client {
 
     @Override
     public boolean isReady(){
-        return true;
+        if(action != null)
+            return true;
+        else
+            return false;
     }
 
     public void setState(State gameState){

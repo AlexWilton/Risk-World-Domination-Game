@@ -39,6 +39,12 @@ public class TestGameStateFactory {
         players.add(new Player(0,c0, "Amazing Alice"));
         players.add(new Player(1,c1, "Boring Bob"));
 
+
+        //give lots of cards to player0 for testing
+        for(int i=0; i<5; i++) {
+            players.get(0).addCard(new RiskCard(RiskCardType.TYPE_ARTILLERY, 7 + i));
+        }
+
         //go through all countries
         Iterator<Player> p = players.iterator();
         int tc =1;

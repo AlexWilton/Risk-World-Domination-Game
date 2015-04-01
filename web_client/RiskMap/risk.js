@@ -51,7 +51,7 @@ var Risk = {
 
 		Risk.mapLayer.draw();
 
-		Risk.divideTerritories();
+		Risk.setTerritoriesColour();
 	},
 
 	/**
@@ -143,7 +143,7 @@ var Risk = {
 		}				
 	},
 
-	divideTerritories: function() {
+	setTerritoriesColour: function() {
 
 		fillRandomColors();
 

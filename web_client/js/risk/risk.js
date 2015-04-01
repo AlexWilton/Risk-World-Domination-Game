@@ -1,3 +1,4 @@
+var colors = ['cyan', 'green', 'blue', 'red', 'purple', 'pink'];
 var Risk = {
 
 	/**
@@ -8,20 +9,10 @@ var Risk = {
 	},
 
 	Settings :{
-		//globalScale: 1,
-		colors: {yellow: '#ff0', green: '#0f0', blue: '#00f', red: '#f00', purple: '#f0f', cyan: '#00ffe4'}
+		colors: {cyan: '#00ffe4', green: '#0f0', blue: '#00f', red: '#f00', purple: '#f0f', pink: '##ffcccc'}
 	},
 
-	/**
-	 * Our main Territories object
-	 * It looks like:
-	 * Territories: {
-	 *     Alaska: {path: Object, color: String, name: 'Alaska', ...},
-	 *	   ... 
-	 *	}
-	 */
 	Territories: {},
-
 	stage: null,
 	mapLayer: null,
 	topLayer:  null,
@@ -55,7 +46,7 @@ var Risk = {
 
 		Risk.mapLayer.draw();
 
-		Risk.divideTerritories();
+		Risk.setTerritoriesColour();
 	},
 
 	/**
@@ -83,13 +74,25 @@ var Risk = {
 
 			});
 
+			var game_state_terrority = "not_found";
+			for(game_state_country_id in game_state.map.countries){
+				var country = game_state.map.countries[game_state_country_id];
+				if(country.name.toLowerCase().replace(" ", "") == TerritoryNames[id].toLowerCase().replace(" ", "")){
+					game_state_terrority = country;
+				}
+			}
+			if(game_state_terrority === "not_found"){
+				console.log("Mapping for " + TerritoryNames[id] + " not found");
+			}
+
 			Risk.Territories[id] = {
 				name: TerritoryNames[id],
 				path: pathObject,
 				nameImg: territoryNameImg,
 				color: null,
 				neighbours: Neighbours[id],
-				armyNum: null
+				armyNum: null,
+				mapped_game_state_territory : game_state_terrority
 			};
 		}
 
@@ -103,11 +106,46 @@ var Risk = {
 		imgObj.src = 'resources/map_grey_new.jpg';
 		
 		var img = new Kinetic.Image({
-			image: imgObj,
+			image: imgObj
 			//alpha: 0.8
 		});
 		Risk.backgroundLayer.add(img);
 	},
+
+	updateMap: function(){
+		$("#map").html(""); //clear old displayed map
+		Risk.Territories = {};
+
+		Risk.setUpTerritoriesObj();
+
+		//Initiate a Kinetic stage
+		Risk.stage = new Kinetic.Stage({
+			container: 'map', //1696/1080
+			width: $("#map").width(),
+			height: $("#map").width() * 1080/1696
+		});
+
+		Risk.mapLayer = new Kinetic.Layer({
+			scale: Risk.GlobalScale()
+		});
+
+		Risk.topLayer = new Kinetic.Layer({
+			scale: Risk.GlobalScale()
+		});
+
+		//Risk.drawBackgroundImg();
+		Risk.drawTerritories();
+
+		Risk.stage.add(Risk.backgroundLayer);
+		Risk.stage.add(Risk.mapLayer);
+		Risk.stage.add(Risk.topLayer);
+
+		Risk.mapLayer.draw();
+		Risk.setTerritoriesColour();
+		Risk.setTerritoriesColour();
+
+	},
+
 
 	drawTerritories: function() {
 		for (t in Risk.Territories) {
@@ -140,65 +178,20 @@ var Risk = {
 				});
 
 				group.on('click', function() {
-					console.log(path.attrs.id);
-					location.hash = path.attrs.id;
+					console.log(Risk.Territories[path.attrs.id]);
+					//location.hash = path.attrs.id;
 				});
 			})(path, t, group);
 		}				
 	},
 
-	divideTerritories: function() {
-
-		fillRandomColors();
-
-		for(var id in Risk.Territories) {
-			var color = Risk.Territories[id].color;
-			
-			var neighbours = Risk.Territories[id].neighbours;
-
-			//a VERY simple algorithm to make the map more equal
-			var similarNeighbours = 0;
-			for(var i = 0; i < neighbours.length; i++) {
-
-				var currNeighbour = neighbours[i];
-				if (Risk.Territories[currNeighbour].color == color) {
-					similarNeighbours++;
-				}
-			}
-
-			//how many similar neighbours we allow
-			if (similarNeighbours > 2) {
-				var newColor = getRandomColor();
-				while (color == newColor) {
-					var newColor = getRandomColor();
-				}
-				Risk.Territories[id].color = newColor;
-
-				Risk.Territories[id].path.setFill(Risk.Settings.colors[newColor]);
-				Risk.Territories[id].path.setOpacity(0.4);				
-			}
-		}
-
+	setTerritoriesColour: function() {
 		Risk.mapLayer.draw();
-
-		function fillRandomColors() {
 			for(var id in Risk.Territories) {
-				var color = getRandomColor();
+				var color = colors[Risk.Territories[id].mapped_game_state_territory.player_owner_id];
 				Risk.Territories[id].color = color;
 				Risk.Territories[id].path.setFill(Risk.Settings.colors[color]);
-				Risk.Territories[id].path.setOpacity(0.4);			
-
+				Risk.Territories[id].path.setOpacity(0.4);
 			}
-		}
-
-		/**
-		 * Returns a color name like 'yellow'
-		 */
-		function getRandomColor() {
-			var colors = ['yellow', 'green', 'blue', 'red'];
-			//Math.random() returns between [0, 1), so don't worry
-			var randomNum = Math.floor(Math.random()*(colors.length)); 
-			return colors[randomNum];
-		}
 	}
-}
+};

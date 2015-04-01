@@ -47,6 +47,7 @@ public class Player implements JSONAware{
     }
 
     public Action getPlayerAction(){
+        while(!client.isReady()){} //wait till client is ready
         return client.getAction();
     }
 

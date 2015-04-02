@@ -23,7 +23,6 @@ public class ParamHandler extends DefaultHandler {
     public ParamHandler(WebClient webClient){
         super();
         this.webClient = webClient;
-        webClient.setState(TestGameStateFactory.getTestGameState()); //TODO remove testing STATE!!!
     }
 
     public void handle( String target,

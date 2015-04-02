@@ -64,6 +64,9 @@ function updateTurnPanel(){
                 }
 
                 break;
+            case "STAGE_DEPLOYING":
+
+                break;
             default:
 
                 break;
@@ -99,11 +102,11 @@ function generateTradeInPanel(){
 
 function waitForServer(){
     $.get('/?operation=is_server_waiting_for_action', function(response){
-        if(response == "true"){
+        if(response.indexOf("true") == 0){
             getStateFromServer();
             updateDisplay();
         }else{
-            setTimeout(waitForServer, 500);
+            setTimeout(waitForServer, 1000);
         }
     });
 }
@@ -123,6 +126,5 @@ function make_trade_in_request(){
                     'Trade Not Allowed.' +
             '</div>');
         }
-        //http://localhost:52484/play.html?operation=is_server_waiting_for_action
     });
 }

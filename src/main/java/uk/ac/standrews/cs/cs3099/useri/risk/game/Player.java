@@ -79,6 +79,7 @@ public class Player implements JSONAware{
      * @return
      */
     public Country choose(ArrayList<Country> occ) {
+        if(occ.size() > 0) return occ.get(0); //use first one found - to be improved!
         //TODO unimplemented method, required for TradeAction!
         return null;
     }

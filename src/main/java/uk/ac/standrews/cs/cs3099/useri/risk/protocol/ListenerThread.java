@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * All fields are final and protected.
  */
 public class ListenerThread implements Runnable {
-    private MessageQueue stuff;
+    private MessageQueue messageQueue;
     private static ArrayList<Player> players = new ArrayList<>();
     private final int ACK_TIMEOUT, MOVE_TIMEOUT;
     protected final Socket sock;
@@ -31,8 +31,8 @@ public class ListenerThread implements Runnable {
     private ArrayList<String> customs;
 
 
-    public ListenerThread(Socket sock, int id, Client client, boolean gameInProgress, int ack_timeout, int move_timeout, MessageQueue s) {
-        this.stuff = s;
+    public ListenerThread(Socket sock, int id, Client client, boolean gameInProgress, int ack_timeout, int move_timeout, MessageQueue q) {
+        this.messageQueue = q;
         this.sock = sock;
         this.ID = id;
         this.client = client;
@@ -54,7 +54,7 @@ public class ListenerThread implements Runnable {
         }
         else if (command instanceof JoinGameCommand) {
             reply(new AcceptJoinGameCommand(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
-            stuff.addPlayer(ID);
+            messageQueue.addPlayer(ID);
             client.setPlayerId(ID);
             String playerName = ((JoinGameCommand) command).getName();
             players.add(new Player(ID, client, playerName));
@@ -62,8 +62,8 @@ public class ListenerThread implements Runnable {
             version = ((JoinGameCommand) command).getVersion();
             if (playerName != null) {
                 // Send player list to all connected players.
-                stuff.sendPlayerList(players);
-                reply(stuff.getMessage(ID));
+                messageQueue.sendPlayerList(players);
+                reply(messageQueue.getMessage(ID));
             }
             return true;
         }
@@ -128,7 +128,7 @@ public class ListenerThread implements Runnable {
 
             // here, the game is initialised with a final list of players.
             while (true){
-                Command comm = stuff.getMessage(ID);
+                Command comm = messageQueue.getMessage(ID);
                 reply(comm);
                 if (comm == null) continue;
                 if (comm.getClass().equals(InitialiseGameCommand.class)){
@@ -148,15 +148,15 @@ public class ListenerThread implements Runnable {
     private Command waitingOn(Class<?> c){
         Command reply;
         while(true){
-            Command comm = stuff.getMessage(ID);
+            Command comm = messageQueue.getMessage(ID);
             reply(comm);
             if (comm == null)
                 continue;
             if (comm.getClass().equals(c)) {
                 try {
                     reply = Command.parseCommand(input.readLine());
-                    reply(stuff.probablygetMessage(ID));
-                    stuff.sendAll(reply);
+                    reply(messageQueue.probablygetMessage(ID));
+                    messageQueue.sendAll(reply);
                     System.out.println("Stuff " + ID);
                     break;
                 } catch (IOException e){
@@ -179,5 +179,9 @@ public class ListenerThread implements Runnable {
 
     public ArrayList<String> getCustoms() {
         return customs;
+    }
+
+    public static ArrayList<Player> getPlayers() {
+        return players;
     }
 }

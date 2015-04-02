@@ -35,6 +35,8 @@ public class State implements JSONAware{
         this.players = players;
         this.cardsDeck = map.getCardsFromMapData();
         this.currentPlayer = players.get(0);
+        this.stage = TurnStage.STAGE_TRADING;
+        wonBattle = false;
     }
 
     public Player getCurrentPlayer() {

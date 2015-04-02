@@ -33,7 +33,7 @@ public class ObtainRiskCardActionTest {
         playerA = new Player(0,null);
         players.add(playerA);
 
-        testState.setup(new Map(), players, riskCards);
+        testState.setup(new Map("data/default.map"), players, riskCards);
         while(testState.getTurnStage() != TurnStage.STAGE_GET_CARD) testState.nextStage(); //set turn stage to Deploy
 
     }

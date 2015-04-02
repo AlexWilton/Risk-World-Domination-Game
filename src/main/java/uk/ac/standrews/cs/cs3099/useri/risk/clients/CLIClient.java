@@ -1,6 +1,5 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
-import ec.util.MersenneTwisterFast;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.CountrySet;
@@ -9,7 +8,10 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Scanner;
 
 public class CLIClient extends Client {
 
@@ -214,6 +216,11 @@ public class CLIClient extends Client {
         return getChoice(1,objective.getTroops());
     }
 
+    @Override
+    public int[] getSeedComponent() {//empty method to just to replace
+        return new int[0];
+    }
+
     private int getChoice(int min, int max){
 
         int choice = min-1;
@@ -286,7 +293,7 @@ public class CLIClient extends Client {
         this.in = in;
         this.out = out;
     }
-
+/**
     public int[] getSeedComponent() {
         MersenneTwisterFast twister = new MersenneTwisterFast();
         twister.setSeed(System.currentTimeMillis());
@@ -297,7 +304,7 @@ public class CLIClient extends Client {
 
         return seedComponent;
     }
-
+**/
     @Override
     public boolean isReady(){
         return true;

@@ -20,17 +20,21 @@ public class State implements JSONAware{
     private Stack<RiskCard> cardsDeck;
 	private Player currentPlayer;
     private Player winner = null;
-    private TurnStage stage;
-    private boolean wonBattle;
+    private TurnStage stage = TurnStage.STAGE_TRADING;;
+    private boolean wonBattle = false;
     private int cardSetstradedIn = 0;
 
-    public void setup(Map map, ArrayList<Player> players, Stack<RiskCard> cardsDeck){
+    public State(){}
+
+    public State(Map map, ArrayList<Player> players){
+        setup(map, players);
+    }
+
+    public void setup(Map map, ArrayList<Player> players){
         this.map = map;
         this.players = players;
-        this.cardsDeck = cardsDeck;
+        this.cardsDeck = map.getCardsFromMapData();
         this.currentPlayer = players.get(0);
-        this.stage = TurnStage.STAGE_TRADING;
-        wonBattle = false;
     }
 
     public Player getCurrentPlayer() {

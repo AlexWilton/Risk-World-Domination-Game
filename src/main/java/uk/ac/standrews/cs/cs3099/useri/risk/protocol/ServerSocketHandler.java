@@ -45,9 +45,6 @@ public class ServerSocketHandler implements Runnable {
         MessageQueue s = new MessageQueue(2, isServerPlaying);
         while (!gameInProgress) {
             try {
-                // TODO set up the initial game state.
-
-
                 // Open the gates!
                 Socket temp = server.accept();
                 System.out.println("New client connected");

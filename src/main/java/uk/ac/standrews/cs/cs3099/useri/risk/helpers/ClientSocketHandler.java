@@ -5,23 +5,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.ArrayQueue;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.ClientApp;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Queue;
 
 
@@ -186,7 +183,7 @@ public class ClientSocketHandler implements Runnable{
 
             //send own acknowledgement
 
-            sendCommand(new AcknowledgementCommand(ackId,0,null,localClient.getPlayerId()));
+            sendCommand(new AcknowledgementCommand(ackId, localClient.getPlayerId()));
 
             //wait for other acknowledgements
 

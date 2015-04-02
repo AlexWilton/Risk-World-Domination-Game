@@ -10,14 +10,10 @@ public class AcknowledgementCommand extends Command {
 
     private static int ACK_ID;
 
-    public AcknowledgementCommand(int id, int response_code, JSONObject data, int player_id) {
+    public AcknowledgementCommand(int id, int player_id) {
         super(COMMAND_STRING);
-        JSONObject payload = new JSONObject();
         ACK_ID = id;
-        payload.put("ack_id", id);
-        payload.put("response", response_code);
-        payload.put("data", data);
-        this.put("payload", payload);
+        this.put("payload", ACK_ID);
         this.put("player_id", player_id);
     }
 
@@ -33,15 +29,11 @@ public class AcknowledgementCommand extends Command {
             if (!obj.get("command").equals("acknowledgement")) {
                 return null;
             }
-            JSONObject payload = (JSONObject) obj.get("payload");
-            Long ack_id_str = (Long) payload.get("ack_id");
-            int ack_id = ack_id_str==null? -1 : ack_id_str.intValue();
-            Long response_code_str = (Long) payload.get("response");
-            int response_code = response_code_str==null? -1 : response_code_str.intValue();
-            JSONObject data = (JSONObject) payload.get("data");
+            Long payload = (Long) obj.get("payload");
+            int ack_id = payload==null? -1 : payload.intValue();
             int playerId = Integer.parseInt(obj.get("player_id").toString());
             System.out.println("AckCommand returned");
-            return new AcknowledgementCommand(ack_id, response_code, data,playerId);
+            return new AcknowledgementCommand(ack_id, playerId);
 
         } catch(ParseException e){
             System.out.println(commandJSON);

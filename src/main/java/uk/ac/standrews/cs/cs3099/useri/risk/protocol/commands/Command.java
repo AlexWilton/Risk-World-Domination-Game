@@ -17,72 +17,99 @@ public class Command extends JSONObject {
         super(object);
     }
 
+    public JSONObject getPayload(){
+        return (JSONObject)this.get("payload");
+    }
+
+    public int getPlayer(){
+        return Integer.parseInt(this.get("player_id").toString());
+    }
+
+    public String getAsEvelope(String signature){
+        String message = this.toJSONString();
+        JSONObject ret = new JSONObject();
+        ret.put("message", message);
+        ret.put("signature", signature);
+
+        return ret.toJSONString();
+
+    }
 
 
-    public static Command parseCommand(String commandJSON){
-        if (commandJSON==null){
+
+    public static Command parseCommand(String envelopeString){
+        if (envelopeString==null){
             //TODO throw exception
             System.out.println("received string empty");
             return null;
         }
-        System.out.println(commandJSON);
-        JSONObject messageObject;
-        messageObject = (JSONObject) JSONValue.parse(commandJSON);
 
-        String command = messageObject.get("command").toString();
+        //extract the actual command
+        JSONObject envelopeJSON = (JSONObject) JSONValue.parse(envelopeString);
+
+        //TODO maybe verify?
+
+        String unescapedCommandString = envelopeJSON.get("message").toString();
+        JSONObject commandJSON = (JSONObject) JSONValue.parse(unescapedCommandString);
+
+        String command = commandJSON.get("command").toString();
 
         Command ret;
 
         switch (command) {
             case DeployCommand.COMMAND_STRING:
-                ret = new DeployCommand(messageObject);
+                ret = new DeployCommand(commandJSON);
                 break;
             case AttackCommand.COMMAND_STRING:
-                ret = new AttackCommand(messageObject);
+                ret = new AttackCommand(commandJSON);
                 break;
             case PlayCardsCommand.COMMAND_STRING:
-                ret = new PlayCardsCommand(messageObject);
+                ret = new PlayCardsCommand(commandJSON);
                 break;
             case DrawCardCommand.COMMAND_STRING:
-                ret = new DrawCardCommand(messageObject);
+                ret = new DrawCardCommand(commandJSON);
                 break;
             case DefendCommand.COMMAND_STRING:
-                ret = new DefendCommand(messageObject);
+                ret = new DefendCommand(commandJSON);
                 break;
             case AttackCaptureCommand.COMMAND_STRING:
-                ret = new AttackCaptureCommand(messageObject);
+                ret = new AttackCaptureCommand(commandJSON);
                 break;
             case FortifyCommand.COMMAND_STRING:
-                ret = new FortifyCommand(messageObject);
+                ret = new FortifyCommand(commandJSON);
                 break;
             case JoinGameCommand.COMMAND_STRING:
-                ret = new JoinGameCommand(messageObject);
+                ret = new JoinGameCommand(commandJSON);
                 break;
             case AcceptJoinGameCommand.COMMAND_STRING:
-                ret = new AcceptJoinGameCommand(messageObject);
+                ret = new AcceptJoinGameCommand(commandJSON);
                 break;
             case RejectJoinGameCommand.COMMAND_STRING:
-                ret = new RejectJoinGameCommand(messageObject);
+                ret = new RejectJoinGameCommand(commandJSON);
                 break;
             case AcknowledgementCommand.COMMAND_STRING:
-                ret = AcknowledgementCommand.parse(commandJSON);
+                ret = AcknowledgementCommand.parse(unescapedCommandString);
                 break;
             case InitialiseGameCommand.COMMAND_STRING:
-                ret = new InitialiseGameCommand(messageObject);
+                ret = new InitialiseGameCommand(commandJSON);
                 break;
             case PingCommand.COMMAND_STRING:
-                ret = PingCommand.parse(commandJSON);
+                ret = PingCommand.parse(unescapedCommandString);
                 break;
             case PlayersJoinedCommand.COMMAND_STRING:
-                ret = new PlayersJoinedCommand(messageObject);
+                ret = new PlayersJoinedCommand(commandJSON);
                 break;
             case ReadyCommand.COMMAND_STRING:
-                ret = new ReadyCommand(messageObject);
+                ret = new ReadyCommand(commandJSON);
                 break;
             default:
                 ret = null;
         }
 
         return ret;
+    }
+
+    private static String unescape(String escapedString){
+        return escapedString.replace("\\","");
     }
 }

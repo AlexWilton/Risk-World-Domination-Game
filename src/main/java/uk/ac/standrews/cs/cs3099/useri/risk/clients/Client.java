@@ -31,6 +31,10 @@ public abstract class Client {
 
     public abstract int[] getSeedComponent();
 
+    public abstract int[] getSeedHash();
+
+    public abstract void newSeedComponent();
+
     public void setPlayerId(int playerId){
         this.playerId = playerId;
     }

@@ -19,12 +19,27 @@ public class ClientApp {
     public static final int CANNOT_OPEN_STREAMS = -2;
     public static final int JOIN_REJECTED = -3;
     public static final int COMMUNICATION_FAILED = -4;
+    public static final int PROTOCOL_ERROR_DETECTED = -5;
 
     public static int run (String address, int port, WebClient webClient) {
         ClientSocketHandler socketHandler = new ClientSocketHandler();
         float[] versions = {1};
         String[] features = {};
-        return socketHandler.initialise(address,port,webClient,versions,features);
+        //connect and obtain game information
+        socketHandler.initialise(address,port,webClient,versions,features);
+
+        //determine first player
+
+        //shuffle risk cards
+
+
+        //initialise game state
+        State gameState = new State();
+
+
+
+        return SUCCESS;
+       
     }
     public static void main(String argv[]){
         //hardcode port and address for now

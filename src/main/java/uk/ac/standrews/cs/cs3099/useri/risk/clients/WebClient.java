@@ -79,6 +79,16 @@ public class WebClient extends Client {
     }
 
     @Override
+    public int[] getSeedHash() {
+        return new int[0];
+    }
+
+    @Override
+    public void newSeedComponent() {
+
+    }
+
+    @Override
     public boolean isReady(){
         if(action != null)
             return true;

@@ -7,6 +7,10 @@ import java.util.Queue;
 
 public class NetworkClient extends Client {
 
+    @Override
+    public void newSeedComponent() {
+
+    }
 
     private Queue<Action> actionQueue;
 
@@ -31,6 +35,12 @@ public class NetworkClient extends Client {
 
     @Override
     public int[] getSeedComponent(){
+
+        return null;
+    }
+
+    @Override
+    public int[] getSeedHash(){
 
         return null;
     }

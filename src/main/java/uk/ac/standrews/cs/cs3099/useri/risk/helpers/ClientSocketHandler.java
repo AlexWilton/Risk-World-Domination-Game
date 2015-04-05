@@ -8,7 +8,10 @@ import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.RiskDice;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.ClientApp;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
@@ -17,6 +20,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+
+import java.io.*;
+import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Queue;
@@ -75,6 +81,16 @@ public class ClientSocketHandler implements Runnable{
         return null;
     }
 
+    /**
+     *
+     * connects this local client and also joins the game
+     * @param address
+     * @param port
+     * @param localClient
+     * @param versions
+     * @param features
+     * @return
+     */
 
     public int initialise(String address, int port, Client localClient, float[] versions, String[] features){
         //try to connect
@@ -214,6 +230,93 @@ public class ClientSocketHandler implements Runnable{
         }
 
         return ClientApp.SUCCESS;
+    }
+
+    public int determineFirstPlayer(){
+
+        try{
+
+
+            //expect dice roll
+            boolean replied = false;
+
+            int count=0;
+            int faces=0;
+
+            while (!replied){
+                Command command = getNextCommand();
+                if (command instanceof RollCommand){
+
+                    count = Integer.parseInt(command.getPayload().get("dice_count").toString());
+                    faces = Integer.parseInt(command.getPayload().get("dice_faces").toString());
+
+                    localClient.newSeedComponent();
+
+                    replied = true;
+                }
+            }
+
+            //send own hash
+
+            sendCommand(new RollHashCommand(toHexString(localClient.getSeedHash()),localClient.getPlayerId()));
+
+            //wait for other hashes
+            RiskDice playerDice = new RiskDice(faces,count);
+            int number_replied = 0;
+            ArrayList<String> hashes = new ArrayList<>(getPlayerAmount());
+
+            while (number_replied<remoteClients.size()){
+                Command command = getNextCommand();
+                if (command instanceof RollHashCommand){
+
+                    int player = command.getPlayer();
+                    String rollHash = command.get("payload").toString();
+                    hashes.set(player,rollHash);
+                    number_replied += 1;
+                }
+            }
+
+            //now send own number
+            sendCommand(new RollNumberCommand(toHexString(localClient.getSeedComponent()),localClient.getPlayerId()));
+            //add to risk dice
+            playerDice.addSeedComponent(localClient.getSeedComponent());
+
+            //receive other players numbers
+            number_replied = 0;
+
+            ArrayList<Boolean> has_replied = new ArrayList<>(getPlayerAmount());
+
+            while (number_replied<remoteClients.size()){
+                Command command = getNextCommand();
+                if (command instanceof RollNumberCommand){
+
+                    int player = command.getPlayer();
+                    if (!has_replied.get(player)){
+                        String rollNumber = command.get("payload").toString();
+                        playerDice.addSeedComponent(toIntArray(rollNumber));
+                        number_replied += 1;
+                        has_replied.set(player,true);
+                    }
+
+                }
+            }
+
+            //get the random number
+
+            int startingPlayer = playerDice.getBattleDiceRolls(0,1)[0];
+
+            return startingPlayer;
+
+        }
+        catch (IOException e){
+            return ClientApp.COMMUNICATION_FAILED;
+        }
+
+
+    }
+
+    private int getPlayerAmount(){
+        return remoteClients.size()+1;
     }
 
     public boolean allRemoteClientsReady(){
@@ -497,5 +600,25 @@ public class ClientSocketHandler implements Runnable{
         }
 
     }
+
+    private String toHexString(int[] value){
+        String ret = "";
+        for (int i : value){
+            ret += StringUtils.leftPad(Integer.toString(i,16),8,"0");
+        }
+
+        return ret;
+    }
+
+    private int[] toIntArray(String original){
+        int[] arr = new int [original.length()/8];
+
+        for (int i = 0; i < original.length()/8;i++){
+            arr[i] = Integer.parseInt(original.substring(i*8,(i+1)*8),16);
+        }
+        return arr;
+    }
+
+
 
 }

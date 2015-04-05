@@ -1,5 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
+import ec.util.MersenneTwisterFast;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.CountrySet;
@@ -8,16 +9,17 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Scanner;
+import java.util.*;
 
 public class CLIClient extends Client {
 
     InputStream in;
     PrintStream out;
 
+    @Override
+    public void newSeedComponent() {
+
+    }
 
 
     public CLIClient (State gameState){
@@ -295,6 +297,17 @@ public class CLIClient extends Client {
     }
 /**
     public int[] getSeedComponent() {
+        MersenneTwisterFast twister = new MersenneTwisterFast();
+        twister.setSeed(System.currentTimeMillis());
+        int [] seedComponent = new int[RiskDice.SEED_ARRAY_LENGTH];
+        for (int i = 0; i < RiskDice.SEED_ARRAY_LENGTH; i++){
+            seedComponent[i] = twister.nextInt();
+        }
+
+        return seedComponent;
+    }
+
+    public int[] getSeedHash() {
         MersenneTwisterFast twister = new MersenneTwisterFast();
         twister.setSeed(System.currentTimeMillis());
         int [] seedComponent = new int[RiskDice.SEED_ARRAY_LENGTH];

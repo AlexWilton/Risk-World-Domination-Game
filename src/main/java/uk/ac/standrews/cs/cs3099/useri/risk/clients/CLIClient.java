@@ -1,6 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
-import ec.util.MersenneTwisterFast;
+
+import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.CountrySet;
@@ -138,6 +139,8 @@ public class CLIClient extends Client {
                 //2. everyone knows the attack plan
 
                 //3. get dice rolls
+
+                RandomNumbers
                 RiskDice dice = new RiskDice(RiskDice.ATTACK_ROLL_FACES,armies+defenders);
                 //get hashes from all clients
                 for (Player p : gameState.getPlayers()){
@@ -295,7 +298,8 @@ public class CLIClient extends Client {
         this.in = in;
         this.out = out;
     }
-/**
+
+/*
     public int[] getSeedComponent() {
         MersenneTwisterFast twister = new MersenneTwisterFast();
         twister.setSeed(System.currentTimeMillis());
@@ -306,18 +310,22 @@ public class CLIClient extends Client {
 
         return seedComponent;
     }
+*/
 
     public int[] getSeedHash() {
-        MersenneTwisterFast twister = new MersenneTwisterFast();
+        /*MersenneTwisterFast twister = new MersenneTwisterFast();
         twister.setSeed(System.currentTimeMillis());
         int [] seedComponent = new int[RiskDice.SEED_ARRAY_LENGTH];
         for (int i = 0; i < RiskDice.SEED_ARRAY_LENGTH; i++){
             seedComponent[i] = twister.nextInt();
         }
 
-        return seedComponent;
+        return seedComponent;*/
+
+        return null;
+
     }
-**/
+
     @Override
     public boolean isReady(){
         return true;

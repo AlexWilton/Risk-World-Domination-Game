@@ -1,5 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
+import org.apache.commons.lang3.StringUtils;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.Action;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
@@ -29,9 +30,7 @@ public abstract class Client {
 
     public abstract int getDefenders(Country attackingCountry, Country defendingCountry, int attackingArmies);
 
-    public abstract int[] getSeedComponent();
-
-    public abstract int[] getSeedHash();
+    public abstract byte[] getSeedComponent();
 
     public abstract void newSeedComponent();
 
@@ -48,5 +47,15 @@ public abstract class Client {
     }
 
     public abstract boolean isReady();
+
+    public String getHexSeed(){
+        return RNGSeed.toHexString(getSeedComponent());
+    }
+
+    public String getHexSeedHash(){
+        return RNGSeed.hexHashFromHexNumber(getHexSeed());
+    }
+
+
 
 }

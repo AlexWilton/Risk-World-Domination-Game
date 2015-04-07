@@ -134,4 +134,6 @@ public class State implements JSONAware{
         state.put("wonBattle", wonBattle);
         return state.toJSONString();
     }
+
+
 }

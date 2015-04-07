@@ -30,7 +30,11 @@ public class ClientApp {
 
         //determine first player
 
+        int firstPlayer = socketHandler.determineFirstPlayer();
+
         //shuffle risk cards
+
+
 
 
         //initialise game state

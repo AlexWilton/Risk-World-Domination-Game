@@ -5,13 +5,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.ArrayQueue;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.RiskDice;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.ClientApp;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
@@ -21,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
-import java.io.*;
-import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Queue;
@@ -258,52 +255,52 @@ public class ClientSocketHandler implements Runnable{
 
             //send own hash
 
-            sendCommand(new RollHashCommand(toHexString(localClient.getSeedHash()),localClient.getPlayerId()));
+            sendCommand(new RollHashCommand(localClient.getHexSeedHash(),localClient.getPlayerId()));
+
 
             //wait for other hashes
-            RiskDice playerDice = new RiskDice(faces,count);
-            int number_replied = 0;
-            ArrayList<String> hashes = new ArrayList<>(getPlayerAmount());
+            RNGSeed seed = new RNGSeed(getPlayerAmount());
 
-            while (number_replied<remoteClients.size()){
+            seed.addSeedComponentHash(localClient.getHexSeedHash(),localClient.getPlayerId());
+
+
+
+            while (!seed.hasAllHashes()){
                 Command command = getNextCommand();
                 if (command instanceof RollHashCommand){
 
                     int player = command.getPlayer();
                     String rollHash = command.get("payload").toString();
-                    hashes.set(player,rollHash);
-                    number_replied += 1;
+                    seed.addSeedComponentHash(rollHash,player);
                 }
             }
 
             //now send own number
-            sendCommand(new RollNumberCommand(toHexString(localClient.getSeedComponent()),localClient.getPlayerId()));
-            //add to risk dice
-            playerDice.addSeedComponent(localClient.getSeedComponent());
+            sendCommand(new RollNumberCommand(localClient.getHexSeed(),localClient.getPlayerId()));
+            //add to risk seed
+            seed.addSeedComponent(localClient.getHexSeed(),localClient.getPlayerId());
 
-            //receive other players numbers
-            number_replied = 0;
+
 
             ArrayList<Boolean> has_replied = new ArrayList<>(getPlayerAmount());
 
-            while (number_replied<remoteClients.size()){
+            while (!seed.hasAllNumbers()){
                 Command command = getNextCommand();
                 if (command instanceof RollNumberCommand){
 
                     int player = command.getPlayer();
-                    if (!has_replied.get(player)){
-                        String rollNumber = command.get("payload").toString();
-                        playerDice.addSeedComponent(toIntArray(rollNumber));
-                        number_replied += 1;
-                        has_replied.set(player,true);
-                    }
+
+                    String rollNumber = command.get("payload").toString();
+                    seed.addSeedComponent(rollNumber,player);
 
                 }
             }
 
             //get the random number
 
-            int startingPlayer = playerDice.getBattleDiceRolls(0,1)[0];
+            RandomNumbers r = new RandomNumbers(seed.getHexSeed());
+
+            int startingPlayer = r.getRandomInt()%faces;
 
             return startingPlayer;
 
@@ -601,23 +598,7 @@ public class ClientSocketHandler implements Runnable{
 
     }
 
-    private String toHexString(int[] value){
-        String ret = "";
-        for (int i : value){
-            ret += StringUtils.leftPad(Integer.toString(i,16),8,"0");
-        }
 
-        return ret;
-    }
-
-    private int[] toIntArray(String original){
-        int[] arr = new int [original.length()/8];
-
-        for (int i = 0; i < original.length()/8;i++){
-            arr[i] = Integer.parseInt(original.substring(i*8,(i+1)*8),16);
-        }
-        return arr;
-    }
 
 
 

@@ -47,10 +47,22 @@ public class Command extends JSONObject {
         //extract the actual command
         JSONObject envelopeJSON = (JSONObject) JSONValue.parse(envelopeString);
 
-        //TODO maybe verify?
+        //check if its the envelope or the message
+        JSONObject commandJSON;
 
-        String unescapedCommandString = envelopeJSON.get("message").toString();
-        JSONObject commandJSON = (JSONObject) JSONValue.parse(unescapedCommandString);
+
+        if (envelopeJSON.containsKey("message")){
+            //TODO maybe verify?
+
+            String unescapedCommandString = envelopeJSON.get("message").toString();
+            commandJSON = (JSONObject) JSONValue.parse(unescapedCommandString);
+        }
+
+        else
+        {
+            commandJSON = envelopeJSON;
+        }
+
 
         String command = commandJSON.get("command").toString();
 
@@ -88,13 +100,13 @@ public class Command extends JSONObject {
                 ret = new RejectJoinGameCommand(commandJSON);
                 break;
             case AcknowledgementCommand.COMMAND_STRING:
-                ret = AcknowledgementCommand.parse(unescapedCommandString);
+                ret = AcknowledgementCommand.parse(command);
                 break;
             case InitialiseGameCommand.COMMAND_STRING:
                 ret = new InitialiseGameCommand(commandJSON);
                 break;
             case PingCommand.COMMAND_STRING:
-                ret = PingCommand.parse(unescapedCommandString);
+                ret = PingCommand.parse(command);
                 break;
             case PlayersJoinedCommand.COMMAND_STRING:
                 ret = new PlayersJoinedCommand(commandJSON);

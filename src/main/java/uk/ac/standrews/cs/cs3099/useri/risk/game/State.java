@@ -3,6 +3,8 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
+import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -133,6 +135,21 @@ public class State implements JSONAware{
         state.put("turn_stage", stage.toString());
         state.put("wonBattle", wonBattle);
         return state.toJSONString();
+    }
+
+    public void shuffleRiskCards(RNGSeed seed){
+        RandomNumbers rng = new RandomNumbers(seed.getHexSeed());
+
+        //cards: Array containing all cards.
+
+        int len = cardsDeck.size();
+
+        for (int i = 0; i<len;i++){
+            int swapPos = rng.getRandomByte();
+            RiskCard c1 = cardsDeck.get(i);
+            cardsDeck.set(i,cardsDeck.get(swapPos));
+            cardsDeck.set(swapPos,c1);
+        }
     }
 
 

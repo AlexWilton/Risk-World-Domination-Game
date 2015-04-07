@@ -31,6 +31,16 @@ import java.util.Queue;
 public class ClientSocketHandler implements Runnable{
 
 
+    public enum ProtocolState {
+        START,
+        WAITING_FOR_PING,
+        WAITING_FOR_READY,
+        WAITING_FOR_ALL_ACKS,
+        RUNNING,
+        REJECTED,
+        FAILED
+    }
+
     private ArrayList<NetworkClient> remoteClients;
 
     private Client localClient;
@@ -41,19 +51,41 @@ public class ClientSocketHandler implements Runnable{
 
     private AttackActionBuilder builder;
 
+    private RNGSeed seed;
+
     private PrintWriter out;
 
     private BufferedReader in;
 
-    private Queue<Command> commandQueue;
 
     private int hostId;
+
+    private int diceFaces, diceNumber;
+
+    private ProtocolState protocolState;
+
+    private int proclaimedPlayerAmount;
+
+
+    public int getDiceFaces(){
+        return diceFaces;
+    }
+
+    public int getDiceNumber(){
+        return diceNumber;
+    }
+
+    public ProtocolState getProtocolState (){
+        return protocolState;
+    }
+
+
 
 
 
     public ClientSocketHandler() {
         this.remoteClients = new ArrayList<>();
-        commandQueue = new ArrayQueue<>();
+        protocolState = ProtocolState.START;
     }
 
     public ArrayList<Client> getAllClients(){
@@ -89,9 +121,9 @@ public class ClientSocketHandler implements Runnable{
      * @return
      */
 
-    public int initialise(String address, int port, Client localClient, float[] versions, String[] features){
+    public int initialise(String address, int port, Client localClient, float[] versions, String[] features, String name){
         //try to connect
-
+        this.localClient = localClient;
         try{
             clientSocket = new Socket(address, port);
             //make the writers/Readers
@@ -120,7 +152,7 @@ public class ClientSocketHandler implements Runnable{
             for (String feature : features){
                 featuresJSON.add(feature);
             }
-            JoinGameCommand joinCommand = new JoinGameCommand(versionsJSON,featuresJSON);
+            JoinGameCommand joinCommand = new JoinGameCommand(versionsJSON,featuresJSON,name);
             System.out.println(joinCommand.toJSONString());
             sendCommand(joinCommand);
 
@@ -141,12 +173,28 @@ public class ClientSocketHandler implements Runnable{
                 else if ( reply instanceof RejectJoinGameCommand){
                     //was rejected
                     System.out.println("Was rejected!");
+                    protocolState = ProtocolState.REJECTED;
                     return ClientApp.JOIN_REJECTED;
                 }
+                else {
+                    System.out.println("Wromg Protocol");
+                    protocolState = ProtocolState.FAILED;
+                    return ClientApp.PROTOCOL_ERROR_DETECTED;
+                }
             }
+            protocolState = ProtocolState.WAITING_FOR_PING;
+            return ClientApp.SUCCESS;
+        }
+        catch (IOException e){
+            e.printStackTrace();
+            System.out.println("wrong");
+            protocolState = ProtocolState.FAILED;
+            return ClientApp.COMMUNICATION_FAILED;
+        }
 
 
 
+/*
             //waiting for hosts ping
             replied = false;
             int amountPlayers = 0;
@@ -216,6 +264,8 @@ public class ClientSocketHandler implements Runnable{
 
             System.out.println("all players ready, negotiation ends!");
 
+            //Create clients
+
 
 
         }
@@ -224,90 +274,20 @@ public class ClientSocketHandler implements Runnable{
             System.out.println("wrong");
 
             return ClientApp.COMMUNICATION_FAILED;
-        }
+        }*/
 
-        return ClientApp.SUCCESS;
+
     }
 
     public int determineFirstPlayer(){
 
-        try{
 
+        while (!seed.hasAllNumbers());
+        RandomNumbers r = new RandomNumbers(seed.getHexSeed());
 
-            //expect dice roll
-            boolean replied = false;
+        int startingPlayer = r.getRandomInt()%getDiceFaces();
 
-            int count=0;
-            int faces=0;
-
-            while (!replied){
-                Command command = getNextCommand();
-                if (command instanceof RollCommand){
-
-                    count = Integer.parseInt(command.getPayload().get("dice_count").toString());
-                    faces = Integer.parseInt(command.getPayload().get("dice_faces").toString());
-
-                    localClient.newSeedComponent();
-
-                    replied = true;
-                }
-            }
-
-            //send own hash
-
-            sendCommand(new RollHashCommand(localClient.getHexSeedHash(),localClient.getPlayerId()));
-
-
-            //wait for other hashes
-            RNGSeed seed = new RNGSeed(getPlayerAmount());
-
-            seed.addSeedComponentHash(localClient.getHexSeedHash(),localClient.getPlayerId());
-
-
-
-            while (!seed.hasAllHashes()){
-                Command command = getNextCommand();
-                if (command instanceof RollHashCommand){
-
-                    int player = command.getPlayer();
-                    String rollHash = command.get("payload").toString();
-                    seed.addSeedComponentHash(rollHash,player);
-                }
-            }
-
-            //now send own number
-            sendCommand(new RollNumberCommand(localClient.getHexSeed(),localClient.getPlayerId()));
-            //add to risk seed
-            seed.addSeedComponent(localClient.getHexSeed(),localClient.getPlayerId());
-
-
-
-            ArrayList<Boolean> has_replied = new ArrayList<>(getPlayerAmount());
-
-            while (!seed.hasAllNumbers()){
-                Command command = getNextCommand();
-                if (command instanceof RollNumberCommand){
-
-                    int player = command.getPlayer();
-
-                    String rollNumber = command.get("payload").toString();
-                    seed.addSeedComponent(rollNumber,player);
-
-                }
-            }
-
-            //get the random number
-
-            RandomNumbers r = new RandomNumbers(seed.getHexSeed());
-
-            int startingPlayer = r.getRandomInt()%faces;
-
-            return startingPlayer;
-
-        }
-        catch (IOException e){
-            return ClientApp.COMMUNICATION_FAILED;
-        }
+        return startingPlayer;
 
 
     }
@@ -327,35 +307,174 @@ public class ClientSocketHandler implements Runnable{
     }
 
     public void run (){
-        float[] versions = null;
-        String[] features = null;
-        try{
-            //send join message
-            JSONArray versionsJSON = new JSONArray();
-            for (float version : versions){
-                versionsJSON.add(version);
-            }
-            JSONArray featuresJSON = new JSONArray();
-            for (String feature : features){
-                featuresJSON.add(feature);
-            }
-            JoinGameCommand joinCommand = new JoinGameCommand(versionsJSON,featuresJSON);
+        while (true) {
+            try {
+                Command currentCommand = getNextCommand();
+                switch (protocolState){
+                    case WAITING_FOR_PING:{
+                        processCommandWaitingPing(currentCommand);
+                    } break;
+                    case WAITING_FOR_READY:{
+                        processCommandWaitingReady(currentCommand);
+                    } break;
+                    case WAITING_FOR_ALL_ACKS:{
+                        processCommandWaitingAck(currentCommand);
+                    } break;
+                    case RUNNING:{
+                        processCommandRunning(currentCommand);
+                    } break;
+                    default:{
+                        System.out.println("UNEXPECTED");
+                        System.exit(-1);
+                    }
+                }
 
-            sendCommand(joinCommand);
-
-
-            //wait for accept or join
-            //run as long as connection is up
-            while(true){
-                interpretJSONMessage(getNextCommand());
             }
-        }
-        catch (IOException e){
-            e.printStackTrace();
-            System.out.println("wrong");
+            catch (IOException e){
+                e.printStackTrace();
+                System.exit(0);
+            }
+
         }
 
     }
+
+    public void processCommandWaitingPing(Command command){
+        if (command instanceof PlayersJoinedCommand){
+            processPlayersJoinedCommand((PlayersJoinedCommand) command);
+        }
+        else if (command instanceof PingCommand){
+            processHostPingCommand((RollNumberCommand) command);
+        }
+        else{
+            System.out.println("Command ignored:");
+            System.out.println(command.toJSONString());
+        }
+    }
+
+    public void processCommandWaitingReady(Command command) {
+        if (command instanceof ReadyCommand){
+            processReadyCommand((ReadyCommand) command);
+        }
+
+        else{
+            System.out.println("Command ignored:");
+            System.out.println(command.toJSONString());
+        }
+    }
+    public void processCommandWaitingAck(Command command){
+
+        System.out.println("Command ignored:");
+        System.out.println(command.toJSONString());
+
+    }
+
+    public void processCommandRunning (Command command){
+
+        if (command instanceof AttackCaptureCommand){
+
+        }
+        else if (command instanceof AttackCommand){
+
+        }
+        else if (command instanceof DefendCommand){
+
+        }
+        else if (command instanceof DeployCommand){
+
+        }
+        else if (command instanceof DrawCardCommand){
+
+        }
+        else if (command instanceof FortifyCommand){
+
+        }
+        else if (command instanceof PlayCardsCommand){
+
+        }
+        else if (command instanceof AcknowledgementCommand){
+
+        }
+        else if (command instanceof RollCommand){
+            processRollCommand((RollCommand) command);
+        }
+        else if (command instanceof RollHashCommand){
+            processRollHashCommand((RollHashCommand) command);
+        }
+        else if (command instanceof RollNumberCommand){
+            processRollNumberCommand((RollNumberCommand) command);
+        }
+        else {
+            System.out.println("Command ignored:");
+            System.out.println(command.toJSONString());
+        }
+
+
+    }
+
+    private void processRollCommand(RollCommand command){
+        diceNumber = Integer.parseInt(command.getPayload().get("dice_count").toString());
+        diceFaces = Integer.parseInt(command.getPayload().get("dice_faces").toString());
+
+        localClient.newSeedComponent();
+
+        seed.addSeedComponentHash(localClient.getHexSeedHash(),localClient.getPlayerId());
+        seed.addSeedComponent(localClient.getHexSeed(),localClient.getPlayerId());
+
+        seed = new RNGSeed(getPlayerAmount());
+    }
+
+    private void processRollHashCommand(RollHashCommand command){
+        int player = command.getPlayer();
+        String rollHash = command.get("payload").toString();
+        seed.addSeedComponentHash(rollHash,player);
+    }
+
+    private void processRollNumberCommand(RollNumberCommand command){
+        int player = command.getPlayer();
+        String rollNumber = command.get("payload").toString();
+        seed.addSeedComponent(rollNumber, player);
+    }
+
+    private void processPlayersJoinedCommand(PlayersJoinedCommand command){
+
+        JSONArray playersJSON = (JSONArray) command.get("payload");
+
+        for (Object playerObject : playersJSON){
+            JSONArray onePlayerJSON = (JSONArray) playerObject;
+            int playerNr = Integer.parseInt(onePlayerJSON.get(0).toString());
+            String playerName = onePlayerJSON.get(1).toString();
+            String playerSig = null;
+            if (onePlayerJSON.size() >2){
+                playerSig = onePlayerJSON.get(2).toString();
+            }
+            //Create the client
+            NetworkClient remoteClient = new NetworkClient();
+            remoteClient.setPlayerId(playerNr);
+            remoteClient.setPlayerName(playerName);
+            //maybe signature
+            remoteClients.add(remoteClient);
+        }
+
+    }
+
+    private void processHostPingCommand(RollNumberCommand command){
+        hostId = command.getPlayer();
+        proclaimedPlayerAmount = Integer.parseInt(command.get("payload").toString());
+        //TODO supposed to ask for ready
+        sendCommand(new PingCommand(localClient.getPlayerId(),null));
+        protocolState = ProtocolState.WAITING_FOR_READY;
+    }
+
+    private void processReadyCommand(ReadyCommand command){
+        protocolState = ProtocolState.RUNNING;
+    }
+
+
+
+
+
+
 
     public void sendCommand (Command command){
         out.println(command.toJSONString());
@@ -368,47 +487,17 @@ public class ClientSocketHandler implements Runnable{
             currentIn += in.readLine();
         }
         Command command = Command.parseCommand(currentIn);
+
+        //Acknowledge if required
+        if (command.containsKey("ack_id")){
+            int ackId = Integer.parseInt(command.get("ack_id").toString());
+            AcknowledgementCommand ack = new AcknowledgementCommand(ackId,localClient.getPlayerId());
+            sendCommand(ack);
+        }
         return command;
     }
 
-    private Command interpretJSONMessage(JSONObject messageObject){
 
-        String command = messageObject.get("command").toString();
-        int player = Integer.parseInt(messageObject.get(("player_id")).toString());
-
-        //handle different commands
-
-        if (command.equals(Commands.TRADE_COMMAND)){
-            interpretTradeCommand(messageObject, player);
-        }
-        else if (command.equals(Commands.DEPLOY_COMMAND)){
-            interpretDeployCommand(messageObject, player);
-        }
-        else if (command.equals(Commands.ATTACK_COMMAND)){
-            interpretAttackCommand(messageObject, player);
-        }
-        else if (command.equals(Commands.PLAY_CARDS_COMMAND)){
-            interpretPlayCardsCommand(messageObject, player);
-        }
-        else if (command.equals(Commands.DRAW_CARD_COMMAND)){
-            interpretDrawCardCommand(messageObject, player);
-        }
-        else if (command.equals(Commands.DEFEND_COMMAND)){
-            interpretDefendCommand(messageObject, player);
-        }
-        else if (command.equals(Commands.ATTACK_CAPTURE_COMMAND)){
-            //interpretCaptureCommand(messageObject, player);
-        }
-        else if (command.equals(Commands.FORTIFY_COMMAND)){
-            interpretFortifyCommand(messageObject, player);
-        }
-        else {
-            System.out.println("NOT IMPLEMENTED COMMAND: " + command);
-            System.out.println(command);
-        }
-
-        return null;
-    }
 
     private void interpretPlayCardsCommand(JSONObject commandObject, int player){
         /*{
@@ -596,6 +685,11 @@ public class ClientSocketHandler implements Runnable{
 
         }
 
+    }
+
+    public RNGSeed getRNGSeed(){
+        while(!seed.hasAllNumbers());
+        return seed;
     }
 
 

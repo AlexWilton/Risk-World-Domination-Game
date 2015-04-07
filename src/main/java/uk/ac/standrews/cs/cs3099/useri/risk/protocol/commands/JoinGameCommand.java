@@ -15,18 +15,17 @@ public class JoinGameCommand extends Command {
     JSONArray features;
     String name;
 
-    public JoinGameCommand(JSONArray versions, JSONArray features){
+
+
+    public JoinGameCommand(JSONArray versions, JSONArray features, String name){
         super("join_game");
         this.versions = versions;
         this.features = features;
         JSONObject payload = new JSONObject();
         payload.put("supported_versions", versions);
         payload.put("supported_features", features);
+        payload.put("name", name);
         this.put("payload", payload);
-    }
-
-    public JoinGameCommand(JSONArray versions, JSONArray features, String name){
-        this(versions, features);
         this.name = name;
     }
 

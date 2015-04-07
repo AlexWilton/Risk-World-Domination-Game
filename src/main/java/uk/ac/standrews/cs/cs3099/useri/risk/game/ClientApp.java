@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Stack;
 
 public class ClientApp {
 
@@ -25,12 +27,24 @@ public class ClientApp {
         ClientSocketHandler socketHandler = new ClientSocketHandler();
         float[] versions = {1};
         String[] features = {};
+        String name = "Some guy";
         //connect and obtain game information
-        socketHandler.initialise(address,port,webClient,versions,features);
+        socketHandler.initialise(address,port,webClient,versions,features,name);
+
+        //create create remote clients
+
 
         //determine first player
 
         int firstPlayer = socketHandler.determineFirstPlayer();
+
+        //make game state
+
+        State state = new State();
+
+        Map map = new Map();
+
+       state.setup(map);
 
         //shuffle risk cards
 

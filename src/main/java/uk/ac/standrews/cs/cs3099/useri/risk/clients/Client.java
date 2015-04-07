@@ -18,6 +18,8 @@ public abstract class Client {
 
     private int playerId;
 
+    private String playerName;
+
     /**
      * @return the next action this player takes based on current game state
      */
@@ -54,6 +56,14 @@ public abstract class Client {
 
     public String getHexSeedHash(){
         return RNGSeed.hexHashFromHexNumber(getHexSeed());
+    }
+
+    public String getPlayerName (){
+        return playerName;
+    }
+
+    public void setPlayerName(String name){
+        this.playerName = name;
     }
 
 

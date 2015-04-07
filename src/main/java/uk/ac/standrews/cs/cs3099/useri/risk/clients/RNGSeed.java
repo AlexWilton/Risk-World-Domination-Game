@@ -88,6 +88,7 @@ public class RNGSeed {
         return ret;
     }
 
+
     public static String toHexString(byte[] value){
         String ret = "";
         for (byte i : value){
@@ -124,5 +125,7 @@ public class RNGSeed {
     public static String hexHashFromHexNumber(String hexNumber){
         return toHexString(calcHash(hexStringToByteArray(hexNumber)));
     }
+
+
 
 }

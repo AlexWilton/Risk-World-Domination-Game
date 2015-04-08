@@ -44,6 +44,7 @@ var Risk = {
 		Risk.stage.add(Risk.mapLayer);
 		Risk.stage.add(Risk.topLayer);
 
+
 		Risk.mapLayer.draw();
 
 		Risk.setTerritoriesColour();
@@ -91,7 +92,7 @@ var Risk = {
 				nameImg: territoryNameImg,
 				color: null,
 				neighbours: Neighbours[id],
-				armyNum: null,
+				armyPoint: ArmyPoints[id],
 				mapped_game_state_territory : game_state_terrority
 			};
 		}
@@ -146,6 +147,47 @@ var Risk = {
 
 	},
 
+	showArmyInfo: function(territory){
+
+			var layer = new Kinetic.Layer();
+			var armyNumText = new Kinetic.Text({
+				x: (territory.armyPoint.x) * 1,
+				y: (territory.armyPoint.y) * 1,
+				//        text: 'COMPLEX TEXT\n\nAll the world\'s a stage, and all the men and women merely players. They have their exits and their entrances.',
+				text: territory.mapped_game_state_territory.troop_count,
+				fontSize: 20,
+				fontFamily: 'Calibri',
+				fill: '#555',
+				width: 30,
+				padding: 0,
+				align: 'center'
+			});
+
+			var cicle = new Kinetic.Circle({
+				x: (territory.armyPoint.x) * 1 + 13,
+				y: (territory.armyPoint.y) * 1 + 10,
+				stroke: '#555',
+				strokeWidth: 1,
+				fill: '#ddd',
+				radius: 15,
+				//height: complexText.getHeight(),
+				shadowColor: 'black',
+				shadowBlur: 1,
+				shadowOffset: [1, 1],
+				shadowOpacity: 0.2,
+				cornerRadius: 2
+			});
+
+			// add the shapes to the layer
+			//layer.add(simpleText);
+			var group = new Kinetic.Group();
+			group.add(cicle);
+			group.add(armyNumText);
+		return group;
+			//Risk.mapLayer.add(cicle);
+			//Risk.mapLayer.add(armyNumText);
+			//Risk.stage.add(layer);
+	},
 
 	drawTerritories: function() {
 		for (t in Risk.Territories) {
@@ -157,8 +199,9 @@ var Risk = {
 			//We have to set up a group for proper mouseover on territories and sprite name images 
 			group.add(path);
 			group.add(nameImg);
+			group.add(Risk.showArmyInfo(Risk.Territories[t]));
 			Risk.mapLayer.add(group);
-		
+
 			//Basic animations 
 			//Wrap the 'path', 't' and 'group' variables inside a closure, and set up the mouseover / mouseout events for the demo
 			//when you make a bigger application you should move this functionality out from here, and maybe put these 'actions' in a seperate function/'class'
@@ -182,6 +225,8 @@ var Risk = {
 					//location.hash = path.attrs.id;
 				});
 			})(path, t, group);
+
+
 		}				
 	},
 
@@ -192,6 +237,8 @@ var Risk = {
 				Risk.Territories[id].color = color;
 				Risk.Territories[id].path.setFill(Risk.Settings.colors[color]);
 				Risk.Territories[id].path.setOpacity(0.4);
+
+
 			}
 	}
 };

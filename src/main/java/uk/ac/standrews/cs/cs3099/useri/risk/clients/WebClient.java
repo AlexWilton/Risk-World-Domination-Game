@@ -10,11 +10,13 @@ import uk.ac.standrews.cs.cs3099.useri.risk.helpers.TestGameStateFactory;
 import java.awt.*;
 import java.net.URI;
 import java.net.URL;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class WebClient extends Client {
 
     JettyServer jettyServer;
-    Action action = null;
+    ArrayBlockingQueue<Action> actionQueue = new ArrayBlockingQueue<Action>(1); //can only hold one action at a time.
 
     public WebClient(){
         //Launch Jetty Web Server
@@ -26,7 +28,7 @@ public class WebClient extends Client {
 
         //Open Web interface in Browser
         int port = jettyServer.getServerPort();
-        openWebpage("http://localhost:" + port + "/");
+        openWebpage("http://localhost:" + port + "/play.html");
     }
 
     public static void openWebpage(String urlAsString) {
@@ -45,8 +47,12 @@ public class WebClient extends Client {
         }
     }
 
-    public void setAction(Action action){
-        this.action = action;
+    public void queueAction(Action action){
+        try {
+            actionQueue.put(action);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -54,9 +60,12 @@ public class WebClient extends Client {
      */
     @Override
     public Action getAction() {
-        Action current = action;
-        action = null;
-        return current;
+        try {
+            return actionQueue.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -87,14 +96,17 @@ public class WebClient extends Client {
 
     @Override
     public boolean isReady(){
-        if(action != null)
+        if(actionQueue.size() > 0)
             return true;
         else
             return false;
     }
 
     public void setState(State gameState){
-        this.gameState = gameState;
+        synchronized (this) {
+            this.gameState = gameState;
+            notify();
+        }
     }
 
     public State getState(){

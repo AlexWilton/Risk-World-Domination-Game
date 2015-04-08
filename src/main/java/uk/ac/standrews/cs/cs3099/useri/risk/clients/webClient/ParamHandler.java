@@ -159,7 +159,7 @@ public class ParamHandler extends DefaultHandler {
         Thread t = new Thread(host);
         t.start();
         
-        return "Server Started";
+        return "true";
     }
 
 
@@ -187,7 +187,7 @@ public class ParamHandler extends DefaultHandler {
         if(ClientApp.run(address, port, webClient) != ClientApp.SUCCESS)
             return "Connect to " + address + ":" + port + " failed!";
 
-        return "Connection Successful";
+        return "true";
     }
 }
 

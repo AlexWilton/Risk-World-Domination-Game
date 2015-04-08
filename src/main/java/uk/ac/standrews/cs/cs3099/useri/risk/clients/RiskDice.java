@@ -1,6 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
-import ec.util.MersenneTwisterFast;
+//import ec.util.MersenneTwisterFast;
 
 import java.util.ArrayList;
 
@@ -36,18 +36,18 @@ public class RiskDice {
 
         int ret[] = new int[amount];
 
-        int[] seed = calculateSeed();
-
-        MersenneTwisterFast twister = new MersenneTwisterFast();
-        twister.setSeed(seed);
-
-        for (int i = 0; i < first+amount; i++){
-            int roll = twister.nextInt(faces - 1) + 1;
-            if (i>=first){
-                ret[i-first] = roll;
-            }
-
-        }
+//        int[] seed = calculateSeed();
+//
+//        MersenneTwisterFast twister = new MersenneTwisterFast();
+//        twister.setSeed(seed);
+//
+//        for (int i = 0; i < first+amount; i++){
+//            int roll = twister.nextInt(faces - 1) + 1;
+//            if (i>=first){
+//                ret[i-first] = roll;
+//            }
+//
+//        }
 
         return ret;
 

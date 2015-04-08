@@ -9,6 +9,8 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.ClientApp;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.TestGameStateFactory;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.ListenerThread;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.ServerSocketHandler;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,15 +33,22 @@ public class ParamHandler extends DefaultHandler {
                         HttpServletResponse response ) throws IOException,
             ServletException
     {
+
+        //use test state if not set
+//        if(webClient.getState() == null) webClient.setState(TestGameStateFactory.getWebClientTestState(webClient));
+
         Map<String, String[]> params = request.getParameterMap();
         if (params.size() > 0)
         {
             response.setContentType("text/plain");
             String responseString = "No Operation Specified";
             String[] opArray = params.get("operation");
-            String operation = (opArray != null) ?(opArray[0]) : "";
+            String operation = (opArray != null && opArray[0] != null) ?(opArray[0]) : "";
             if(operation != null && !operation.equals("")){
                 switch (operation){
+                    case "host_game":
+                        responseString = createHost(params);
+                        break;
                     case "connect":
                         responseString = connectToHost(params);
                         break;
@@ -51,7 +60,7 @@ public class ParamHandler extends DefaultHandler {
                         break;
                     case "is_server_waiting_for_action":
                         Player myself = getWebClientPlayer();
-                        if(webClient.getState().getCurrentPlayer() == myself && !webClient.isReady())
+                        if(!webClient.isReady())
                             responseString = String.valueOf(true);
                         else
                             responseString = String.valueOf(false);
@@ -64,6 +73,8 @@ public class ParamHandler extends DefaultHandler {
                 }
             }
 
+            if(!operation.equals("is_server_waiting_for_action"))
+                System.out.println("Request for operation: " + operation + " received. (" + params.toString() + ")\nResponse sent: " + responseString + "\n");
             response.getWriter().println(responseString);
             baseRequest.setHandled(true);
         }
@@ -92,7 +103,7 @@ public class ParamHandler extends DefaultHandler {
                     if(!ta.validateAgainstState(webClient.getState())){
                         return String.valueOf(false);
                     }
-                    webClient.setAction(ta);
+                    webClient.queueAction(ta);
                     return String.valueOf(true);
                 }else{
                     return String.valueOf(false);
@@ -101,6 +112,50 @@ public class ParamHandler extends DefaultHandler {
                 return "Unknown Action";
         }
     }
+
+
+    private String createHost(Map<String, String[]> params) {
+        //Get Port to host on
+        String[] portArray = params.get("port");
+        int port;
+        try{
+            port = (portArray != null) ? (Integer.parseInt(portArray[0])) : -1;
+        }catch (NumberFormatException e){
+            port = -1;
+        }
+        if(port == -1)
+            return "Error! Valid Port Number not provided";
+
+        //Get Number Of Players
+        String[] numPlayerArray = params.get("number_of_players");
+        int numOfPlayers;
+        try{
+            numOfPlayers = (numPlayerArray != null) ? (Integer.parseInt(numPlayerArray[0])) : -1;
+            if(numOfPlayers < ServerSocketHandler.MIN_PLAYER_COUNT || numOfPlayers > ServerSocketHandler.MAX_PLAYER_COUNT)
+                numOfPlayers =-1;
+        }catch (NumberFormatException e){
+            numOfPlayers = -1;
+        }
+        if(port == -1)
+            return "Error! Valid Number of Players not provided";
+
+
+        //Get Number Of Players
+        String[] is_host_playingArray = params.get("is_host_playing");
+        boolean is_host_playing;
+            if(is_host_playingArray.length == 0)
+                return "Error! Valid is Host Playing boolean not provided";
+            is_host_playing = Boolean.parseBoolean(numPlayerArray[0]);
+
+
+        ServerSocketHandler host = new ServerSocketHandler(port, numOfPlayers, webClient, is_host_playing);
+        Thread t = new Thread(host);
+        t.start();
+        
+        return "Server Started";
+    }
+
+
 
 
     private String connectToHost(Map<String, String[]> params){

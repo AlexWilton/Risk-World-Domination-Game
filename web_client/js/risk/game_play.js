@@ -17,7 +17,7 @@ function setup(){
             }, 500);
         });
     });
-};
+}
 
 function getStateFromServer(functionToCallAfter){
     $.ajax( "/?operation=get_state" )
@@ -52,7 +52,7 @@ function updateMapDisplay(){
 
 function updateTurnPanel(){
     if(game_state.currentPlayer.ID == my_player_id){ //my turn
-        var panelHtml = "Turn Stage: " + game_state.turn_stage;
+        var panelHtml = "<strong>Your Turn</strong> (" + game_state.turn_stage + ")";
         switch(game_state.turn_stage){
             case "STAGE_TRADING":
                 if(isTradePossibleForMe())
@@ -65,7 +65,8 @@ function updateTurnPanel(){
 
                 break;
             case "STAGE_DEPLOYING":
-
+                panelHtml += "<br/>You have " + game_state.currentPlayer.unassignedArmies + " armies to deploy.";
+                panelHtml += "<br/><br/><small><strong>Select</strong> countries you wish to deploy to and specify how many armies to send to each.</small>";
                 break;
             default:
 

@@ -9,9 +9,9 @@ public class ServerTester {
     public static void main(String[] args) {
 
         WebClient webClient = new WebClient();
-//        webClient.setState(TestGameStateFactory.getWebClientTestState(webClient));
-//        GameEngine gameEngine = new GameEngine();
-//        gameEngine.initialise(webClient.getState());
-//        gameEngine.gameLoop();
+        webClient.setState(TestGameStateFactory.getWebClientTestState(webClient));
+        GameEngine gameEngine = new GameEngine();
+        gameEngine.initialise(webClient.getState());
+        gameEngine.gameLoop();
     }
 }

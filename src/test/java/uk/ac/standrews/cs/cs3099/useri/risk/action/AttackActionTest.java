@@ -28,7 +28,7 @@ public class AttackActionTest{
         playerB = new Player(1,null);
         players.add(playerA);
         players.add(playerB);
-        testState.setup(new Map(), players, null);
+        testState.setup(new Map(), players);
         while(testState.getTurnStage() != TurnStage.STAGE_BATTLES) testState.nextStage(); //set turn stage to Battle
         indonesia = testState.getCountryByID(38);
         newGuinea = testState.getCountryByID(39);

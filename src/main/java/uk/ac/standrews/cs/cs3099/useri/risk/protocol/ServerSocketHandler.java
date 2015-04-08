@@ -57,7 +57,7 @@ public class ServerSocketHandler implements Runnable {
 
                 // Decide whether we want to start the game already, partially randomly.
                 //Random r = new Random(System.nanoTime());
-                if (i == MAX_PLAYER_COUNT - 1) {
+                if (i == NUMBER_OF_PLAYERS - 1) {
 
                     gameInProgress = true;
                 }

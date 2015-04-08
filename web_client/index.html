@@ -39,17 +39,27 @@
                         </div>
                         <div class="panel-body">
                             <p>What settings are needed for game hosting?</p>
-                            <form class="form-inline form-center" style="text-align:center;" action="/RiskMap/">
+                            <form class="form-inline form-center" style="text-align:center;" id="hostForm" action="/RiskMap/">
                                 <div class="form-group">
-                                    <label for="numberOfPlayers">Number Of Players </label>
-                                    <input type="number" class="form-control" id="numberOfPlayers" value="3" style="width:50px;">
+                                    <label >Number Of Players: </label>
+                                    <input type="number" class="form-control" name="number_of_players" value="3" style="width:50px;">
                                 </div>
                                 <div class="form-group">
-                                    <label for="hostPortNumber" style="margin-left: 20px;">Port Number:</label>
-                                    <input type="number" class="form-control" id="hostPortNumber" placeholder="00000" style="width : 90px;">
+                                    <label style="margin-left: 20px;">Port Number:</label>
+                                    <input type="number" class="form-control" name="port" value=8888 style="width : 90px;">
+                                </div>
+                                <br/><br/>
+                                <label style="margin-left: 20px;">Is Host Playing?</label>
+                                <div class="btn-group" data-toggle="buttons">
+                                    <label class="btn btn-primary">
+                                        <input type="radio" name="is_host_playing" id="yes" value="true" autocomplete="off"> Yes
+                                    </label>
+                                    <label class="btn btn-primary active">
+                                        <input type="radio" name="is_host_playing" id="no" value="false" autocomplete="off" checked> No
+                                    </label>
                                 </div>
                                 <br/><br/><br/>
-                                <button type="submit" class="btn btn-primary btn-lg btn-block">Host Game!</button>
+                                <button type="button" class="btn btn-primary btn-lg btn-block" id="hostButton">Host Game!</button>
                             </form>
                         </div>
                     </div>

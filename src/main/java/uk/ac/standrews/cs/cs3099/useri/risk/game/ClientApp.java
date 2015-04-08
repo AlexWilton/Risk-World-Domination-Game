@@ -28,32 +28,18 @@ public class ClientApp {
         float[] versions = {1};
         String[] features = {};
         String name = "Some guy";
+
         //connect and obtain game information
         socketHandler.initialise(address,port,webClient,versions,features,name);
 
-        //create create remote clients
+        //Run the socket handler
+        Thread socketHandlerThread = new Thread(socketHandler);
+        socketHandlerThread.start();
 
-
-        //determine first player
-
-        int firstPlayer = socketHandler.determineFirstPlayer();
-
-        //make game state
-
-        State state = new State();
-
-        Map map = new Map();
-
-       state.setup(map);
-
-        //shuffle risk cards
-
-
-
-
-        //initialise game state
-        State gameState = new State();
-
+        //initialise and start the game engine thread
+        GameEngine engine = new GameEngine();
+        Thread gameEngineThread = new Thread(engine);
+        gameEngineThread.start();
 
 
         return SUCCESS;

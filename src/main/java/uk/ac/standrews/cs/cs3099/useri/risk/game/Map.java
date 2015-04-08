@@ -172,6 +172,16 @@ public class Map implements JSONAware{
         return validMap;
     }
 
+    public boolean hasUnassignedCountries(){
+
+        for (Country c : countries){
+            if (c.getOwner() == null){
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public String toJSONString() {
         JSONObject map = new JSONObject();

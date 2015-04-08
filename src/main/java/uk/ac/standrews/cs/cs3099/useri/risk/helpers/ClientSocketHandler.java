@@ -21,8 +21,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Queue;
+import java.util.*;
 
 
 /**
@@ -36,6 +35,7 @@ public class ClientSocketHandler implements Runnable{
         WAITING_FOR_PING,
         WAITING_FOR_READY,
         WAITING_FOR_ALL_ACKS,
+
         RUNNING,
         REJECTED,
         FAILED
@@ -56,6 +56,8 @@ public class ClientSocketHandler implements Runnable{
     private PrintWriter out;
 
     private BufferedReader in;
+
+    private Deque<RNGSeed> queuedSeeds;
 
 
     private int hostId;
@@ -86,6 +88,7 @@ public class ClientSocketHandler implements Runnable{
     public ClientSocketHandler() {
         this.remoteClients = new ArrayList<>();
         protocolState = ProtocolState.START;
+        queuedSeeds = new ArrayDeque<>();
     }
 
     public ArrayList<Client> getAllClients(){
@@ -282,8 +285,8 @@ public class ClientSocketHandler implements Runnable{
     public int determineFirstPlayer(){
 
 
-        while (!seed.hasAllNumbers());
-        RandomNumbers r = new RandomNumbers(seed.getHexSeed());
+        RNGSeed fpSeed = popOldestSeed();
+        RandomNumbers r = new RandomNumbers(fpSeed.getHexSeed());
 
         int startingPlayer = r.getRandomInt()%getDiceFaces();
 
@@ -418,10 +421,16 @@ public class ClientSocketHandler implements Runnable{
 
         localClient.newSeedComponent();
 
-        seed.addSeedComponentHash(localClient.getHexSeedHash(),localClient.getPlayerId());
-        seed.addSeedComponent(localClient.getHexSeed(),localClient.getPlayerId());
+        //queue old seed
+        if (seed != null){
+            if (seed.hasAllNumbers()){
+                queuedSeeds.push(seed);
+            }
+        }
 
         seed = new RNGSeed(getPlayerAmount());
+        seed.addSeedComponentHash(localClient.getHexSeedHash(),localClient.getPlayerId());
+        seed.addSeedComponent(localClient.getHexSeed(),localClient.getPlayerId());
     }
 
     private void processRollHashCommand(RollHashCommand command){
@@ -687,9 +696,24 @@ public class ClientSocketHandler implements Runnable{
 
     }
 
-    public RNGSeed getRNGSeed(){
+    public RNGSeed getOldestRNGSeed(){
+        //Queued first
+        if (queuedSeeds.size() > 0)
+            return queuedSeeds.peek();
+        while(seed == null);
         while(!seed.hasAllNumbers());
         return seed;
+    }
+
+    public RNGSeed popOldestSeed(){
+        //Queued first
+        if (queuedSeeds.size() > 0)
+            return queuedSeeds.pop();
+        while(seed == null);
+        while(!seed.hasAllNumbers());
+        RNGSeed ret = seed;
+        seed = null;
+        return ret;
     }
 
 

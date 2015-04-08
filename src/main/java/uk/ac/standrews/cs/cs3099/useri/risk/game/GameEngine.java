@@ -1,15 +1,19 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Stack;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.action.Action;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.CLIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
 
 /**
  * runs the main game loop and gets turns from the players
  *
  */
-public class GameEngine {
+public class GameEngine implements Runnable{
 	private State state;
 	
 	
@@ -23,6 +27,19 @@ public class GameEngine {
 	 * 5. sends out update notification to all clients
 	 * 
 	 */
+
+    private ClientSocketHandler csh;
+
+    public GameEngine(ClientSocketHandler csh){
+        this.csh = csh;
+    }
+
+    @Override
+    public void run(){
+        initialise();
+        gameLoop();
+    }
+
 	public void gameLoop(){
 		System.out.println("Game Loop running...");
         Player currentPlayer;
@@ -58,8 +75,37 @@ public class GameEngine {
         this.state=state;
     }
 
+
+
     public void initialise(){
-        //take the data and parse them
+        //create gamestate
+        State gamestate = new State();
+
+        //initialise map
+        Map map = new Map();
+
+        //wait till we are "playing"
+
+        while (csh.getProtocolState() != ClientSocketHandler.ProtocolState.RUNNING);
+
+        //setup the players
+        ArrayList<Player> players = new ArrayList<Player>();
+
+        for (Client c : csh.getAllClients()){
+            players.add(new Player(c.getPlayerId(),c, c.getPlayerName()));
+        }
+        gamestate.setup(map,players);
+
+
+        //Now roll dice to determine first player
+        int firstPlayer = csh.determineFirstPlayer();
+
+        //now shuffle cards
+
+        gamestate.shuffleRiskCards(csh.popOldestSeed());
+
+        //setup the countries in the normal game loop
+
 
     }
 }

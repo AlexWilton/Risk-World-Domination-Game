@@ -39,6 +39,10 @@ public class State implements JSONAware{
         this.currentPlayer = players.get(0);
     }
 
+    public void setCurrentPlayer(int playerId){
+        currentPlayer = getPlayer(playerId);
+    }
+
     public Player getCurrentPlayer() {
         return currentPlayer;
     }
@@ -60,7 +64,7 @@ public class State implements JSONAware{
     }
 
     public void endTurn(){
-        currentPlayer = players.get((players.indexOf(currentPlayer) + 1) % players.size());
+        nextPlayer();
         stage = TurnStage.STAGE_FINISH.next();
         wonBattle = false;
     }
@@ -150,6 +154,18 @@ public class State implements JSONAware{
             cardsDeck.set(i,cardsDeck.get(swapPos));
             cardsDeck.set(swapPos,c1);
         }
+    }
+
+    public boolean hasUnassignedCountries(){
+        return map.hasUnassignedCountries();
+    }
+
+    public void nextPlayer(){
+        currentPlayer = getPlayer((currentPlayer.getID()+1)%getPlayerAmount());
+    }
+
+    public int getPlayerAmount(){
+        return getPlayers().size();
     }
 
 

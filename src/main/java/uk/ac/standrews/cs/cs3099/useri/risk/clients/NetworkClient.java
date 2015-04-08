@@ -34,16 +34,11 @@ public class NetworkClient extends Client {
     }
 
     @Override
-    public int[] getSeedComponent(){
+    public byte[] getSeedComponent(){
 
         return null;
     }
 
-    @Override
-    public int[] getSeedHash(){
-
-        return null;
-    }
 
     @Override
     public int getDefenders(Country attacker, Country objective, int attackingArmies) {

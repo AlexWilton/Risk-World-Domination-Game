@@ -6,9 +6,9 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 
 /**
  * abstract Action class
- * 
+ *
  * turns consist of multiple Actions
- * 
+ *
  * actions are constructed by Clients, and validate themselves against a game state, and can produce a new state themselves.
  *
  */
@@ -37,7 +37,7 @@ public abstract class Action {
         }
         return false;
     }
-	
+
 	/**
 	 * Performs the action on the game state, alters it accordingly returning the new state
 	 */

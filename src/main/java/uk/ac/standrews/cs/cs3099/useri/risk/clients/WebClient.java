@@ -74,14 +74,11 @@ public class WebClient extends Client {
     }
 
     @Override
-    public int[] getSeedComponent() {
-        return new int[0];
+    public byte[] getSeedComponent() {
+        return new byte[0];
     }
 
-    @Override
-    public int[] getSeedHash() {
-        return new int[0];
-    }
+
 
     @Override
     public void newSeedComponent() {

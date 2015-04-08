@@ -28,7 +28,7 @@ public class WebClient extends Client {
 
         //Open Web interface in Browser
         int port = jettyServer.getServerPort();
-        openWebpage("http://localhost:" + port + "/play.html");
+        openWebpage("http://localhost:" + port + "/");
     }
 
     public static void openWebpage(String urlAsString) {

@@ -52,6 +52,13 @@ public class ParamHandler extends DefaultHandler {
                     case "connect":
                         responseString = connectToHost(params);
                         break;
+                    case "move_to_game_play":
+                        if(webClient.getState() != null){
+                            responseString = "true";
+                        }else{
+                            responseString = "false";
+                        }
+                        break;
                     case "get_player_id":
                         responseString = String.valueOf(webClient.getPlayerId());
                         break;

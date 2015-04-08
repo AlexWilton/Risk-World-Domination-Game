@@ -3,6 +3,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.helpers;
 import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.AttackAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
@@ -59,6 +60,21 @@ public class AttackActionBuilder implements Runnable{
 
         //make rng
         RandomNumbers rng = new RandomNumbers(seed.getHexSeed());
+
+        //generate the numbers
+
+        attackerRolls = new int[attackerArmies];
+        defenderRolls = new int[defenderArmies];
+
+        for (int i = 0; i<attackerArmies; i++) {
+            attackerRolls[i] = rng.getRandomByte();
+        }
+
+        for (int i = 0; i<defenderArmies; i++) {
+            defenderRolls[i] = rng.getRandomByte();
+        }
+
+        gameState.getPlayer(attackerId).getClient().pushAction(buildAction(gameState));
 
 
     }

@@ -25,7 +25,7 @@ public class AttackAction extends Action {
     private int defenderArmiesLost = 0;
 
 
-    public AttackAction (Player player, Country attackingCountry, Country defendingCountry) {
+    public AttackAction (Player player, Country attackingCountry, Country defendingCountry, int[] attackerDice, int[] defenderDice) {
         super(player, TurnStage.STAGE_BATTLES);
         this.attackingCountry = attackingCountry;
         this.defendingCountry = defendingCountry;

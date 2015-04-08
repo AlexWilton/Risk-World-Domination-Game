@@ -81,6 +81,12 @@ public abstract class Client {
         this.playReady = set;
     }
 
+    /**
+     * push an action to internal queue to be returned next (fifo)
+     * @param act
+     */
+    public abstract void pushAction (Action act);
+
 
 
 }

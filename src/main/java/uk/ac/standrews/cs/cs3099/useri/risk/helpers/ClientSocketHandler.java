@@ -201,89 +201,6 @@ public class ClientSocketHandler implements Runnable{
 
 
 
-/*
-            //waiting for hosts ping
-            replied = false;
-            int amountPlayers = 0;
-
-            while (!replied){
-                Command reply = getNextCommand();
-                if (reply instanceof PingCommand){
-                    String amountPlayersString = reply.get("payload").toString();
-                    amountPlayers = Integer.parseInt(amountPlayersString);
-                    hostId = Integer.parseInt(reply.get("player_id").toString());
-                    System.out.println("Host Ping recieved from " + hostId + " ! Game has " + amountPlayers + " Players.");
-                    //add host network client
-                    NetworkClient hostCLient = new NetworkClient();
-                    hostCLient.setPlayerId(hostId);
-                    remoteClients.add(hostCLient);
-                    replied = true;
-                }
-            }
-
-            //send own ping
-            sendCommand(new PingCommand(localClient.getPlayerId(),amountPlayers));
-
-            //wait for other pings until server sends ready
-            replied = false;
-            int ackId = 0;
-            while (!replied){
-                Command reply = getNextCommand();
-                if (reply instanceof PingCommand){
-                    int playerId = Integer.parseInt(reply.get("player_id").toString());
-                    NetworkClient c = new NetworkClient();
-                    c.setPlayerId(playerId);
-                    remoteClients.add(c);
-                    System.out.println("added new player with id " + playerId);
-
-
-                }
-                else if ( reply instanceof ReadyCommand){
-                    replied = true;
-                    ackId = Integer.parseInt(reply.get("ack_id").toString());
-                    //mark host ready;
-                    ((NetworkClient)getClientById(hostId)).setReady(true);
-
-                    System.out.println("host is ready! waiting for acknowledgements by all remote players and sending own acknowledgement");
-
-                }
-            }
-
-            //send own acknowledgement
-
-            sendCommand(new AcknowledgementCommand(ackId, localClient.getPlayerId()));
-
-            //wait for other acknowledgements
-
-            while (!allRemoteClientsReady()){
-                Command reply = getNextCommand();
-                if (reply instanceof AcknowledgementCommand){
-                    JSONObject payload = (JSONObject) reply.get("payload");
-                    int recdAccId = Integer.parseInt(payload.get("ack_id").toString());
-                    System.out.println(reply.get("player_id").toString());
-                    int playerId = Integer.parseInt(reply.get("player_id").toString());
-                    if (ackId == recdAccId){
-                        ((NetworkClient)getClientById(playerId)).setReady(true);
-                        System.out.println("player " + playerId + " ready!");
-                    }
-                }
-            }
-
-            System.out.println("all players ready, negotiation ends!");
-
-            //Create clients
-
-
-
-        }
-        catch (IOException e){
-            e.printStackTrace();
-            System.out.println("wrong");
-
-            return ClientApp.COMMUNICATION_FAILED;
-        }*/
-
-
     }
 
     public int determineFirstPlayer(){
@@ -394,7 +311,7 @@ public class ClientSocketHandler implements Runnable{
 
         }
         else if (command instanceof DefendCommand){
-
+            processDefendCommand((DefendCommand) command);
         }
         else if (command instanceof DeployCommand){
             processDeployCommand((DeployCommand) command);
@@ -407,12 +324,6 @@ public class ClientSocketHandler implements Runnable{
         }
         else if (command instanceof PlayCardsCommand){
             processPlayCardsCommand((PlayCardsCommand) command);
-        }
-        else if (command instanceof AcknowledgementCommand){
-
-        }
-        else if (command instanceof RollCommand){
-            processRollCommand((RollCommand) command);
         }
         else if (command instanceof RollHashCommand){
             processRollHashCommand((RollHashCommand) command);
@@ -432,9 +343,7 @@ public class ClientSocketHandler implements Runnable{
 
     }
 
-    private void processRollCommand(RollCommand command){
 
-    }
 
     private void processRollHashCommand(RollHashCommand command){
         try {
@@ -558,6 +467,12 @@ public class ClientSocketHandler implements Runnable{
         int player = command.getPlayer();
 
         builder.setDefenderArmies(armies);
+        builder.setGamesState(gameState);
+        builder.setClientSocketHandler(this);
+
+        Thread builderThread = new Thread(builder);
+
+        builderThread.start();
 
 
 

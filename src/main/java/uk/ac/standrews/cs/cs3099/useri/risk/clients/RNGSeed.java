@@ -11,26 +11,28 @@ import java.util.Random;
  * Created by patrick on 05/04/15.
  */
 public class RNGSeed {
-    private ArrayList<String> components;
-    private ArrayList<String> componentHashes;
+    private String[] components;
+    private String[] componentHashes;
     private boolean[] gotHash;
     private boolean[] gotNumber;
 
     public RNGSeed(int players){
-        components = new ArrayList<>(players);
-        componentHashes = new ArrayList<>(players);
+        components = new String[players];
+        componentHashes = new String[players];
         gotHash = new boolean[players];
         gotNumber = new boolean[players];
         for (int i = 0; i<players;i++){
             gotHash[i] = false;
             gotNumber[i] = false;
+            componentHashes[i] = null;
+            components[i] = null;
         }
 
     }
 
 
     public void addSeedComponentHash(String hash, int player){
-        componentHashes.set(player,hash);
+        componentHashes[player] = hash;
         gotHash[player] = true;
     }
 
@@ -38,8 +40,8 @@ public class RNGSeed {
      * return false if its wrong
      */
     public boolean addSeedComponent(String component, int player){
-        if (componentHashes.get(player).equals(hexHashFromHexNumber(component)) && !gotNumber[player]) {
-            components.set(player, component);
+        if (componentHashes[player].equals(hexHashFromHexNumber(component)) && !gotNumber[player]) {
+            components[player] = component;
             gotNumber[player] = true;
             return true;
         }
@@ -87,6 +89,14 @@ public class RNGSeed {
         }
 
         return ret;
+    }
+
+    public boolean hasHash(int player){
+        return gotHash[player];
+    }
+
+    public boolean hasNumber(int player){
+        return gotNumber[player];
     }
 
 

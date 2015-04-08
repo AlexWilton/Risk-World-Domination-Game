@@ -19,7 +19,6 @@ public class Player implements JSONAware{
 	private CountrySet occupiedCountries;
 	private ArrayList<RiskCard> cards;
 	private int unassignedArmies;
-    private Country countryWhichMustBeDeployedTo = null;
 	///enable if a player is disconnected to skip his turn
 	private boolean inactive;
 
@@ -48,6 +47,7 @@ public class Player implements JSONAware{
     }
 
     public Action getPlayerAction(){
+        while(!client.isReady()){} //wait till client is ready
         return client.getAction();
     }
 
@@ -79,11 +79,7 @@ public class Player implements JSONAware{
      * @return
      */
     public Country choose(ArrayList<Country> occ) {
-        if(occ.size() > 0) {
-            Country chosen = occ.get(0);
-            countryWhichMustBeDeployedTo = chosen;
-            return chosen; //use first one found - to be improved!
-        }
+        if(occ.size() > 0) return occ.get(0); //use first one found - to be improved!
         //TODO unimplemented method, required for TradeAction!
         return null;
     }
@@ -131,7 +127,6 @@ public class Player implements JSONAware{
             cardArray.add(c);
         player.put("cards", cardArray);
         player.put("unassignedArmies", unassignedArmies);
-        player.put("countryWhichMustBeDeployedTo", countryWhichMustBeDeployedTo);
         player.put("inactive", inactive);
         return player.toJSONString();
     }

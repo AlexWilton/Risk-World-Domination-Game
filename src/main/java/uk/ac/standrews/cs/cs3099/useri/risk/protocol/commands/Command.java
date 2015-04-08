@@ -115,7 +115,14 @@ public class Command extends JSONObject {
             case ReadyCommand.COMMAND_STRING:
                 ret = new ReadyCommand(commandJSON);
                 break;
+            case RollHashCommand.COMMAND_STRING:
+                ret = new RollHashCommand(commandJSON);
+                break;
+            case RollNumberCommand.COMMAND_STRING:
+                ret = new RollNumberCommand(commandJSON);
+                break;
             default:
+                System.out.println("Cant parse " + command);
                 ret = null;
         }
 
@@ -127,7 +134,7 @@ public class Command extends JSONObject {
     }
 
     private static String escapeString(String unescapedString) {
-        return unescapedString.replace("\\","\\\\").replace("\"","\\\"");
+        return unescapedString.replace("\n","\\n").replace("\"", "\"");
     }
 
     @Override

@@ -10,13 +10,11 @@ import uk.ac.standrews.cs.cs3099.useri.risk.helpers.TestGameStateFactory;
 import java.awt.*;
 import java.net.URI;
 import java.net.URL;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 public class WebClient extends Client {
 
     JettyServer jettyServer;
-    ArrayBlockingQueue<Action> actionQueue = new ArrayBlockingQueue<Action>(1); //can only hold one action at a time.
+    Action action = null;
 
     public WebClient(){
         //Launch Jetty Web Server
@@ -28,7 +26,7 @@ public class WebClient extends Client {
 
         //Open Web interface in Browser
         int port = jettyServer.getServerPort();
-        openWebpage("http://localhost:" + port + "/play.html");
+        openWebpage("http://localhost:" + port + "/");
     }
 
     public static void openWebpage(String urlAsString) {
@@ -47,12 +45,8 @@ public class WebClient extends Client {
         }
     }
 
-    public void queueAction(Action action){
-        try {
-            actionQueue.put(action);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public void setAction(Action action){
+        this.action = action;
     }
 
     /**
@@ -60,12 +54,9 @@ public class WebClient extends Client {
      */
     @Override
     public Action getAction() {
-        try {
-            return actionQueue.take();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
+        Action current = action;
+        action = null;
+        return current;
     }
 
     /**
@@ -84,29 +75,22 @@ public class WebClient extends Client {
 
     @Override
     protected byte[] getSeedComponent() {
-        return new byte[0];
+        return RNGSeed.makeRandom256BitNumber();
     }
 
 
 
-    @Override
-    public void newSeedComponent() {
-
-    }
 
     @Override
     public boolean isReady(){
-        if(actionQueue.size() > 0)
+        if(action != null)
             return true;
         else
             return false;
     }
 
     public void setState(State gameState){
-        synchronized (this) {
-            this.gameState = gameState;
-            notify();
-        }
+        this.gameState = gameState;
     }
 
     public State getState(){

@@ -1,7 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.helpers;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.CLIClient;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 
 import java.util.ArrayList;
@@ -104,7 +103,7 @@ public class TestGameStateFactory {
     }
 
 
-    public static State getWebClientTestState(WebClient webClient){
+    public static State getWebClientTestState(){
 
         //create gamestate
         State gamestate = new State();
@@ -123,11 +122,12 @@ public class TestGameStateFactory {
         riskCards.add(new RiskCard(RiskCardType.TYPE_INFANTRY,6));
 
         //setup two cliclients
+        CLIClient c0 = new CLIClient(gamestate);
         CLIClient c1 = new CLIClient(gamestate);
 
         //setup two players, just assign all the countries alternating with two armies in each
         ArrayList<Player> players = new ArrayList<Player>();
-        players.add(new Player(0,webClient, "Amazing Alice"));
+        players.add(new Player(0,c0, "Amazing Alice"));
         players.add(new Player(1,c1, "Boring Bob"));
 
 

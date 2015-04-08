@@ -91,6 +91,15 @@ public class State implements JSONAware{
         cardSetstradedIn++;
     }
 
+    public void removePlayer(int playerId){
+        for (int i = 0; i<players.size(); i++){
+            if (players.get(i).getID() == playerId){
+                players.remove(i);
+                break;
+            }
+        }
+    }
+
     /**
      * Get the top card (index 0, as proposed in the drawing protocol) from the deck and remove it from the deck.
      * @return the top card from the deck.
@@ -149,7 +158,7 @@ public class State implements JSONAware{
         int len = cardsDeck.size();
 
         for (int i = 0; i<len;i++){
-            int swapPos = rng.getRandomByte();
+            int swapPos = (rng.getRandomByte()+128)%len;
             RiskCard c1 = cardsDeck.get(i);
             cardsDeck.set(i,cardsDeck.get(swapPos));
             cardsDeck.set(swapPos,c1);

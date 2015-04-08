@@ -71,6 +71,7 @@ public class GameEngine implements Runnable{
         this.state = state;
     }
 
+
     public void initialise(State state, ArrayList<Client> clients){
         this.state=state;
     }
@@ -86,7 +87,13 @@ public class GameEngine implements Runnable{
 
         //wait till we are "playing"
 
-        while (csh.getProtocolState() != ClientSocketHandler.ProtocolState.RUNNING);
+        while (csh.getProtocolState() != ClientSocketHandler.ProtocolState.RUNNING){
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         //setup the players
         ArrayList<Player> players = new ArrayList<Player>();
@@ -100,12 +107,19 @@ public class GameEngine implements Runnable{
         //Now roll dice to determine first player
         int firstPlayer = csh.determineFirstPlayer();
 
+        System.out.println("Player " + gamestate.getPlayer(firstPlayer).getName() + " goes first!");
+
         //now shuffle cards
 
-        gamestate.shuffleRiskCards(csh.popOldestSeed());
+        System.out.println("shuffling cards");
+
+        gamestate.shuffleRiskCards(csh.popSeed());
+
+        System.out.println("shuffled cards");
 
         //setup the countries in the normal game loop
 
+        state = gamestate;
 
     }
 }

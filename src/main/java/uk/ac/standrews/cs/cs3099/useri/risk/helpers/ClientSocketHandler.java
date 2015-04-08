@@ -34,7 +34,7 @@ public class ClientSocketHandler implements Runnable{
         START,
         WAITING_FOR_PING,
         WAITING_FOR_READY,
-        WAITING_FOR_ALL_ACKS,
+        WAITING_FOR_INIT,
 
         RUNNING,
         REJECTED,
@@ -57,25 +57,15 @@ public class ClientSocketHandler implements Runnable{
 
     private BufferedReader in;
 
-    private Deque<RNGSeed> queuedSeeds;
 
 
     private int hostId;
 
-    private int diceFaces, diceNumber;
 
     private ProtocolState protocolState;
 
     private int proclaimedPlayerAmount;
 
-
-    public int getDiceFaces(){
-        return diceFaces;
-    }
-
-    public int getDiceNumber(){
-        return diceNumber;
-    }
 
     public ProtocolState getProtocolState (){
         return protocolState;
@@ -88,7 +78,7 @@ public class ClientSocketHandler implements Runnable{
     public ClientSocketHandler() {
         this.remoteClients = new ArrayList<>();
         protocolState = ProtocolState.START;
-        queuedSeeds = new ArrayDeque<>();
+
     }
 
     public ArrayList<Client> getAllClients(){
@@ -127,6 +117,7 @@ public class ClientSocketHandler implements Runnable{
     public int initialise(String address, int port, Client localClient, float[] versions, String[] features, String name){
         //try to connect
         this.localClient = localClient;
+        localClient.setPlayerName(name);
         try{
             clientSocket = new Socket(address, port);
             //make the writers/Readers
@@ -285,10 +276,10 @@ public class ClientSocketHandler implements Runnable{
     public int determineFirstPlayer(){
 
 
-        RNGSeed fpSeed = popOldestSeed();
+        RNGSeed fpSeed = popSeed();
         RandomNumbers r = new RandomNumbers(fpSeed.getHexSeed());
 
-        int startingPlayer = r.getRandomInt()%getDiceFaces();
+        int startingPlayer = (r.getRandomByte()+128)%getPlayerAmount();
 
         return startingPlayer;
 
@@ -320,8 +311,8 @@ public class ClientSocketHandler implements Runnable{
                     case WAITING_FOR_READY:{
                         processCommandWaitingReady(currentCommand);
                     } break;
-                    case WAITING_FOR_ALL_ACKS:{
-                        processCommandWaitingAck(currentCommand);
+                    case WAITING_FOR_INIT:{
+                        processCommandWaitingInit(currentCommand);
                     } break;
                     case RUNNING:{
                         processCommandRunning(currentCommand);
@@ -359,16 +350,24 @@ public class ClientSocketHandler implements Runnable{
         if (command instanceof ReadyCommand){
             processReadyCommand((ReadyCommand) command);
         }
+        else if (command instanceof PingCommand){
+            processPingCommand((PingCommand) command);
+        }
 
         else{
             System.out.println("Command ignored:");
             System.out.println(command.toJSONString());
         }
     }
-    public void processCommandWaitingAck(Command command){
+    public void processCommandWaitingInit(Command command){
 
-        System.out.println("Command ignored:");
-        System.out.println(command.toJSONString());
+        if (command instanceof InitialiseGameCommand){
+            processInitialiseGameCommand((InitialiseGameCommand) command);
+        }
+        else {
+            System.out.println("Command ignored:");
+            System.out.println(command.toJSONString());
+        }
 
     }
 
@@ -407,6 +406,10 @@ public class ClientSocketHandler implements Runnable{
         else if (command instanceof RollNumberCommand){
             processRollNumberCommand((RollNumberCommand) command);
         }
+
+        else if (command instanceof SetupCommand){
+
+        }
         else {
             System.out.println("Command ignored:");
             System.out.println(command.toJSONString());
@@ -416,33 +419,32 @@ public class ClientSocketHandler implements Runnable{
     }
 
     private void processRollCommand(RollCommand command){
-        diceNumber = Integer.parseInt(command.getPayload().get("dice_count").toString());
-        diceFaces = Integer.parseInt(command.getPayload().get("dice_faces").toString());
 
-        localClient.newSeedComponent();
-
-        //queue old seed
-        if (seed != null){
-            if (seed.hasAllNumbers()){
-                queuedSeeds.push(seed);
-            }
-        }
-
-        seed = new RNGSeed(getPlayerAmount());
-        seed.addSeedComponentHash(localClient.getHexSeedHash(),localClient.getPlayerId());
-        seed.addSeedComponent(localClient.getHexSeed(),localClient.getPlayerId());
     }
 
     private void processRollHashCommand(RollHashCommand command){
+        try {
+            while (seed == null) Thread.sleep(10);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
         int player = command.getPlayer();
         String rollHash = command.get("payload").toString();
+
         seed.addSeedComponentHash(rollHash,player);
+
+
     }
 
     private void processRollNumberCommand(RollNumberCommand command){
         int player = command.getPlayer();
         String rollNumber = command.get("payload").toString();
         seed.addSeedComponent(rollNumber, player);
+
+        seed.addSeedComponent(rollNumber, player);
+
     }
 
     private void processPlayersJoinedCommand(PlayersJoinedCommand command){
@@ -473,12 +475,25 @@ public class ClientSocketHandler implements Runnable{
     private void processHostPingCommand(PingCommand command){
         hostId = command.getPlayer();
         proclaimedPlayerAmount = Integer.parseInt(command.get("payload").toString());
+
         //TODO supposed to ask for ready
-        sendCommand(new PingCommand(localClient.getPlayerId(),null));
+        sendCommand(new PingCommand(localClient.getPlayerId(), null));
+        localClient.markPlayReady(true);
         protocolState = ProtocolState.WAITING_FOR_READY;
+        processCommandRunning(command);
+    }
+
+    private void processPingCommand(PingCommand command){
+        getClientById(command.getPlayer()).markPlayReady(true);
     }
 
     private void processReadyCommand(ReadyCommand command){
+
+        protocolState = ProtocolState.WAITING_FOR_INIT;
+    }
+
+    private void processInitialiseGameCommand(InitialiseGameCommand command){
+
         protocolState = ProtocolState.RUNNING;
     }
 
@@ -494,6 +509,7 @@ public class ClientSocketHandler implements Runnable{
 
     }
     public Command getNextCommand () throws IOException{
+
         String currentIn = "";
         while (StringUtils.countMatches(currentIn,"{") != StringUtils.countMatches(currentIn,"}") || StringUtils.countMatches(currentIn,"{") == 0){
             String nextPart = in.readLine();
@@ -508,6 +524,8 @@ public class ClientSocketHandler implements Runnable{
             AcknowledgementCommand ack = new AcknowledgementCommand(ackId,localClient.getPlayerId());
             sendCommand(ack);
         }
+
+
         return command;
     }
 
@@ -701,21 +719,39 @@ public class ClientSocketHandler implements Runnable{
 
     }
 
-    public RNGSeed getOldestRNGSeed(){
-        //Queued first
-        if (queuedSeeds.size() > 0)
-            return queuedSeeds.peek();
-        while(seed == null);
-        while(!seed.hasAllNumbers());
-        return seed;
-    }
 
-    public RNGSeed popOldestSeed(){
-        //Queued first
-        if (queuedSeeds.size() > 0)
-            return queuedSeeds.pop();
-        while(seed == null);
-        while(!seed.hasAllNumbers());
+
+    public RNGSeed popSeed(){
+
+        localClient.newSeedComponent();
+
+        seed = new RNGSeed(getPlayerAmount());
+        seed.addSeedComponentHash(localClient.getHexSeedHash(),localClient.getPlayerId());
+        seed.addSeedComponent(localClient.getHexSeed(),localClient.getPlayerId());
+        sendCommand(new RollHashCommand(localClient.getHexSeedHash(),localClient.getPlayerId()));
+
+        try {
+            while (!seed.hasAllHashes()) Thread.sleep(10);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        System.out.println("has all hashes");
+
+        sendCommand(new RollNumberCommand(localClient.getHexSeed(), localClient.getPlayerId()));
+
+
+        try {
+            while (!seed.hasAllNumbers()) Thread.sleep(10);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        System.out.println("has all numbers");
         RNGSeed ret = seed;
         seed = null;
         return ret;

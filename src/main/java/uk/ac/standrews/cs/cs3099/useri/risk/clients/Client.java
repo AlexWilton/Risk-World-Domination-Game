@@ -22,6 +22,8 @@ public abstract class Client {
 
     private String hexSeedComponent;
 
+    private boolean playReady = false;
+
     /**
      * @return the next action this player takes based on current game state
      */
@@ -68,6 +70,15 @@ public abstract class Client {
 
     public void setPlayerName(String name){
         this.playerName = name;
+    }
+
+
+    public boolean playReady(){
+        return playReady;
+    }
+
+    public void markPlayReady(boolean set){
+        this.playReady = set;
     }
 
 

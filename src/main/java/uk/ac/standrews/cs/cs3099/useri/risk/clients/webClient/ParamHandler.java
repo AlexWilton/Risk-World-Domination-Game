@@ -80,7 +80,7 @@ public class ParamHandler extends DefaultHandler {
                 }
             }
 
-            if(!operation.equals("is_server_waiting_for_action"))
+            if(!operation.equals("is_server_waiting_for_action") && !operation.equals("move_to_game_play"))
                 System.out.println("Request for operation: " + operation + " received. (" + params.toString() + ")\nResponse sent: " + responseString + "\n");
             response.getWriter().println(responseString);
             baseRequest.setHandled(true);
@@ -150,9 +150,9 @@ public class ParamHandler extends DefaultHandler {
         //Get Number Of Players
         String[] is_host_playingArray = params.get("is_host_playing");
         boolean is_host_playing;
-            if(is_host_playingArray.length == 0)
+        if(is_host_playingArray.length == 0)
                 return "Error! Valid is Host Playing boolean not provided";
-            is_host_playing = Boolean.parseBoolean(numPlayerArray[0]);
+            is_host_playing = Boolean.parseBoolean(is_host_playingArray[0]);
 
 
         ServerSocketHandler host = new ServerSocketHandler(port, numOfPlayers, webClient, is_host_playing);

@@ -1,9 +1,12 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.helpers;
 
+import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.AttackAction;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
-public class AttackActionBuilder {
+public class AttackActionBuilder implements Runnable{
 
     int attackerId;
     int defenderId;
@@ -14,6 +17,9 @@ public class AttackActionBuilder {
 
     int[] attackerRolls;
     int[] defenderRolls;
+
+    State gameState;
+    ClientSocketHandler clientSocketHandler;
 
     public AttackAction buildAction(State gameState) {
         return new AttackAction(gameState.getPlayers().get(attackerId),gameState.getCountryByID(originId),gameState.getCountryByID(objectiveId),attackerRolls,defenderRolls);
@@ -36,6 +42,25 @@ public class AttackActionBuilder {
     }
     public void setDefenderArmies(int id){
         defenderArmies = id;
+    }
+
+    public void setGamesState(State state) {
+        gameState = state;
+    }
+
+    public void setClientSocketHandler(ClientSocketHandler csh){
+        clientSocketHandler = csh;
+    }
+
+    @Override
+    public void run(){
+        //wait for seed
+        RNGSeed seed = clientSocketHandler.popSeed();
+
+        //make rng
+        RandomNumbers rng = new RandomNumbers(seed.getHexSeed());
+
+
     }
 
     public void setDefenderRolls(int[] rolls){

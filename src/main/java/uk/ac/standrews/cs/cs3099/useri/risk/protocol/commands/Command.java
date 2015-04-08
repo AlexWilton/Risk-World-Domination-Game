@@ -1,5 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
@@ -19,6 +20,10 @@ public class Command extends JSONObject {
 
     public JSONObject getPayload(){
         return (JSONObject)this.get("payload");
+    }
+
+    public JSONArray getPayloadAsArray(){
+        return (JSONArray)this.get("payload");
     }
 
     public int getPayloadAsInt(){

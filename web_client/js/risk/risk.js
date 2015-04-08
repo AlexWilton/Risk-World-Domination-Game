@@ -222,6 +222,8 @@ var Risk = {
 
 				group.on('click', function() {
 					console.log(Risk.Territories[path.attrs.id]);
+                    selectedTerriories.push(Risk.Territories[path.attrs.id].mapped_game_state_territory);
+                    updateTurnPanel();
 					//location.hash = path.attrs.id;
 				});
 			})(path, t, group);

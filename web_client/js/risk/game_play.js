@@ -1,4 +1,4 @@
-var game_state, my_player_id;
+var game_state, my_player_id, selectedTerriories = [];
 
 //$( window ).load(setup);
 
@@ -67,6 +67,7 @@ function updateTurnPanel(){
             case "STAGE_DEPLOYING":
                 panelHtml += "<br/>You have " + game_state.currentPlayer.unassignedArmies + " armies to deploy.";
                 panelHtml += "<br/><br/><small><strong>Select</strong> countries you wish to deploy to and specify how many armies to send to each.</small>";
+                panelHtml += generateDeployPanel();
                 break;
             default:
 
@@ -101,11 +102,22 @@ function generateTradeInPanel(){
     return panelHtml;
 }
 
+function generateDeployPanel(){
+    var panelHtml = "";
+    for(t in selectedTerriories){
+        if(selectedTerriories[t].player_owner_id == my_player_id) {
+
+            panelHtml += selectedTerriories[t].name + "<br/>";
+        }
+    }
+
+    return panelHtml;
+}
+
 function waitForServer(){
     $.get('/?operation=is_server_waiting_for_action', function(response){
         if(response.indexOf("true") == 0){
-            getStateFromServer();
-            updateDisplay();
+            getStateFromServer(updateDisplay);
         }else{
             setTimeout(waitForServer, 1000);
         }

@@ -48,7 +48,8 @@ public class ServerSocketHandler implements Runnable {
                 // Open the gates!
                 Socket temp = server.accept();
                 System.out.println("New client connected");
-                ListenerThread client = new ListenerThread(temp, i, new NetworkClient(), gameInProgress, ACK_TIMEOUT, MOVE_TIMEOUT, s);
+                //TODO GAMESTATE!!
+                ListenerThread client = new ListenerThread(temp, i, new NetworkClient(null), gameInProgress, ACK_TIMEOUT, MOVE_TIMEOUT, s);
                 clientSocketPool.add(i++, client);
                 // Make new Thread for client.
                 Thread t = new Thread(client);
@@ -91,7 +92,8 @@ public class ServerSocketHandler implements Runnable {
             try {
                 Socket temp = server.accept();
                 System.out.println("New client connected");
-                ListenerThread client = new ListenerThread(temp, i, new NetworkClient(), gameInProgress, ACK_TIMEOUT, MOVE_TIMEOUT, s);
+                //TODO GAME STATE!!
+                ListenerThread client = new ListenerThread(temp, i, new NetworkClient(null), gameInProgress, ACK_TIMEOUT, MOVE_TIMEOUT, s);
                 // Make new Thread for client.
                 Thread t = new Thread(client);
                 t.start();

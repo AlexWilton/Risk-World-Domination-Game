@@ -21,6 +21,10 @@ public class Command extends JSONObject {
         return (JSONObject)this.get("payload");
     }
 
+    public int getPayloadAsInt(){
+        return Integer.parseInt(this.get("payload").toString());
+    }
+
     public int getPlayer(){
         return Integer.parseInt(this.get("player_id").toString());
     }
@@ -120,6 +124,9 @@ public class Command extends JSONObject {
                 break;
             case RollNumberCommand.COMMAND_STRING:
                 ret = new RollNumberCommand(commandJSON);
+                break;
+            case SetupCommand.COMMAND_STRING:
+                ret = new SetupCommand(commandJSON);
                 break;
             default:
                 System.out.println("Cant parse " + command);

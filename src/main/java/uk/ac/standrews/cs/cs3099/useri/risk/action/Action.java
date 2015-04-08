@@ -30,7 +30,7 @@ public abstract class Action {
 	 * false if there is an error
 	 */
 	public boolean validateAgainstState(State state){
-        if (player.equals(state.getCurrentPlayer())) {
+        if (player.getID() == state.getCurrentPlayer().getID()) {
             if (state.getTurnStage().equals(stage)) {
                 return true;
             }

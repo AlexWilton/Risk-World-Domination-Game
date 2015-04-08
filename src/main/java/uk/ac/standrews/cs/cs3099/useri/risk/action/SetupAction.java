@@ -34,10 +34,10 @@ public class SetupAction extends Action {
      */
     @Override
     public boolean validateAgainstState(State state) {
-        if(state.hasUnassignedCountries())
+        if(!state.hasUnassignedCountries())
             return false;
 
-        if(player == state.getCurrentPlayer())
+        if(player != state.getCurrentPlayer())
             return false;
 
         if (country.getOwner() != null)
@@ -56,6 +56,7 @@ public class SetupAction extends Action {
     public void performOnState(State state) {
         country.setOwner(player);
         state.endTurn();
+        System.out.println (player.getName() + " took possession of " + country.getCountryName());
     }
 
 

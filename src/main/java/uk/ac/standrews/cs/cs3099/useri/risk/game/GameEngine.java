@@ -81,6 +81,9 @@ public class GameEngine implements Runnable{
     public void initialise(){
         //create gamestate
         State gamestate = new State();
+        state = gamestate;
+
+        csh.linkGameState(state);
 
         //initialise map
         Map map = new Map();
@@ -109,6 +112,8 @@ public class GameEngine implements Runnable{
 
         System.out.println("Player " + gamestate.getPlayer(firstPlayer).getName() + " goes first!");
 
+        gamestate.setCurrentPlayer(firstPlayer);
+
         //now shuffle cards
 
         System.out.println("shuffling cards");
@@ -119,7 +124,8 @@ public class GameEngine implements Runnable{
 
         //setup the countries in the normal game loop
 
-        state = gamestate;
+
+
 
     }
 }

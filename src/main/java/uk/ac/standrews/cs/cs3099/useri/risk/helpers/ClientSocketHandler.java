@@ -6,6 +6,7 @@ import org.eclipse.jetty.util.ArrayQueue;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.SetupAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
@@ -71,6 +72,10 @@ public class ClientSocketHandler implements Runnable{
         return protocolState;
     }
 
+    public void linkGameState(State state){
+        gameState = state;
+    }
+
 
 
 
@@ -100,6 +105,15 @@ public class ClientSocketHandler implements Runnable{
             return localClient;
         }
 
+        return null;
+    }
+
+    public NetworkClient getRemoteClientById(int id){
+        for (Client c : remoteClients){
+            if (c.getPlayerId() == id){
+                return (NetworkClient) c;
+            }
+        }
         return null;
     }
 
@@ -408,7 +422,7 @@ public class ClientSocketHandler implements Runnable{
         }
 
         else if (command instanceof SetupCommand){
-
+            processSetupCommand((SetupCommand) command);
         }
         else {
             System.out.println("Command ignored:");
@@ -462,13 +476,20 @@ public class ClientSocketHandler implements Runnable{
                 playerSig = onePlayerJSON.get(2).toString();
             }
             //Create the client
-            NetworkClient remoteClient = new NetworkClient();
+            NetworkClient remoteClient = new NetworkClient(gameState);
             remoteClient.setPlayerId(playerNr);
             remoteClient.setPlayerName(playerName);
             System.out.println("Created " + playerName);
             //maybe signature
             remoteClients.add(remoteClient);
         }
+
+    }
+
+    private void processSetupCommand(SetupCommand command){
+        int countryId = command.getPayloadAsInt();
+        SetupAction act = new SetupAction(gameState.getPlayer(command.getPlayer()),gameState.getCountryByID(countryId));
+        getRemoteClientById(command.getPlayer()).pushAction(act);
 
     }
 

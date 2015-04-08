@@ -74,7 +74,7 @@ public class WebClient extends Client {
     }
 
     @Override
-    public byte[] getSeedComponent() {
+    protected byte[] getSeedComponent() {
         return new byte[0];
     }
 

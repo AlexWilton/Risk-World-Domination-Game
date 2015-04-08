@@ -22,7 +22,7 @@ public class FortifyActionTest {
         players.add(playerA);
         players.add(playerB);
 
-        testState.setup(new Map(), players, null);
+        testState.setup(new Map(), players);
         while(testState.getTurnStage() != TurnStage.STAGE_FORTIFY) testState.nextStage(); //set turn stage to Fortify
         indonesia = testState.getCountryByID(38);
         newGuinea = testState.getCountryByID(39);

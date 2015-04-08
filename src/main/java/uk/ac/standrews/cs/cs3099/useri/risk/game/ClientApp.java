@@ -37,7 +37,7 @@ public class ClientApp {
         socketHandlerThread.start();
 
         //initialise and start the game engine thread
-        GameEngine engine = new GameEngine();
+        GameEngine engine = new GameEngine(socketHandler);
         Thread gameEngineThread = new Thread(engine);
         gameEngineThread.start();
 

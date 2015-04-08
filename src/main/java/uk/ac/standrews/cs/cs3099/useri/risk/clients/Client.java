@@ -20,6 +20,8 @@ public abstract class Client {
 
     private String playerName;
 
+    private String hexSeedComponent;
+
     /**
      * @return the next action this player takes based on current game state
      */
@@ -32,9 +34,11 @@ public abstract class Client {
 
     public abstract int getDefenders(Country attackingCountry, Country defendingCountry, int attackingArmies);
 
-    public abstract byte[] getSeedComponent();
+    protected abstract byte[] getSeedComponent();
 
-    public abstract void newSeedComponent();
+    public void newSeedComponent(){
+        hexSeedComponent = RNGSeed.toHexString(getSeedComponent());
+    }
 
     public void setPlayerId(int playerId){
         this.playerId = playerId;
@@ -51,7 +55,7 @@ public abstract class Client {
     public abstract boolean isReady();
 
     public String getHexSeed(){
-        return RNGSeed.toHexString(getSeedComponent());
+        return hexSeedComponent;
     }
 
     public String getHexSeedHash(){

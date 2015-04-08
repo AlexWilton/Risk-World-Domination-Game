@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by patrick on 05/04/15.
@@ -92,7 +93,7 @@ public class RNGSeed {
     public static String toHexString(byte[] value){
         String ret = "";
         for (byte i : value){
-            ret += StringUtils.leftPad(Integer.toHexString(i), 2, "0");
+            ret += StringUtils.leftPad(Integer.toHexString(i & 0xFF), 2, "0");
         }
 
         return ret;
@@ -124,6 +125,14 @@ public class RNGSeed {
 
     public static String hexHashFromHexNumber(String hexNumber){
         return toHexString(calcHash(hexStringToByteArray(hexNumber)));
+    }
+
+    public static byte[] makeRandom256BitNumber(){
+        Random r = new Random(System.currentTimeMillis());
+        byte ret[] = new byte[32];
+        r.nextBytes(ret);
+        return ret;
+
     }
 
 

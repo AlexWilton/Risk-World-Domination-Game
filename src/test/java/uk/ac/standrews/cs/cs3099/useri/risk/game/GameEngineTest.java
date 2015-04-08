@@ -13,7 +13,7 @@ public class GameEngineTest {
 
     @Before
     public void setUp() throws Exception {
-        engine = new GameEngine();
+        engine = new GameEngine(null);
         State state = new State();
         ArrayList<Client> clients = new ArrayList<Client>();
         engine.initialise(state);

@@ -347,7 +347,7 @@ public class ClientSocketHandler implements Runnable{
             processPlayersJoinedCommand((PlayersJoinedCommand) command);
         }
         else if (command instanceof PingCommand){
-            processHostPingCommand((RollNumberCommand) command);
+            processHostPingCommand((PingCommand) command);
         }
         else{
             System.out.println("Command ignored:");
@@ -452,6 +452,8 @@ public class ClientSocketHandler implements Runnable{
         for (Object playerObject : playersJSON){
             JSONArray onePlayerJSON = (JSONArray) playerObject;
             int playerNr = Integer.parseInt(onePlayerJSON.get(0).toString());
+            if (playerNr == localClient.getPlayerId())
+                continue;
             String playerName = onePlayerJSON.get(1).toString();
             String playerSig = null;
             if (onePlayerJSON.size() >2){
@@ -461,13 +463,14 @@ public class ClientSocketHandler implements Runnable{
             NetworkClient remoteClient = new NetworkClient();
             remoteClient.setPlayerId(playerNr);
             remoteClient.setPlayerName(playerName);
+            System.out.println("Created " + playerName);
             //maybe signature
             remoteClients.add(remoteClient);
         }
 
     }
 
-    private void processHostPingCommand(RollNumberCommand command){
+    private void processHostPingCommand(PingCommand command){
         hostId = command.getPlayer();
         proclaimedPlayerAmount = Integer.parseInt(command.get("payload").toString());
         //TODO supposed to ask for ready
@@ -493,7 +496,9 @@ public class ClientSocketHandler implements Runnable{
     public Command getNextCommand () throws IOException{
         String currentIn = "";
         while (StringUtils.countMatches(currentIn,"{") != StringUtils.countMatches(currentIn,"}") || StringUtils.countMatches(currentIn,"{") == 0){
-            currentIn += in.readLine();
+            String nextPart = in.readLine();
+            if (currentIn.length() >0 || nextPart.startsWith("{"))
+                currentIn += nextPart;
         }
         Command command = Command.parseCommand(currentIn);
 

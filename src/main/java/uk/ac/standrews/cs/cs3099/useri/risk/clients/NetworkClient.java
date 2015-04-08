@@ -34,7 +34,7 @@ public class NetworkClient extends Client {
     }
 
     @Override
-    public byte[] getSeedComponent(){
+    protected byte[] getSeedComponent(){
 
         return null;
     }

@@ -25,7 +25,7 @@ public class DeployArmyActionTest{
         players.add(playerA);
         players.add(playerB);
 
-        testState.setup(new Map(), players, null);
+        testState.setup(new Map(), players);
         while(testState.getTurnStage() != TurnStage.STAGE_DEPLOYING) testState.nextStage(); //set turn stage to Deploy
         indonesia = testState.getCountryByID(38);
         newGuinea = testState.getCountryByID(39);

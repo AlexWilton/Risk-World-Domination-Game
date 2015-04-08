@@ -17,10 +17,6 @@ public class CLIClient extends Client {
     InputStream in;
     PrintStream out;
 
-    @Override
-    public void newSeedComponent() {
-
-    }
 
 
     public CLIClient (State gameState){
@@ -140,15 +136,10 @@ public class CLIClient extends Client {
 
                 //3. get dice rolls
 
-                RandomNumbers
-                RiskDice dice = new RiskDice(RiskDice.ATTACK_ROLL_FACES,armies+defenders);
-                //get hashes from all clients
-                for (Player p : gameState.getPlayers()){
-                    dice.addSeedComponent(p.getClient().getSeedComponent());
-                }
+                //TODO
 
-                int [] atkDiceRolls = dice.getBattleDiceRolls(0,armies);
-                int [] defDiceRolls = dice.getBattleDiceRolls(armies,defenders);
+                int [] atkDiceRolls = null;
+                int [] defDiceRolls = null;
 
                 Arrays.sort(atkDiceRolls);
                 Arrays.sort(defDiceRolls);
@@ -222,8 +213,8 @@ public class CLIClient extends Client {
     }
 
     @Override
-    public int[] getSeedComponent() {//empty method to just to replace
-        return new int[0];
+    protected byte[] getSeedComponent() {//empty method to just to replace
+        return new byte[0];
     }
 
     private int getChoice(int min, int max){
@@ -311,20 +302,6 @@ public class CLIClient extends Client {
         return seedComponent;
     }
 */
-
-    public int[] getSeedHash() {
-        /*MersenneTwisterFast twister = new MersenneTwisterFast();
-        twister.setSeed(System.currentTimeMillis());
-        int [] seedComponent = new int[RiskDice.SEED_ARRAY_LENGTH];
-        for (int i = 0; i < RiskDice.SEED_ARRAY_LENGTH; i++){
-            seedComponent[i] = twister.nextInt();
-        }
-
-        return seedComponent;*/
-
-        return null;
-
-    }
 
     @Override
     public boolean isReady(){

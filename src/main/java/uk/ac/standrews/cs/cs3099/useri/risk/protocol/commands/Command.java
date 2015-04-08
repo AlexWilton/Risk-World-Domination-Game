@@ -50,16 +50,17 @@ public class Command extends JSONObject {
         //check if its the envelope or the message
         JSONObject commandJSON;
 
-
+        String unescapedCommandString = "";
         if (envelopeJSON.containsKey("message")){
             //TODO maybe verify?
 
-            String unescapedCommandString = envelopeJSON.get("message").toString();
+            unescapedCommandString = unescape(envelopeJSON.get("message").toString());
             commandJSON = (JSONObject) JSONValue.parse(unescapedCommandString);
         }
 
         else
         {
+            unescapedCommandString = envelopeString;
             commandJSON = envelopeJSON;
         }
 
@@ -100,13 +101,13 @@ public class Command extends JSONObject {
                 ret = new RejectJoinGameCommand(commandJSON);
                 break;
             case AcknowledgementCommand.COMMAND_STRING:
-                ret = AcknowledgementCommand.parse(command);
+                ret = AcknowledgementCommand.parse(unescapedCommandString);
                 break;
             case InitialiseGameCommand.COMMAND_STRING:
                 ret = new InitialiseGameCommand(commandJSON);
                 break;
             case PingCommand.COMMAND_STRING:
-                ret = PingCommand.parse(command);
+                ret = PingCommand.parse(unescapedCommandString);
                 break;
             case PlayersJoinedCommand.COMMAND_STRING:
                 ret = new PlayersJoinedCommand(commandJSON);
@@ -123,5 +124,17 @@ public class Command extends JSONObject {
 
     private static String unescape(String escapedString){
         return escapedString.replace("\\","");
+    }
+
+    private static String escapeString(String unescapedString) {
+        return unescapedString.replace("\\","\\\\").replace("\"","\\\"");
+    }
+
+    @Override
+    public String toJSONString(){
+        JSONObject envelope = new JSONObject();
+        envelope.put("message",escapeString(super.toJSONString()));
+        envelope.put("signature",""); //TODO
+        return envelope.toJSONString();
     }
 }

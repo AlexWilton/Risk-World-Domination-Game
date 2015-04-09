@@ -107,8 +107,6 @@ public abstract class Client {
     public Command popCommand() {
         while (commandQueue.isEmpty()){
 
-
-
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {

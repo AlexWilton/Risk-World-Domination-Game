@@ -48,11 +48,11 @@ public class MessageQueue {
             return null;
 
         System.out.println("Sending " + command.toJSONString());
-        notifyAll();
         sentMessage[id] = true;
         if (sentAll()){
             flag = false;
         }
+        notifyAll();
         return command;
     }
 
@@ -65,8 +65,8 @@ public class MessageQueue {
         return true;
     }
 
-    public synchronized void sendPlayerList(ArrayList<Player> players, Integer id){
-        sendAll(new PlayersJoinedCommand(players), id);
+    public synchronized void sendPlayerList(ArrayList<Player> players){
+        sendAll(new PlayersJoinedCommand(players), null);
     }
 
     public synchronized void sendPing(int payload, Integer id) {
@@ -80,18 +80,32 @@ public class MessageQueue {
     public synchronized void sendAll(Command command, Integer id) {
         if (flag){
             try {
-                System.out.println("blocking " + command);
+                System.out.println("blocking " + command + "\n while still having " + this.command);
                 wait();
             } catch (InterruptedException e){
                 e.printStackTrace();
             }
         }
         this.command = command;
+        System.out.println("Queued " + command + " by " + id);
         flag = true;
         for (int i = 0; i<sentMessage.length; i++)
             sentMessage[i] = false;
-        if (id != null)sentMessage[id] = true;
+        if (id != null) sentMessage[id] = true;
         notifyAll();
+    }
+
+    public synchronized boolean probablySendAll(Command command, Integer id) {
+        if (flag){
+            return false;
+        }
+        this.command = command;
+        flag = true;
+        for (int i = 0; i<sentMessage.length; i++)
+            sentMessage[i] = false;
+        if (id != null) sentMessage[id] = true;
+        notifyAll();
+        return true;
     }
 
     public synchronized void addPlayer(int id){

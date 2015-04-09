@@ -46,7 +46,7 @@ public class ListenerThread implements Runnable {
      * @throws IOException
      */
     private synchronized boolean initialiseConnection() throws IOException {
-        Command command = JoinGameCommand.parse(input.readLine());
+        Command command = Command.parseCommand(input.readLine());
         if(command == null) {
             reply(new AcknowledgementCommand(32768, ID));//TODO added hardcoded player id to make it work
             purgeConnection();

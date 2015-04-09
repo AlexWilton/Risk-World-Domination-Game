@@ -30,19 +30,20 @@ public class ClientApp {
         String name = "Some guy";
 
         //connect and obtain game information
-        socketHandler.initialise(address,port,webClient,versions,features,name);
+        int result = socketHandler.initialise(address,port,webClient,versions,features,name);
 
-        //Run the socket handler
-        Thread socketHandlerThread = new Thread(socketHandler);
-        socketHandlerThread.start();
+        if(result == SUCCESS) {
+            //Run the socket handler
+            Thread socketHandlerThread = new Thread(socketHandler);
+            socketHandlerThread.start();
 
-        //initialise and start the game engine thread
-        GameEngine engine = new GameEngine(socketHandler);
-        Thread gameEngineThread = new Thread(engine);
-        gameEngineThread.start();
+            //initialise and start the game engine thread
+            GameEngine engine = new GameEngine(socketHandler);
+            Thread gameEngineThread = new Thread(engine);
+            gameEngineThread.start();
+        }
 
-
-        return SUCCESS;
+        return result;
        
     }
     public static void main(String argv[]){

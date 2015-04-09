@@ -86,7 +86,11 @@ public class Country implements JSONAware{
         country.put("name", countryName);
         country.put("country_id", countryId);
         country.put("troop_count", troops);
-        country.put("player_owner_id", owner.getID());
+        if(owner ==null){
+            country.put("player_owner_id", "unassigned");
+        }else {
+            country.put("player_owner_id", owner.getID());
+        }
         return country.toJSONString();
     }
 }

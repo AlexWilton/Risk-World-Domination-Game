@@ -169,6 +169,17 @@ public class State implements JSONAware{
         return map.hasUnassignedCountries();
     }
 
+    public CountrySet unoccupiedCountries(){
+        CountrySet ret = new CountrySet();
+        for (Country c : map.getAllCountries()){
+            if (c.getOwner() == null){
+                ret.add(c);
+            }
+        }
+
+        return ret;
+    }
+
     public void nextPlayer(){
         currentPlayer = getPlayer((currentPlayer.getID()+1)%getPlayerAmount());
     }

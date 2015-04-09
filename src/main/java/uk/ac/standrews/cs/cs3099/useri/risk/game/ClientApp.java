@@ -1,6 +1,8 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
 import org.json.simple.JSONArray;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.CLIClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.JoinGameCommand;
@@ -23,14 +25,14 @@ public class ClientApp {
     public static final int COMMUNICATION_FAILED = -4;
     public static final int PROTOCOL_ERROR_DETECTED = -5;
 
-    public static int run (String address, int port, WebClient webClient) {
+    public static int run (String address, int port, Client localClient) {
         ClientSocketHandler socketHandler = new ClientSocketHandler();
         float[] versions = {1};
         String[] features = {};
         String name = "Some guy";
 
         //connect and obtain game information
-        socketHandler.initialise(address,port,webClient,versions,features,name);
+        socketHandler.initialise(address,port,localClient,versions,features,name);
 
         //Run the socket handler
         Thread socketHandlerThread = new Thread(socketHandler);
@@ -51,7 +53,7 @@ public class ClientApp {
         String address = "localhost";
 
         //try to connect to server
-        run(address,port, new WebClient());
+        run(address,port, new CLIClient(null));
 
 
     }

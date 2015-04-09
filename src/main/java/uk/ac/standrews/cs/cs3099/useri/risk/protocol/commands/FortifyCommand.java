@@ -1,5 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
@@ -15,6 +16,30 @@ public class FortifyCommand extends Command {
 
     public FortifyCommand(JSONObject object){
         super(object);
+    }
+
+    public FortifyCommand(int origin, int target, int armies,int player) {
+        super(COMMAND_STRING);
+        JSONArray payload = new JSONArray();
+        JSONArray triple = new JSONArray();
+        triple.add(origin);
+        triple.add(target);
+        triple.add(armies);
+        payload.add(triple);
+        this.put("payload",payload);
+        this.put("player_id", player);
+        this.put("ack_id", "1");
+
+    }
+
+    public FortifyCommand(int player) {
+        super(COMMAND_STRING);
+
+
+        this.put("payload",null);
+        this.put("player_id", player);
+        this.put("ack_id", "1");
+
     }
 }
 

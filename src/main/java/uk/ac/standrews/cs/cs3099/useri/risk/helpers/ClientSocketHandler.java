@@ -71,6 +71,7 @@ public class ClientSocketHandler implements Runnable{
 
     public void linkGameState(State state){
         gameState = state;
+        localClient.setState(state);
     }
 
 
@@ -464,6 +465,10 @@ public class ClientSocketHandler implements Runnable{
         RNGSeed ret = seed;
         seed = null;
         return ret;
+    }
+
+    public void updateLocalClient(){
+        localClient.pushGameState();
     }
 
 

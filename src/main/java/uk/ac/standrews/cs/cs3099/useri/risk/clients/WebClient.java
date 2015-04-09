@@ -93,11 +93,13 @@ public class WebClient extends Client {
     }
 
 
-    public void setState(State gameState){
-        this.gameState = gameState;
-    }
+
 
     public State getState(){
         return gameState;
+    }
+
+    public boolean isLocal(){
+        return true;
     }
 }

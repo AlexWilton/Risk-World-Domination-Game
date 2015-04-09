@@ -10,15 +10,22 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
  * Created by bs44 on 30/01/15.
  */
 public class FortifyAction extends Action {
-    private final Country from;
-    private final Country to;
-    private final int armies;
+    private Country from;
+    private Country to;
+    private int armies;
+
+    private boolean isEndTurnOnly;
 
     public FortifyAction(Player player, Country from, Country to, int armies) {
         super(player, TurnStage.STAGE_FORTIFY);
         this.from = from;
         this.to = to;
         this.armies = armies;
+    }
+
+    public FortifyAction(Player player){
+        super(player,TurnStage.STAGE_FORTIFY);
+        isEndTurnOnly = true;
     }
 
     /**
@@ -31,6 +38,9 @@ public class FortifyAction extends Action {
      */
     @Override
     public boolean validateAgainstState(State state) {
+        if (isEndTurnOnly == true){
+            return true;
+        }
         if (super.validateAgainstState(state)){
             if (validMove()) {
                 return true;
@@ -56,8 +66,12 @@ public class FortifyAction extends Action {
      */
     @Override
     public void performOnState(State state) {
-        from.setTroops(from.getTroops() - armies);
-        to.setTroops(to.getTroops() + armies);
-        state.nextStage();
+        if (!isEndTurnOnly) {
+            from.setTroops(from.getTroops() - armies);
+            to.setTroops(to.getTroops() + armies);
+            state.nextStage();
+        }
+        //Fortify HAS TO END TURN ACCORDING TO PROTOCOL
+        state.endTurn();
     }
 }

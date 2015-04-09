@@ -31,9 +31,9 @@ public abstract class Action {
 	 */
 	public boolean validateAgainstState(State state){
         if (player.getID() == state.getCurrentPlayer().getID()) {
-            if (state.getTurnStage().equals(stage)) {
+            //if (state.getTurnStage().equals(stage)) {
                 return true;
-            }
+           // }
         }
         return false;
     }

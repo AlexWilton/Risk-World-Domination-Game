@@ -19,7 +19,7 @@ public abstract class Client {
 
     protected State gameState;
 
-    private int playerId;
+    protected int playerId;
 
     private String playerName;
 
@@ -119,7 +119,7 @@ public abstract class Client {
     }
 
 
-    public DefendCommand popDefendCommand() {
+    public DefendCommand popDefendCommand(int origin, int target, int armies) {
         while (defendCommand == null){
 
 
@@ -137,6 +137,12 @@ public abstract class Client {
 
         return ret;
 
+    }
+
+    public abstract boolean isLocal();
+
+    public void setState(State gameState){
+        this.gameState = gameState;
     }
 
 

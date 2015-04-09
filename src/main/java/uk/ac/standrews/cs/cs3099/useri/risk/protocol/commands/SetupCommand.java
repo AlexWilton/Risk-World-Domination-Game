@@ -16,5 +16,13 @@ public class SetupCommand extends Command {
     public SetupCommand(JSONObject object){
         super(object);
     }
+
+    public SetupCommand(int target, int player) {
+        super(COMMAND_STRING);
+        this.put("payload",target);
+        this.put("player_id", player);
+        this.put("ack_id", "1");
+
+    }
 }
 

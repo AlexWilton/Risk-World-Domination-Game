@@ -1,5 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
@@ -15,5 +16,13 @@ public class DefendCommand extends Command {
 
     public DefendCommand(JSONObject object){
         super(object);
+    }
+
+    public DefendCommand(int armies, int player) {
+        super(COMMAND_STRING);
+        this.put("payload",armies);
+        this.put("player_id", player);
+        this.put("ack_id", "1");
+
     }
 }

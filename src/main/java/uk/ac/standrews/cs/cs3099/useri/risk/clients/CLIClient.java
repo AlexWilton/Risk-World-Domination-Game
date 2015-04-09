@@ -7,8 +7,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.CountrySet;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -21,35 +20,16 @@ public class CLIClient extends Client {
 
 
 
+
+
+
     public CLIClient (State gameState){
         super(gameState);
         this.gameState = gameState;
         this.in = System.in;
         this.out = System.out;
     }
-    /**
-     * @return the next action this player takes based on current game state
-     */
-    public Action getAction(){
 
-        Action ret = null;
-
-        switch (gameState.getTurnStage()){
-            case STAGE_TRADING:
-                ret = tradeMenu();break;
-            case STAGE_DEPLOYING:
-                ret = deployMenu();break;
-            case STAGE_BATTLES:
-                ret = attackMenu();break;
-            case STAGE_FORTIFY:
-                ret = fortifyMenu();break;
-        }
-
-        return ret;
-
-
-
-    }
 
     /**
      * notify player of the
@@ -58,10 +38,10 @@ public class CLIClient extends Client {
         //no need for asynchronous updates (yet)
     }
 
-    private Action tradeMenu(){
+    private Command tradeMenu(){
 
 
-        Action ret = null;
+        Command ret = null;
         out.println("TRADE MENU");
         out.println("1 - Trade in Risk Cards");
         out.println("2 - Deployment Stage");
@@ -80,21 +60,21 @@ public class CLIClient extends Client {
 
     }
 
-    private Action deployMenu(){
+    private Command deployMenu(){
 
-        Action ret;
+        Command ret;
 
-        if (gameState.getCurrentPlayer().getUnassignedArmies() > 0) {
-            out.println("You have " + gameState.getCurrentPlayer().getUnassignedArmies() + " unassigned armies. Assign to which country?");
+        if (gameState.getPlayer(playerId).getUnassignedArmies() > 0) {
+            out.println("You have " + gameState.getPlayer(playerId).getUnassignedArmies() + " unassigned armies. Assign to which country?");
 
-            Country target = selectCountry(gameState.getCurrentPlayer().getOccupiedCountries(),false,true,false);
+            Country target = selectCountry(gameState.getPlayer(playerId).getOccupiedCountries(),false,true,false);
 
             out.println("How many armies to deploy to " + target.getCountryName());
 
-            int amount = getChoice(0, gameState.getCurrentPlayer().getUnassignedArmies());
+            int amount = getChoice(0, gameState.getPlayer(playerId).getUnassignedArmies());
 
 
-            ret = new DeployArmyAction(gameState.getCurrentPlayer(),target,amount);
+            ret = new DeployCommand(target.getCountryId(),amount,gameState.getPlayer(playerId).getID());
         }
         else {
             out.println("Skipping deployment - no unassigned armies");
@@ -105,15 +85,15 @@ public class CLIClient extends Client {
         return ret;
     }
 
-    private Action attackMenu(){
+    private Command attackMenu(){
 
-        Action ret;
+        Command ret;
         out.println("ATTACK MENU");
         out.println("Select country of origin for attack. In brackets you see (armies,potential targets). select 0 for no attack");
 
 
         //DETERMINE POINT OF ORIGIN
-        Country origin = selectCountry(gameState.getCurrentPlayer().getOccupiedCountries(),true,false,false);
+        Country origin = selectCountry(gameState.getPlayer(playerId).getOccupiedCountries(),true,false,false);
 
 
         if (origin != null){
@@ -129,32 +109,9 @@ public class CLIClient extends Client {
 
                 int armies = getChoice(0,origin.getTroops());
 
-                //publish attack intention
-                //------------- attack is finalised
-                //1.get defenders
-                int defenders = objective.getOwner().getClient().getDefenders(origin,objective,armies);
 
-                //2. everyone knows the attack plan
+                ret = new AttackCommand(origin.getCountryId(),objective.getCountryId(),armies,gameState.getPlayer(playerId).getID());
 
-                //3. get dice rolls
-
-                //TODO
-
-                int [] atkDiceRolls = null;
-                int [] defDiceRolls = null;
-
-                Arrays.sort(atkDiceRolls);
-                Arrays.sort(defDiceRolls);
-
-
-
-                out.println("Battle protocol: ");
-                out.println("Attacker ( armies ) : " + origin.getCountryName() + " ( " + armies + " )");
-                out.println("Defender ( armies ) : " + objective.getCountryName() + " ( " + defenders + " )");
-                out.println("Attacker dice rolls  : " + Arrays.toString(atkDiceRolls));
-                out.println("Defender dice rolls  : " + Arrays.toString(defDiceRolls));
-
-                ret = new AttackAction(gameState.getCurrentPlayer(),origin,objective,atkDiceRolls,defDiceRolls);
 
 
             }
@@ -174,13 +131,13 @@ public class CLIClient extends Client {
         return ret;
     }
 
-    private Action fortifyMenu(){
+    private Command fortifyMenu(){
 
-        Action ret;
+        Command ret;
         out.println("FORTIFY MENU");
         out.println("If you want to fortify, select the origin country, if you dont, select 0 to end your turn. in brackets you see (available troops, potential targets).");
 
-        Country origin = selectCountry(gameState.getCurrentPlayer().getOccupiedCountries(),false,true,true);
+        Country origin = selectCountry(gameState.getPlayer(playerId).getOccupiedCountries(),false,true,true);
 
         if (origin != null){
             out.println("Select the country to fortify, select 0 do choose a different origin. (available troops, potential targets).");
@@ -192,15 +149,15 @@ public class CLIClient extends Client {
 
                 int armies = getChoice(0,origin.getTroops()-1);
 
-                ret = new FortifyAction(gameState.getCurrentPlayer(),origin,target,armies);
+                ret = new FortifyCommand(origin.getCountryId(),target.getCountryId(),armies,playerId);
             }
             else{
                 ret = fortifyMenu();
             }
         }
         else {
-            gameState.nextStage();
-            ret = new EndTurnAction(gameState.getCurrentPlayer());
+
+            ret = new FortifyCommand(playerId);
         }
 
 
@@ -216,7 +173,7 @@ public class CLIClient extends Client {
 
     @Override
     protected byte[] getSeedComponent() {//empty method to just to replace
-        return new byte[0];
+        return RNGSeed.makeRandom256BitNumber();
     }
 
     private int getChoice(int min, int max){
@@ -292,18 +249,14 @@ public class CLIClient extends Client {
         this.out = out;
     }
 
-/*
-    public int[] getSeedComponent() {
-        MersenneTwisterFast twister = new MersenneTwisterFast();
-        twister.setSeed(System.currentTimeMillis());
-        int [] seedComponent = new int[RiskDice.SEED_ARRAY_LENGTH];
-        for (int i = 0; i < RiskDice.SEED_ARRAY_LENGTH; i++){
-            seedComponent[i] = twister.nextInt();
-        }
 
-        return seedComponent;
+
+    public SetupCommand setupMenu(){
+        out.println("SETUP MENU: SELECT COUNTRY TO OCCUPY");
+        Country target = selectCountry(gameState.unoccupiedCountries(),true,true,true);
+
+        return new SetupCommand(target.getCountryId(),playerId);
     }
-*/
 
     @Override
     public boolean isReady(){
@@ -315,6 +268,39 @@ public class CLIClient extends Client {
     @Override
     public void pushCommand(Command command) {
 
+    }
+
+    @Override
+    public Command popCommand() {
+        Command ret = null;
+
+        if (gameState.hasUnassignedCountries()){
+            ret = setupMenu();
+        }
+        switch (gameState.getTurnStage()){
+            case STAGE_TRADING:
+                ret = tradeMenu();break;
+            case STAGE_DEPLOYING:
+                ret = deployMenu();break;
+            case STAGE_BATTLES:
+                ret = attackMenu();break;
+            case STAGE_FORTIFY:
+                ret = fortifyMenu();break;
+        }
+
+        return ret;
+    }
+
+    @Override
+    public DefendCommand popDefendCommand(int origin, int target, int armies) {
+        int defArmies = getDefenders(gameState.getCountryByID(origin),gameState.getCountryByID(target),armies);
+
+        return new DefendCommand(defArmies,playerId);
+
+    }
+
+    public boolean isLocal(){
+        return true;
     }
 
 

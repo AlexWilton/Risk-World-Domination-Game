@@ -59,4 +59,10 @@ public class NetworkClient extends Client {
         ready = set;
     }
 
+    public boolean isLocal(){
+        return false;
+    }
+
+
+
 }

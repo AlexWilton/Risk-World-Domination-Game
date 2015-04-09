@@ -48,7 +48,12 @@ public class GameEngine implements Runnable{
         Player currentPlayer;
         while(true) {
             currentPlayer = state.getCurrentPlayer();
+            System.out.println("Ask player " + currentPlayer.getName());
             Command currentCommand = currentPlayer.getClient().popCommand();
+            //if its local, propagate
+            if (currentPlayer.getClient().isLocal()){
+                csh.sendCommand(currentCommand);
+            }
             Action playerAction = null;
             if (currentCommand instanceof AttackCommand){
                 playerAction = processAttackCommand((AttackCommand) currentCommand);
@@ -57,20 +62,25 @@ public class GameEngine implements Runnable{
                 playerAction = processDeployCommand((DeployCommand) currentCommand);
             }
             else if (currentCommand instanceof FortifyCommand){
-                playerAction = processDeployCommand((DeployCommand) currentCommand);
+                playerAction = processFortifyCommand((FortifyCommand) currentCommand);
             }
             else if (currentCommand instanceof DrawCardCommand){
-                playerAction = processDeployCommand((DeployCommand) currentCommand);
+                playerAction = processDrawCardCommand((DrawCardCommand) currentCommand);
             }
             else if (currentCommand instanceof SetupCommand){
-                playerAction = processDeployCommand((DeployCommand) currentCommand);
+                playerAction = processSetupCommand((SetupCommand) currentCommand);
             }
             else if (currentCommand instanceof PlayCardsCommand){
-                playerAction = processDeployCommand((DeployCommand) currentCommand);
+                playerAction = processPlayCardsCommand((PlayCardsCommand) currentCommand);
             }
             else {
                 System.out.println("cant process command " + currentCommand.toJSONString());
                 continue;
+            }
+
+            if (playerAction == null){
+                System.out.println("End turn");
+                playerAction = new FortifyAction(currentPlayer);
             }
 
 
@@ -90,6 +100,7 @@ public class GameEngine implements Runnable{
             }
 
             //TODO send out update notifications to all clients
+            csh.updateLocalClient();
 
         }
 	}
@@ -157,14 +168,14 @@ public class GameEngine implements Runnable{
 
         //go through all countries
         Iterator<Player> p = players.iterator();
-        int tc =1;
+        int tc =2;
 
         for (Country c : map.getAllCountries()){
             if (!p.hasNext()){
                 p = players.iterator();
             }
             if (tc > 3) {
-                tc = 1;
+                tc = 2;
             }
             p.next().occupyCountry(c, tc++);
         }
@@ -236,7 +247,11 @@ public class GameEngine implements Runnable{
 
         int attackArmies = Integer.parseInt(attackPlan.get(2).toString());
 
-        DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand();
+        DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId,objectiveId,attackArmies);
+        //if its local, propagate
+        if (state.getCountryByID(objectiveId).getOwner().getClient().isLocal()){
+            csh.sendCommand(def);
+        }
 
         int defendArmies = def.getPayloadAsInt();
 
@@ -275,6 +290,9 @@ public class GameEngine implements Runnable{
         }
         */
 
+        if (command.get("payload") == null){
+            return new FortifyAction(state.getPlayer(command.getPlayer()));
+        }
         JSONArray fortification = command.getPayloadAsArray();
         int player = command.getPlayer();
 

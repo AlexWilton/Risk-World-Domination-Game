@@ -1,6 +1,8 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
 import org.json.simple.JSONArray;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.CLIClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.JoinGameCommand;
@@ -30,7 +32,7 @@ public class ClientApp {
         String name = "Some guy";
 
         //connect and obtain game information
-        socketHandler.initialise(address,port,localClient,versions,features,name);
+        int result = socketHandler.initialise(address,port,localClient,versions,features,name);
 
         if(result == SUCCESS) {
             //Run the socket handler

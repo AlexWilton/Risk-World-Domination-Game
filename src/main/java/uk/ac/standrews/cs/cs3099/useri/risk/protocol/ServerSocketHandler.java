@@ -43,7 +43,7 @@ public class ServerSocketHandler implements Runnable {
     public void run() {
         int i = isServerPlaying ? 1 : 0;         //If the server is isServerPlaying, first client gets ID 1, otherwise 0.
         clientSocketPool = new ArrayList<>();
-        MessageQueue s = new MessageQueue(2, isServerPlaying);
+        MessageQueue s = new MessageQueue(2);
         while (!gameInProgress) {
             try {
                 // Open the gates!
@@ -58,7 +58,7 @@ public class ServerSocketHandler implements Runnable {
 
                 // Decide whether we want to start the game already, partially randomly.
                 //Random r = new Random(System.nanoTime());
-                if (i == NUMBER_OF_PLAYERS - 1) {
+                if (i == NUMBER_OF_PLAYERS) {
 
                     gameInProgress = true;
                 }
@@ -76,13 +76,13 @@ public class ServerSocketHandler implements Runnable {
         }
 
         while (!allInitialised(InitState.STAGE_PING));  //wait for all clients to pass the init stage.
-        s.sendPing(i);
+        s.sendPing(i, isServerPlaying?0:null);
         while (!allInitialised(InitState.STAGE_READY));  //wait on ping commands to be received.
-        s.sendReady();
+        s.sendReady(isServerPlaying?0:null);
         while (!allInitialised(InitState.STAGE_PLAYING));  //wait on acknowledgements
         InitialiseGameCommand command = generateInitGame();
         //System.out.println(command);
-        s.sendAll(command);
+        s.sendAll(command, isServerPlaying?0:null);
         //System.out.println("Stuff seems to be working");
 
         //TODO ListenerThread remove player if error occurs!

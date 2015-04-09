@@ -9,14 +9,12 @@ import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.ReadyCommand;
 import java.util.ArrayList;
 
 public class MessageQueue {
-    private final Integer ID;
     private boolean flag = false;
     private static Command command;
     private boolean[] player_connected;
     private boolean[] sentMessage;
 
-    public MessageQueue(int players, boolean playing) {
-        this.ID = playing? 0:null;
+    public MessageQueue(int players) {
         sentMessage = new boolean[players];
         player_connected = new boolean[players];
     }
@@ -67,21 +65,22 @@ public class MessageQueue {
         return true;
     }
 
-    public synchronized void sendPlayerList(ArrayList<Player> players){
-        sendAll(new PlayersJoinedCommand(players));
+    public synchronized void sendPlayerList(ArrayList<Player> players, Integer id){
+        sendAll(new PlayersJoinedCommand(players), id);
     }
 
-    public synchronized void sendPing(int payload) {
-        sendAll(new PingCommand(ID, payload));
+    public synchronized void sendPing(int payload, Integer id) {
+        sendAll(new PingCommand(id, payload), id);
     }
 
-    public synchronized void sendReady() {
-        sendAll(new ReadyCommand(ID, 1));
+    public synchronized void sendReady(Integer id) {
+        sendAll(new ReadyCommand(id, 1), id);
     }
 
-    public synchronized void sendAll(Command command) {
+    public synchronized void sendAll(Command command, Integer id) {
         if (flag){
             try {
+                System.out.println("blocking " + command);
                 wait();
             } catch (InterruptedException e){
                 e.printStackTrace();
@@ -91,6 +90,7 @@ public class MessageQueue {
         flag = true;
         for (int i = 0; i<sentMessage.length; i++)
             sentMessage[i] = false;
+        if (id != null)sentMessage[id] = true;
         notifyAll();
     }
 

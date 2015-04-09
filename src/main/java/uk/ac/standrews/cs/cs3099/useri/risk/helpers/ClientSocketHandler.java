@@ -36,7 +36,6 @@ public class ClientSocketHandler implements Runnable{
         WAITING_FOR_PING,
         WAITING_FOR_READY,
         WAITING_FOR_INIT,
-
         RUNNING,
         REJECTED,
         FAILED
@@ -309,7 +308,9 @@ public class ClientSocketHandler implements Runnable{
             processRollNumberCommand((RollNumberCommand) command);
         }
         else {
-            getClientById(command.getPlayer()).pushCommand(command);
+            Client c = getClientById(command.getPlayer());
+            if(c != null)
+                c.pushCommand(command);
         }
 
 
@@ -402,6 +403,7 @@ public class ClientSocketHandler implements Runnable{
 
     public void sendCommand (Command command){
         out.println(command.toJSONString());
+        System.out.println("Sent to server: " + command.toJSONString());
         out.flush();
 
     }

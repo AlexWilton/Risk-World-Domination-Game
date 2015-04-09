@@ -62,7 +62,7 @@ public class ListenerThread implements Runnable {
             version = ((JoinGameCommand) command).getVersion();
             if (playerName != null) {
                 // Send player list to all connected players.
-                messageQueue.sendPlayerList(players);
+                messageQueue.sendPlayerList(players, ID);
                 reply(messageQueue.getMessage(ID));
             }
             return true;
@@ -136,6 +136,18 @@ public class ListenerThread implements Runnable {
                 }
             }
 
+            while(true) {
+                try {
+                    reply = Command.parseCommand(input.readLine()); //get input commmand from client
+                    reply(messageQueue.probablygetMessage(ID)); //check for messages we need to send to client (then send them)
+                    System.out.println("Player " + ID + "received: " + reply);
+                    messageQueue.sendAll(reply, ID); //send client's command to all the other clients
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
 
         } catch(IOException e){
             e.printStackTrace();
@@ -156,7 +168,7 @@ public class ListenerThread implements Runnable {
                 try {
                     reply = Command.parseCommand(input.readLine());
                     reply(messageQueue.probablygetMessage(ID));
-                    messageQueue.sendAll(reply);
+                    messageQueue.sendAll(reply, ID);
                     System.out.println("Stuff " + ID);
                     break;
                 } catch (IOException e){

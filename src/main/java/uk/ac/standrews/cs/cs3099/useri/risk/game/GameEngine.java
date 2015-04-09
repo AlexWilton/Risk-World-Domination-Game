@@ -122,7 +122,6 @@ public class GameEngine implements Runnable{
         State gamestate = new State();
         state = gamestate;
 
-        csh.linkGameState(state);
 
         //initialise map
         Map map = new Map();
@@ -180,9 +179,7 @@ public class GameEngine implements Runnable{
             p.next().occupyCountry(c, tc++);
         }
 
-
-
-
+        csh.linkGameState(state);
 
     }
 

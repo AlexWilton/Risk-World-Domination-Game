@@ -15,8 +15,8 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 public class ServerSocketHandler implements Runnable {
-    public static final int  ACK_TIMEOUT = 1, MOVE_TIMEOUT = 30, MAX_PLAYER_COUNT = 6, MIN_PLAYER_COUNT = 2;
-    private final int PORT, NUMBER_OF_PLAYERS;
+    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 1, MOVE_TIMEOUT = 30;
+    public static final int MAX_PLAYER_COUNT = 6, MIN_PLAYER_COUNT = 2; //needed for web client to know the range of allowed number of players. (needs to be public)
     private WebClient webClient;
     private ServerSocket server;
     private ArrayList<ListenerThread> clientSocketPool;

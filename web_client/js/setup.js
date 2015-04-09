@@ -23,7 +23,7 @@ $( document ).ready(function(){
                 if(response.indexOf("true") == 0) {
                     gotoGamePlayWhenReady();
                 }else{
-                    alert("Attempt to connect to host failed... (" + response + ")");
+                    alert(response);
                 }
             })
             .fail(function(data) {

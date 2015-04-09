@@ -12,11 +12,13 @@ import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
 import java.awt.*;
 import java.net.URI;
 import java.net.URL;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class WebClient extends Client {
 
     JettyServer jettyServer;
-    Action action = null;
+    ArrayBlockingQueue<Action> actionQueue = new ArrayBlockingQueue<Action>(1); //can only hold one action at a time.
 
     public WebClient(){
         super(null);
@@ -48,19 +50,15 @@ public class WebClient extends Client {
         }
     }
 
-    public void setAction(Action action){
-        this.action = action;
+    public void queueAction(Action action){
+        try {
+            actionQueue.put(action);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    /**
-     * @return the next action this player takes based on current game state
-     */
-
-    public Action getAction() {
-        Action current = action;
-        action = null;
-        return current;
-    }
+ 
 
     /**
      * notify player that game state has changed
@@ -86,7 +84,7 @@ public class WebClient extends Client {
 
     @Override
     public boolean isReady(){
-        if(action != null)
+        if(actionQueue.size() > 0)
             return true;
         else
             return false;

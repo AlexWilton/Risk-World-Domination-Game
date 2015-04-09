@@ -1,8 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
 import org.json.simple.JSONArray;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.CLIClient;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.JoinGameCommand;
@@ -34,17 +32,18 @@ public class ClientApp {
         //connect and obtain game information
         socketHandler.initialise(address,port,localClient,versions,features,name);
 
-        //Run the socket handler
-        Thread socketHandlerThread = new Thread(socketHandler);
-        socketHandlerThread.start();
+        if(result == SUCCESS) {
+            //Run the socket handler
+            Thread socketHandlerThread = new Thread(socketHandler);
+            socketHandlerThread.start();
 
-        //initialise and start the game engine thread
-        GameEngine engine = new GameEngine(socketHandler);
-        Thread gameEngineThread = new Thread(engine);
-        gameEngineThread.start();
+            //initialise and start the game engine thread
+            GameEngine engine = new GameEngine(socketHandler);
+            Thread gameEngineThread = new Thread(engine);
+            gameEngineThread.start();
+        }
 
-
-        return SUCCESS;
+        return result;
        
     }
     public static void main(String argv[]){

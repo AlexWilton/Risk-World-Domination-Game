@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import java.net.Socket;
+import java.security.spec.ECField;
 import java.util.*;
 
 
@@ -143,7 +144,6 @@ public class ClientSocketHandler implements Runnable{
 
         }
         catch (IOException e){
-            e.printStackTrace();
             System.out.println("Cant connect to server");
             return ClientApp.BAD_ADDRESS;
         }

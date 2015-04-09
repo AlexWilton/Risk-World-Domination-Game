@@ -43,6 +43,8 @@ public class JoinGameCommand extends Command {
             if (versions == null) {
                 return null;
             }
+            if (features == null)
+                features = new JSONArray();
 
             return new JoinGameCommand(versions, features, name);
 
@@ -59,6 +61,10 @@ public class JoinGameCommand extends Command {
 
     public JoinGameCommand(JSONObject object){
         super(object);
+        JSONObject payload = (JSONObject) object.get("payload");
+        versions = (JSONArray) payload.get("supported_versions");
+        features = (JSONArray) payload.get("supported_features");
+        name = (String) payload.get("name");
     }
 
     public ArrayList<String> getFeatures() {

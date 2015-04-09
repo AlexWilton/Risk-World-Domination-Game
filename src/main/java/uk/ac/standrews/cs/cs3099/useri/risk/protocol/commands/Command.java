@@ -31,7 +31,10 @@ public class Command extends JSONObject {
     }
 
     public int getPlayer(){
-        return Integer.parseInt(this.get("player_id").toString());
+        Object playerObj = this.get("player_id");
+        if(playerObj == null) return -1; //for non-playing host
+
+        return Integer.parseInt(playerObj.toString());
     }
 
     public String getAsEvelope(String signature){

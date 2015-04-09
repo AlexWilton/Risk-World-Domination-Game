@@ -124,6 +124,7 @@ public class Player implements JSONAware{
             cardArray.add(c);
         player.put("cards", cardArray);
         player.put("unassignedArmies", unassignedArmies);
+        player.put("countryWhichMustBeDeployedTo", countryWhichMustBeDeployedTo);
         player.put("inactive", inactive);
         return player.toJSONString();
     }

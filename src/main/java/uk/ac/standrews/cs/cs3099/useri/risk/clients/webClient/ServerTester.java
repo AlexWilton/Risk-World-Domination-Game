@@ -10,7 +10,7 @@ public class ServerTester {
 
         WebClient webClient = new WebClient();
 //        webClient.setState(TestGameStateFactory.getWebClientTestState(webClient));
-//        GameEngine gameEngine = new GameEngine();
+//        GameEngine gameEngine = new GameEngine(null);
 //        gameEngine.initialise(webClient.getState());
 //        gameEngine.gameLoop();
     }

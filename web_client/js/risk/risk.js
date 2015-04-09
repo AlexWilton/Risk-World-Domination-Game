@@ -196,9 +196,7 @@ var Risk = {
 			var nameImg = Risk.Territories[t].nameImg;
 			var group = new Kinetic.Group();
 
-
-
-			//We have to set up a group for proper mouseover on territories and sprite name images 
+			//We have to set up a group for proper mouseover on territories and sprite name images
 			group.add(path);
 			group.add(nameImg);
 			group.add(Risk.showArmyInfo(Risk.Territories[t]));
@@ -220,11 +218,15 @@ var Risk = {
 					path.setOpacity(0.4);
 					group.moveTo(Risk.mapLayer);
 					Risk.topLayer.draw();
+                    //updateDisplay();
 				});
 
 				group.on('click', function() {
 					console.log(Risk.Territories[path.attrs.id]);
-					//location.hash = path.attrs.id;
+                    var selectedCountry = Risk.Territories[path.attrs.id].mapped_game_state_territory;
+                    if($.inArray(selectedCountry,selectedTerriories == -1))
+                        selectedTerriories.push(Risk.Territories[path.attrs.id].mapped_game_state_territory);
+                    updateTurnPanel();
 				});
 			})(path, t, group);
 

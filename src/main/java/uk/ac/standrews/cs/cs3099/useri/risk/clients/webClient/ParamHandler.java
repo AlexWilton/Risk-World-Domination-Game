@@ -3,14 +3,19 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.json.simple.parser.JSONParser;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.DeployArmyAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.ClientApp;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.TestGameStateFactory;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.ListenerThread;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.ServerSocketHandler;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DeployCommand;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DeployTuple;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.PlayCardsCommand;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -92,6 +97,7 @@ public class ParamHandler extends DefaultHandler {
     }
 
     private String performAction(Map<String, String[]> params){
+        Player myself = getWebClientPlayer();
         String[] actionArray = params.get("action");
         String action = (actionArray!= null) ? (actionArray[0]) : "";
         if(action.equals(""))
@@ -99,20 +105,55 @@ public class ParamHandler extends DefaultHandler {
         switch (action){
             case "trade_in":
                 if(!webClient.isReady()){
-                    Player myself = getWebClientPlayer();
                     String[] cardIdsAsStrings = params.get("card");
-                    ArrayList<RiskCard> cards = new ArrayList<RiskCard>();
+                    ArrayList<Integer> cardIDs = new ArrayList<Integer>();
+                    ArrayList<RiskCard> riskCards = new ArrayList<RiskCard>();
                     for(String cardIdAsString : cardIdsAsStrings){
                         int id = Integer.parseInt(cardIdAsString);
-                        cards.add(myself.getRiskCardById(id));
+                        riskCards.add(myself.getRiskCardById(id));
+                        cardIDs.add(id);
                     }
-                    TradeAction ta = new TradeAction(getWebClientPlayer(),cards);
+                    ArrayList<ArrayList<Integer>> cardTriplets = new ArrayList<ArrayList<Integer>>();
+                    cardTriplets.add(cardIDs);
+                    TradeAction ta = new TradeAction(myself, riskCards);
                     if(!ta.validateAgainstState(webClient.getState())){
                         return String.valueOf(false);
                     }
+                    PlayCardsCommand playCardsCommand = new PlayCardsCommand(cardTriplets, ta.calculateArmies(webClient.getState()), myself.getID());
+                    webClient.queueCommand(playCardsCommand);
+                    return String.valueOf(true);
+                }else{
+                    return String.valueOf(false);
+                }
+            case "deploy_armies":
+                if(!webClient.isReady()){
+                    ArrayList<DeployTuple> deployTuples = new ArrayList<DeployTuple>();
+                    for(Country myCountry : myself.getOccupiedCountries()){
+                        int myCountry_id = myCountry.getCountryId();
+                        if(params.containsKey(String.valueOf(myCountry_id))){
+                            int armiesToDeployToCountry = Integer.valueOf(params.get(String.valueOf(myCountry_id))[0]);
+                            deployTuples.add(new DeployTuple(myCountry_id, armiesToDeployToCountry));
+
+                            //check deploy is allowed
+                            DeployArmyAction deployArmyAction = new DeployArmyAction(myself, myCountry, armiesToDeployToCountry);
+                            if(!deployArmyAction.validateAgainstState(webClient.getState())){
+                                return "Error! Deployment of " + armiesToDeployToCountry + " armies to " + myCountry.getCountryName() + " not allowed";
+                            }
+                        }
+                    }
+
+                    //check army deployments add up to Player's unassignedArmies
+                    int armiesToDeployCount = 0;
+                    for(DeployTuple dt : deployTuples){
+                        armiesToDeployCount += dt.armies;
+                    }
+                    if(armiesToDeployCount != myself.getUnassignedArmies())
+                        return "You Must deploy all " + myself.getUnassignedArmies() + " armies!";
 
 
-                    //TODO webClient.queueAction(ta);
+
+                    DeployCommand deployCommand = new DeployCommand(deployTuples, myself.getID());
+                    webClient.queueCommand(deployCommand);
                     return String.valueOf(true);
                 }else{
                     return String.valueOf(false);

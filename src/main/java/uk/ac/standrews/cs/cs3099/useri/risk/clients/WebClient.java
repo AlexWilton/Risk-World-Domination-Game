@@ -5,7 +5,6 @@ import uk.ac.standrews.cs.cs3099.useri.risk.action.Action;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.JettyServer;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
-import uk.ac.standrews.cs.cs3099.useri.risk.helpers.TestGameStateFactory;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
 
@@ -13,12 +12,11 @@ import java.awt.*;
 import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 public class WebClient extends Client {
 
     JettyServer jettyServer;
-    ArrayBlockingQueue<Action> actionQueue = new ArrayBlockingQueue<Action>(1); //can only hold one action at a time.
+    ArrayBlockingQueue<Command> commandQueue = new ArrayBlockingQueue<Command>(1); //can only hold one action at a time.
 
     public WebClient(){
         super(null);
@@ -31,7 +29,7 @@ public class WebClient extends Client {
 
         //Open Web interface in Browser
         int port = jettyServer.getServerPort();
-        openWebpage("http://localhost:" + port + "/");
+        openWebpage("http://localhost:" + port + "/play.html");
     }
 
     public static void openWebpage(String urlAsString) {
@@ -50,15 +48,23 @@ public class WebClient extends Client {
         }
     }
 
-    public void queueAction(Action action){
+    public void queueCommand(Command command){
         try {
-            actionQueue.put(action);
+            commandQueue.put(command);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
- 
+    @Override
+    public Command popCommand() {
+        try {
+            return commandQueue.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     /**
      * notify player that game state has changed
@@ -84,7 +90,7 @@ public class WebClient extends Client {
 
     @Override
     public boolean isReady(){
-        if(actionQueue.size() > 0)
+        if(commandQueue.size() > 0)
             return true;
         else
             return false;
@@ -99,5 +105,10 @@ public class WebClient extends Client {
 
     public boolean isLocal(){
         return true;
+    }
+
+    @Override
+    public DefendCommand popDefendCommand(int origin, int target, int armies) {
+        return new DefendCommand((gameState.getCountryByID(target).getTroops() > 1) ? 2 : 1, playerId);
     }
 }

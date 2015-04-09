@@ -30,7 +30,8 @@ function getStateFromServer(functionToCallAfter){
 function updateDisplay(){
     updatePlayerDisplay();
     updateTurnPanel();
-    updateMapDisplay();
+    Risk.updateMap();
+    Risk.setTerritoriesColour();
 }
 
 function updatePlayerDisplay(){
@@ -41,13 +42,6 @@ function updatePlayerDisplay(){
         playerInfo += "</h5>";
     });
     $("#playerInfo").html(playerInfo);
-}
-
-function updateMapDisplay(){
-    game_state.players.forEach(function(player){
-
-    });
-    Risk.setTerritoriesColour();
 }
 
 function updateTurnPanel(){
@@ -103,32 +97,52 @@ function generateTradeInPanel(){
 }
 
 function generateDeployPanel(){
-    var panelHtml = "";
+    var panelHtml = '<form id="deployArmies" class="form-horizontal">' +
+    '<input type="hidden" name="operation" value="perform_action"/>' +
+    '<input type="hidden" name="action" value="deploy_armies"/>';
     for(t in selectedTerriories){
         if(selectedTerriories[t].player_owner_id == my_player_id) {
-
-            panelHtml += selectedTerriories[t].name + "<br/>";
+            var name = selectedTerriories[t].name;
+            panelHtml += '<div class="form-group">' +
+            '<label class="col-sm-8 control-label">'+name+'</label> ' +
+            '<div class="col-sm-4"> ' +
+            '<select name="' + selectedTerriories[t].country_id + '" class="form-control">';
+            //'<div class="input-group-addon">'+name+'</div>';
+            //panelHtml += '<select name="' + name + '" class="form-control">';
+            for(var i = 0; i<= game_state.currentPlayer.unassignedArmies; i++) {
+                panelHtml += '<option>' + i +'</option>';
+            }
+            panelHtml += "</select></div></div>";
         }
     }
 
+    panelHtml += '<div id="deployOutcome"></div><button type="button" onclick="attempt_deployment()" class="btn btn-info">Deploy Armies</button></form>';
     return panelHtml;
 }
 
-function waitForServer(){
-    $.get('/?operation=is_server_waiting_for_action', function(response){
+function attempt_deployment(){
+    $.get('/?' + $('#deployArmies').serialize(), function(response){
+        console.log(response);
         if(response.indexOf("true") == 0){
-            getStateFromServer(updateDisplay);
+            $("#turnPanel").html("");
+            $("#deployOutcome").html("<h4>Waiting for Server...</h4>");
+            waitForServer();
         }else{
-            setTimeout(waitForServer, 1000);
+            $("#deployOutcome").html('<div class="alert alert-danger alert-dismissible" role="alert">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>' +
+            '<span class="sr-only">Error:</span>' +
+            response +
+            '</div>');
         }
     });
 }
 
 
 function make_trade_in_request(){
-    $.get('/?' + $('#tradeIn').serialize(), function(outcome){
-        console.log(outcome);
-        if(outcome){
+    $.get('/?' + $('#tradeIn').serialize(), function(response){
+        console.log(response);
+        if(response.indexOf("true") == 0){
             $("#turnPanel").html("");
             $("#tradeOutcome").html("<h4>Waiting for Server...</h4>");
             waitForServer();
@@ -138,6 +152,17 @@ function make_trade_in_request(){
                 '<span class="sr-only">Error:</span>' +
                     'Trade Not Allowed.' +
             '</div>');
+        }
+    });
+}
+
+
+function waitForServer(){
+    $.get('/?operation=is_server_waiting_for_action', function(response){
+        if(response.indexOf("true") == 0){
+            getStateFromServer(updateDisplay);
+        }else{
+            setTimeout(waitForServer, 1000);
         }
     });
 }

@@ -49,6 +49,7 @@ public class DeployArmyAction extends Action{
         country.setTroops(country.getTroops() + armies);
         player.setUnassignedArmies(getPlayer().getUnassignedArmies() - armies);
 
-        //TODO although, still needs TESTS!!!
+        if(state.getCurrentPlayer().getUnassignedArmies() == 0)
+            state.nextStage();
     }
 }

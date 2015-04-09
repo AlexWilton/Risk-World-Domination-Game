@@ -469,12 +469,4 @@ public class ClientSocketHandler implements Runnable{
         return ret;
     }
 
-    public void updateLocalClient(){
-        localClient.pushGameState();
-    }
-
-
-
-
-
 }

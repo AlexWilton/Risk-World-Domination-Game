@@ -51,44 +51,45 @@ public class GameEngine implements Runnable{
             System.out.println("Ask player " + currentPlayer.getName());
             Command currentCommand = currentPlayer.getClient().popCommand();
             //if its local, propagate
-            if (currentPlayer.getClient().isLocal()){
-                csh.sendCommand(currentCommand);
+            if (csh != null && currentPlayer.getClient().isLocal()){
+               csh.sendCommand(currentCommand);
             }
-            Action playerAction = null;
+            ArrayList<Action> playerActions = new ArrayList<Action>();
             if (currentCommand instanceof AttackCommand){
-                playerAction = processAttackCommand((AttackCommand) currentCommand);
+                playerActions.add(processAttackCommand((AttackCommand) currentCommand));
             }
             else if (currentCommand instanceof DeployCommand){
-                playerAction = processDeployCommand((DeployCommand) currentCommand);
+                playerActions.addAll(processDeployCommand((DeployCommand) currentCommand));
             }
             else if (currentCommand instanceof FortifyCommand){
-                playerAction = processFortifyCommand((FortifyCommand) currentCommand);
+                playerActions.add(processFortifyCommand((FortifyCommand) currentCommand));
             }
             else if (currentCommand instanceof DrawCardCommand){
-                playerAction = processDrawCardCommand((DrawCardCommand) currentCommand);
+                playerActions.add(processDrawCardCommand((DrawCardCommand) currentCommand));
             }
             else if (currentCommand instanceof SetupCommand){
-                playerAction = processSetupCommand((SetupCommand) currentCommand);
+                playerActions.add(processSetupCommand((SetupCommand) currentCommand));
             }
             else if (currentCommand instanceof PlayCardsCommand){
-                playerAction = processPlayCardsCommand((PlayCardsCommand) currentCommand);
+                playerActions.add(processPlayCardsCommand((PlayCardsCommand) currentCommand));
             }
             else {
                 System.out.println("cant process command " + currentCommand.toJSONString());
                 continue;
             }
 
-            if (playerAction == null){
+            if (playerActions.size() == 0){
                 System.out.println("End turn");
-                playerAction = new FortifyAction(currentPlayer);
+                playerActions.add(new FortifyAction(currentPlayer));
             }
 
-
-            if (playerAction.validateAgainstState(state)) {
-                playerAction.performOnState(state);
-            }else{
-                System.out.println("Error move did not validate");
-                System.exit(1);
+            for(Action playerAction : playerActions) {
+                if (playerAction.validateAgainstState(state)) {
+                    playerAction.performOnState(state);
+                } else {
+                    System.out.println("Error move did not validate");
+                    System.exit(1);
+                }
             }
 
             if(state.winConditionsMet()){
@@ -98,9 +99,6 @@ public class GameEngine implements Runnable{
                 //TODO follow endGame protocol
                 System.exit(0);
             }
-
-            //TODO send out update notifications to all clients
-            csh.updateLocalClient();
 
         }
 	}
@@ -326,8 +324,8 @@ public class GameEngine implements Runnable{
 
     }
 
-    private DeployArmyAction processDeployCommand(DeployCommand command) {
-
+    private ArrayList<DeployArmyAction> processDeployCommand(DeployCommand command) {
+        ArrayList<DeployArmyAction> deployArmyActions = new ArrayList<>();
         JSONArray territoryNumberPairs = command.getPayloadAsArray();
         int player = command.getPlayer();
         //construct amount of deploy actions
@@ -339,32 +337,22 @@ public class GameEngine implements Runnable{
             int armies = Integer.parseInt(pairArray.get(1).toString());
 
             //create deploy action
-            DeployArmyAction act = new DeployArmyAction(state.getPlayers().get(player),state.getCountryByID(countryId),armies);
+            deployArmyActions.add(new DeployArmyAction(state.getPlayers().get(player),state.getCountryByID(countryId),armies));
+//
+//            //push to client
+//
+//
+//
+//            //pushed action to client
+//
+//            System.out.println("pushed deploy action to client " + player);
 
-            //push to client
-
-
-
-            //pushed action to client
-
-            System.out.println("pushed deploy action to client " + player);
-
-            //test command
-            /*{
-                "command": "deploy",
-                    "payload": [[1,1],[2,1]],
-                "ack_id": 1,
-                    "player_id" : 1
-
-            }*/
-
-            return act;
 
         }
 
         //TODO ret multiple
 
-        return null;
+        return deployArmyActions;
 
     }
 

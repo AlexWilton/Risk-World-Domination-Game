@@ -15,7 +15,8 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 public class ServerSocketHandler implements Runnable {
-    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 1, MOVE_TIMEOUT = 30, MAX_PLAYER_COUNT = 6, MIN_PLAYER_COUNT = 2;
+    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 1, MOVE_TIMEOUT = 30;
+    public static final int MAX_PLAYER_COUNT = 6, MIN_PLAYER_COUNT = 2; //needed for web client to know the range of allowed number of players. (needs to be public)
     private WebClient webClient;
     private ServerSocket server;
     private ArrayList<ListenerThread> clientSocketPool;
@@ -45,10 +46,12 @@ public class ServerSocketHandler implements Runnable {
         MessageQueue s = new MessageQueue(2, isServerPlaying);
         while (!gameInProgress) {
             try {
+                // TODO set up the initial game state.
+
+
                 // Open the gates!
                 Socket temp = server.accept();
                 System.out.println("New client connected");
-                //TODO GAMESTATE!!
                 ListenerThread client = new ListenerThread(temp, i, new NetworkClient(null), gameInProgress, ACK_TIMEOUT, MOVE_TIMEOUT, s);
                 clientSocketPool.add(i++, client);
                 // Make new Thread for client.
@@ -92,7 +95,6 @@ public class ServerSocketHandler implements Runnable {
             try {
                 Socket temp = server.accept();
                 System.out.println("New client connected");
-                //TODO GAME STATE!!
                 ListenerThread client = new ListenerThread(temp, i, new NetworkClient(null), gameInProgress, ACK_TIMEOUT, MOVE_TIMEOUT, s);
                 // Make new Thread for client.
                 Thread t = new Thread(client);

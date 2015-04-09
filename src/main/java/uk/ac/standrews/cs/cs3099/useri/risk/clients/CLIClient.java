@@ -74,7 +74,10 @@ public class CLIClient extends Client {
             int amount = getChoice(0, gameState.getPlayer(playerId).getUnassignedArmies());
 
 
-            ret = new DeployCommand(target.getCountryId(),amount,gameState.getPlayer(playerId).getID());
+            ArrayList<DeployTuple> tupList = new ArrayList<>();
+
+            tupList.add(new DeployTuple(target.getCountryId(),amount));
+            ret = new DeployCommand(tupList,gameState.getPlayer(playerId).getID());
         }
         else {
             out.println("Skipping deployment - no unassigned armies");

@@ -6,6 +6,8 @@ import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.JettyServer;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.TestGameStateFactory;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
 
 import java.awt.*;
 import java.net.URI;
@@ -17,6 +19,7 @@ public class WebClient extends Client {
     Action action = null;
 
     public WebClient(){
+        super(null);
         //Launch Jetty Web Server
         jettyServer = new JettyServer(this);
         jettyServer.run();
@@ -52,7 +55,7 @@ public class WebClient extends Client {
     /**
      * @return the next action this player takes based on current game state
      */
-    @Override
+
     public Action getAction() {
         Action current = action;
         action = null;
@@ -88,6 +91,7 @@ public class WebClient extends Client {
         else
             return false;
     }
+
 
     public void setState(State gameState){
         this.gameState = gameState;

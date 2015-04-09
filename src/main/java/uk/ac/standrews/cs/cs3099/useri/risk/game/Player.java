@@ -46,9 +46,7 @@ public class Player implements JSONAware{
         occupiedCountries.remove(c);
     }
 
-    public Action getPlayerAction(){
-        return client.getAction();
-    }
+
 
     public int getUnassignedArmies(){
         return unassignedArmies;

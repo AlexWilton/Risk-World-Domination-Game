@@ -3,6 +3,8 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.Action;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -14,31 +16,19 @@ public class NetworkClient extends Client {
 
     }
 
-    private Queue<Action> actionQueue;
+
 
     private boolean ready;
 
     public NetworkClient(State gamestate){
+        super(gamestate);
         ready = false;
-        actionQueue = new ArrayDeque<>();
 
         this.gameState = gamestate;
 
     }
 
-    @Override
-    public Action getAction () {
-        //wait until an action is in the queue
-        while (actionQueue.isEmpty()){
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        //the return the first
-        return actionQueue.remove();
-    }
+
 
     @Override
     public void pushGameState(){
@@ -57,15 +47,13 @@ public class NetworkClient extends Client {
         return 0;
     }
 
-    @Override
-    public void pushAction(Action action){
-        actionQueue.add(action);
-    }
 
     @Override
     public boolean isReady(){
         return ready;
     }
+
+
 
     public void setReady (boolean set){
         ready = set;

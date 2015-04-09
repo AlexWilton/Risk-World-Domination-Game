@@ -1,10 +1,13 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
-import org.apache.commons.lang3.StringUtils;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.Action;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
+
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 /**
  * represents one client.
@@ -23,11 +26,19 @@ public abstract class Client {
     private String hexSeedComponent;
 
     private boolean playReady = false;
+    private Queue<Command> commandQueue;
 
-    /**
-     * @return the next action this player takes based on current game state
-     */
-    public abstract Action getAction();
+    private DefendCommand defendCommand;
+
+
+    public Client(State gamestate){
+
+        commandQueue = new ArrayDeque<>();
+
+        this.gameState = gamestate;
+
+    }
+
 
     /**
      * notify player that game state has changed
@@ -81,11 +92,52 @@ public abstract class Client {
         this.playReady = set;
     }
 
-    /**
-     * push an action to internal queue to be returned next (fifo)
-     * @param act
-     */
-    public abstract void pushAction (Action act);
+
+    public void pushCommand(Command command) {
+        if (command instanceof DefendCommand){
+            defendCommand=(DefendCommand)command;
+        }
+
+        else{
+            commandQueue.add(command);
+        }
+    }
+
+
+    public Command popCommand() {
+        while (commandQueue.isEmpty()){
+
+
+
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return commandQueue.remove();
+    }
+
+
+    public DefendCommand popDefendCommand() {
+        while (defendCommand == null){
+
+
+
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        DefendCommand ret = defendCommand;
+
+        defendCommand = null;
+
+        return ret;
+
+    }
 
 
 

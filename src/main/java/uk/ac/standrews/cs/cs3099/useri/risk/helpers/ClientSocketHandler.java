@@ -49,8 +49,6 @@ public class ClientSocketHandler implements Runnable{
 
     private State gameState;
 
-    private AttackActionBuilder builder;
-
     private RNGSeed seed;
 
     private PrintWriter out;
@@ -303,41 +301,14 @@ public class ClientSocketHandler implements Runnable{
 
     public void processCommandRunning (Command command){
 
-        if (command instanceof AttackCaptureCommand){
-
-        }
-        else if (command instanceof AttackCommand){
-            processAttackCommand((AttackCommand) command);
-
-        }
-        else if (command instanceof DefendCommand){
-            processDefendCommand((DefendCommand) command);
-        }
-        else if (command instanceof DeployCommand){
-            processDeployCommand((DeployCommand) command);
-        }
-        else if (command instanceof DrawCardCommand){
-            processDrawCardCommand((DrawCardCommand) command);
-        }
-        else if (command instanceof FortifyCommand){
-            processFortifyCommand((FortifyCommand) command);
-        }
-        else if (command instanceof PlayCardsCommand){
-            processPlayCardsCommand((PlayCardsCommand) command);
-        }
-        else if (command instanceof RollHashCommand){
+        if (command instanceof RollHashCommand){
             processRollHashCommand((RollHashCommand) command);
         }
         else if (command instanceof RollNumberCommand){
             processRollNumberCommand((RollNumberCommand) command);
         }
-
-        else if (command instanceof SetupCommand){
-            processSetupCommand((SetupCommand) command);
-        }
         else {
-            System.out.println("Command ignored:");
-            System.out.println(command.toJSONString());
+            getClientById(command.getPlayer()).pushCommand(command);
         }
 
 
@@ -395,12 +366,7 @@ public class ClientSocketHandler implements Runnable{
 
     }
 
-    private void processSetupCommand(SetupCommand command){
-        int countryId = command.getPayloadAsInt();
-        SetupAction act = new SetupAction(gameState.getPlayer(command.getPlayer()),gameState.getCountryByID(countryId));
-        getRemoteClientById(command.getPlayer()).pushAction(act);
 
-    }
 
     private void processHostPingCommand(PingCommand command){
         hostId = command.getPlayer();
@@ -460,179 +426,7 @@ public class ClientSocketHandler implements Runnable{
     }
 
 
-    private void processDefendCommand(DefendCommand command) {
 
-
-        int armies = command.getPayloadAsInt();
-        int player = command.getPlayer();
-
-        builder.setDefenderArmies(armies);
-        builder.setGamesState(gameState);
-        builder.setClientSocketHandler(this);
-
-        Thread builderThread = new Thread(builder);
-
-        builderThread.start();
-
-
-
-    }
-
-    private void processPlayCardsCommand(PlayCardsCommand command){
-        /*{
-            "command": "play_cards",
-            "payload": {
-                "cards": [
-                    [1, 2, 3],
-                    [4, 5, 6]
-                ],
-                "armies": 3
-            },
-            "player_id": 0,
-            "ack_id": 1
-        }*/
-
-        JSONObject payload = command.getPayload();
-        int player = command.getPlayer();
-
-        JSONArray cards = (JSONArray)(payload.get("cards"));
-
-        ArrayList<ArrayList<RiskCard>> triplets = new ArrayList<ArrayList<RiskCard>>();
-        for (Object tripletObject : cards) {
-            JSONArray tripletJSON = (JSONArray) tripletObject;
-            ArrayList<RiskCard> triplet = new ArrayList<RiskCard>();
-            for (int i = 0; i<tripletJSON.size();i++){
-                int cardId = Integer.parseInt(tripletJSON.get(i).toString());
-                triplet.add(gameState.getPlayers().get(player).getRiskCardById(cardId));
-            }
-            triplets.add(triplet);
-        }
-
-        for (ArrayList<RiskCard> triplet : triplets){
-            TradeAction act = new TradeAction(gameState.getPlayers().get(player),triplet);
-            getRemoteClientById(player).pushAction(act);
-            System.out.println("Interpreted trade command");
-        }
-
-
-
-
-
-    }
-
-
-    private void processAttackCommand(AttackCommand command){
-        /*{
-            "command": "attack",
-            "payload": [1,2,1],
-            "player_id" : 1
-        }*/
-
-        JSONArray attackPlan = command.getPayloadAsArray();
-        int player = command.getPlayer();
-
-        int originId = Integer.parseInt(attackPlan.get(0).toString());
-
-        int objectiveId = Integer.parseInt(attackPlan.get(1).toString());
-
-        int attackArmies = Integer.parseInt(attackPlan.get(2).toString());
-
-        AttackActionBuilder builder = new AttackActionBuilder();
-
-        builder.setAttackerId(player);
-        builder.setAttackerArmies(attackArmies);
-        builder.setObjectiveId(objectiveId);
-        builder.setOriginId(originId);
-        this.builder =builder;
-        System.out.println("Interpreted attack command");
-
-
-
-
-    }
-
-    private void processFortifyCommand(FortifyCommand command){
-        /*
-        {
-            "command": "fortify",
-            "payload": [1, 2, 5],
-            "player_id": 0,
-            "ack_id": 1
-        }
-        */
-
-        JSONArray fortification = command.getPayloadAsArray();
-        int player = command.getPlayer();
-
-        int originId = Integer.parseInt(fortification.get(0).toString());
-
-        int objectiveId = Integer.parseInt(fortification.get(1).toString());
-
-        int armies = Integer.parseInt(fortification.get(2).toString());
-
-        FortifyAction act = new FortifyAction(gameState.getPlayers().get(player),gameState.getCountryByID(originId),gameState.getCountryByID(objectiveId),armies);
-        System.out.println("Interpreted fortify command");
-        getRemoteClientById(player).pushAction(act);
-
-
-
-
-    }
-
-    private void processDrawCardCommand(DrawCardCommand command){
-        /*{
-            "command": "draw_card",
-            "payload": 12,
-            "player_id": 0,
-            "ack_id": 1
-        }*/
-
-        int player = command.getPlayer();
-        ObtainRiskCardAction act = new ObtainRiskCardAction(gameState.getPlayers().get(player));
-        System.out.println("Interpreted draw command");
-        getRemoteClientById(player).pushAction(act);
-
-
-
-
-    }
-
-    private void processDeployCommand(DeployCommand command) {
-
-        JSONArray territoryNumberPairs = command.getPayloadAsArray();
-        int player = command.getPlayer();
-        //construct amount of deploy actions
-        for (Object pair : territoryNumberPairs) {
-
-            //extract parameters
-            JSONArray pairArray = (JSONArray) pair;
-            int countryId = Integer.parseInt(pairArray.get(0).toString());
-            int armies = Integer.parseInt(pairArray.get(1).toString());
-
-            //create deploy action
-            DeployArmyAction act = new DeployArmyAction(gameState.getPlayers().get(player),gameState.getCountryByID(countryId),armies);
-
-            //push to client
-
-            getRemoteClientById(player).pushAction(act);
-
-            //pushed action to client
-
-            System.out.println("pushed deploy action to client " + player);
-
-            //test command
-            /*{
-                "command": "deploy",
-                    "payload": [[1,1],[2,1]],
-                "ack_id": 1,
-                    "player_id" : 1
-
-            }*/
-
-
-        }
-
-    }
 
 
 

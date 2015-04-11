@@ -1,5 +1,7 @@
 var game_state, my_player_id, selectedTerriories = [];
 
+//TODO use pre-game in state to add player by player deployment of 1 army to each country and move to real game play after all deployment finished.
+
 function setup(){
     $.ajax( "/?operation=get_player_id").done(function(id){
         my_player_id = parseInt(id);

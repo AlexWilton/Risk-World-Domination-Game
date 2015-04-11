@@ -25,6 +25,7 @@ public class State implements JSONAware{
     private TurnStage stage = TurnStage.STAGE_TRADING;;
     private boolean wonBattle = false;
     private int cardSetstradedIn = 0;
+    private boolean preGamePlay = true;
 
     public State(){}
 
@@ -159,7 +160,12 @@ public class State implements JSONAware{
 
         }
         state.put("all_countries_claimed", areAllCountriesClaimed);
+        state.put("pre_game_play", preGamePlay);
         return state.toJSONString();
+    }
+
+    public void endPreGame(){
+        preGamePlay = false;
     }
 
     public void shuffleRiskCards(RNGSeed seed){

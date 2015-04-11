@@ -51,5 +51,12 @@ public class DeployArmyAction extends Action{
 
         if(state.getCurrentPlayer().getUnassignedArmies() == 0)
             state.nextStage();
+
+        boolean allArmiesPlayed = true;
+        for(Player p : state.getPlayers()){
+            if(p.getUnassignedArmies() != 0)
+                allArmiesPlayed = false;
+        }
+        if(allArmiesPlayed) state.endPreGame();
     }
 }

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 /**
@@ -37,8 +38,9 @@ public class ListenerThread implements Runnable {
         this.ID = id;
         this.client = client;
         this.gameInProgress = gameInProgress;
-        this.ACK_TIMEOUT = ack_timeout;
-        this.MOVE_TIMEOUT = move_timeout;
+        this.ACK_TIMEOUT = ack_timeout * 1000;
+        this.MOVE_TIMEOUT = move_timeout * 1000;
+
     }
 
     /**
@@ -48,7 +50,7 @@ public class ListenerThread implements Runnable {
     private synchronized boolean initialiseConnection() throws IOException {
         Command command = Command.parseCommand(input.readLine());
         if(command == null) {
-            reply(new AcknowledgementCommand(32768, ID));//TODO added hardcoded player id to make it work
+            reply(new AcknowledgementCommand(ID));//TODO added hardcoded player id to make it work
             purgeConnection();
             return false;
         }
@@ -60,11 +62,9 @@ public class ListenerThread implements Runnable {
             players.add(new Player(ID, client, playerName));
             customs = ((JoinGameCommand) command).getFeatures();
             version = ((JoinGameCommand) command).getVersion();
-            if (playerName != null) {
-                // Send player list to all connected players.
-                messageQueue.sendPlayerList(players);
-                reply(messageQueue.getMessage(ID));
-            }
+            // Send player list to all connected players.
+            messageQueue.sendPlayerList(players);
+            reply(messageQueue.getMessage(ID));
             return true;
         }
         return false;
@@ -86,7 +86,7 @@ public class ListenerThread implements Runnable {
 
     private void rejectGame() throws IOException {
         if (JoinGameCommand.parse(input.readLine()) == null)
-            reply(new AcknowledgementCommand(32768, 0));//TODO added hardcoded player id to make it work
+            reply(new AcknowledgementCommand(0));//TODO added hardcoded player id to make it work
         else
             reply(new RejectJoinGameCommand("Game already in progress"));
 
@@ -102,6 +102,7 @@ public class ListenerThread implements Runnable {
     @Override
     public void run() {
         try {
+            sock.setSoTimeout(MOVE_TIMEOUT);
             input = new BufferedReader(new InputStreamReader(sock.getInputStream()));
             output = new PrintWriter(sock.getOutputStream());
 
@@ -119,9 +120,11 @@ public class ListenerThread implements Runnable {
             System.out.println("Ping reply received: "+ ID);
             state = state.next();     // Ping reply received
 
+            sock.setSoTimeout(ACK_TIMEOUT);
             reply = waitingOn(ReadyCommand.class);
+            sock.setSoTimeout(MOVE_TIMEOUT);
 
-            if (!(reply instanceof AcknowledgementCommand) || ((AcknowledgementCommand)reply).getAcknowledgementId() != 1){
+            if (!(reply instanceof AcknowledgementCommand) || ((AcknowledgementCommand)reply).getAcknowledgementId() != Command.getLastAckID()){
                 throw new InitialisationException("Acknowledgement error");
             }
             state = state.next();    // Ready acknowledgement received
@@ -136,29 +139,29 @@ public class ListenerThread implements Runnable {
                 }
             }
 
+            // Start forwarding every message as is.
             while(true) {
                 Command comm;
                 while ((comm = messageQueue.probablygetMessage(ID)) != null){
                     reply(comm);
-                    //Thread.sleep(10);
+                    if (comm.requiresTimeout()){
+                        sock.setSoTimeout(ACK_TIMEOUT);
+                    }
                 }
                 if (input.ready()) {
                     reply = Command.parseCommand(input.readLine());
+
                     messageQueue.sendAll(reply, ID);
                     System.out.println("Player " + ID + " received " + reply);
+                    sock.setSoTimeout(MOVE_TIMEOUT);
                 }
-
-                //Command comm;
             }
-
-
-        } catch(IOException e){
+        } catch(InitialisationException | SocketTimeoutException f) {
+            messageQueue.sendAll(new TimeOutCommand(ID, null), null);
+            reply(messageQueue.getMessage(ID));
+        } catch(IOException e) {
             e.printStackTrace();
-        } catch(InitialisationException f) {
-            //TODO send error message and remove this player.
-        } /*catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
+        }
 
     }
 

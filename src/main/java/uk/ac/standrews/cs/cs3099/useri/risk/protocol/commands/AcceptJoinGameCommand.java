@@ -3,7 +3,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 
 
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 public class AcceptJoinGameCommand extends Command {
 
@@ -21,5 +20,7 @@ public class AcceptJoinGameCommand extends Command {
     public AcceptJoinGameCommand(JSONObject object){
         super(object);
     }
+
+    public boolean requiresTimeout() {return false;}
 
 }

@@ -88,4 +88,6 @@ public class JoinGameCommand extends Command {
         }
         return i;
     }
+
+    public boolean requiresTimeout() {return false;}
 }

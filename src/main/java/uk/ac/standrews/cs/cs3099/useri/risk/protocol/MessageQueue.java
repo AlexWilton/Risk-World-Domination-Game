@@ -13,10 +13,12 @@ public class MessageQueue {
     private static Command command;
     private boolean[] player_connected;
     private boolean[] sentMessage;
+    private final Integer ID;
 
-    public MessageQueue(int players) {
+    public MessageQueue(int players , boolean isHostPlaying) {
         sentMessage = new boolean[players];
         player_connected = new boolean[players];
+        ID = isHostPlaying? 0 : null;
     }
 
 
@@ -66,15 +68,15 @@ public class MessageQueue {
     }
 
     public synchronized void sendPlayerList(ArrayList<Player> players){
-        sendAll(new PlayersJoinedCommand(players), null);
+        sendAll(new PlayersJoinedCommand(players), ID);
     }
 
-    public synchronized void sendPing(int payload, Integer id) {
-        sendAll(new PingCommand(id, payload), id);
+    public synchronized void sendPing(int payload) {
+        sendAll(new PingCommand(ID, payload), ID);
     }
 
-    public synchronized void sendReady(Integer id) {
-        sendAll(new ReadyCommand(id, 1), id);
+    public synchronized void sendReady() {
+        sendAll(new ReadyCommand(ID, 1), ID);
     }
 
     public synchronized void sendAll(Command command, Integer id) {

@@ -22,4 +22,6 @@ public class InitialiseGameCommand extends Command{
     public InitialiseGameCommand(JSONObject object){
         super(object);
     }
+
+    public boolean requiresTimeout() {return false;}
 }

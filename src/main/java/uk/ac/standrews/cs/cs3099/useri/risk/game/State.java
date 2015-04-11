@@ -37,6 +37,12 @@ public class State implements JSONAware{
         this.players = players;
         this.cardsDeck = map.getCardsFromMapData();
         this.currentPlayer = players.get(0);
+
+        //set number of inital troops for each player (based on the total number of players in the game)
+        int armiesForEachPlayer = 20 + (6 - players.size()) * 5;
+        for(Player p : players){
+            p.setUnassignedArmies(armiesForEachPlayer);
+        }
     }
 
     public void setCurrentPlayer(int playerId){

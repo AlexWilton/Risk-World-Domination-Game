@@ -55,6 +55,7 @@ public class SetupAction extends Action {
     @Override
     public void performOnState(State state) {
         country.setOwner(player);
+        player.addCountry(country);
 
         //player must put one army in a country when claiming it
         country.setTroops(1);

@@ -147,6 +147,12 @@ public class State implements JSONAware{
         state.put("winner", winner);
         state.put("turn_stage", stage.toString());
         state.put("wonBattle", wonBattle);
+        boolean areAllCountriesClaimed = true;
+        for(Country c : map.getAllCountries()){
+            if(c.getOwner() == null) areAllCountriesClaimed = false;
+
+        }
+        state.put("all_countries_claimed", areAllCountriesClaimed);
         return state.toJSONString();
     }
 

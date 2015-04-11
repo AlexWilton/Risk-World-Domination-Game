@@ -2,8 +2,10 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.DeployArmyAction;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.SetupAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.ClientApp;
@@ -16,6 +18,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.protocol.ServerSocketHandler;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DeployCommand;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DeployTuple;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.PlayCardsCommand;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.SetupCommand;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -85,7 +88,7 @@ public class ParamHandler extends DefaultHandler {
                 }
             }
 
-            if(!operation.equals("is_server_waiting_for_action") && !operation.equals("move_to_game_play"))
+            if(!operation.equals("is_server_waiting_for_action") && !operation.equals("move_to_game_play")  && !operation.equals("get_state"))
                 System.out.println("Request for operation: " + operation + " received. (" + params.toString() + ")\nResponse sent: " + responseString + "\n");
             response.getWriter().println(responseString);
             baseRequest.setHandled(true);
@@ -102,9 +105,33 @@ public class ParamHandler extends DefaultHandler {
         String action = (actionArray!= null) ? (actionArray[0]) : "";
         if(action.equals(""))
             return "Error! Action Type not provided";
+
+        if(webClient.isReady()) //if client already has a command it hasn't yet performed, don't allow a new command!
+            return String.valueOf(false);
+
         switch (action){
+            case "setup_claim_country":
+                String[] countryIdArray = params.get("country_id");
+                int country_id;
+                try{
+                    country_id = (countryIdArray != null) ? (Integer.parseInt(countryIdArray[0])) : -1;
+                }catch (NumberFormatException e){
+                    country_id = -1;
+                }
+                if(country_id == -1)
+                    return "Error! Valid Country Id not provided";
+
+                //validate country claim attempt
+                SetupAction sa = new SetupAction(myself, webClient.getState().getCountryByID(country_id));
+                if(!sa.validateAgainstState(webClient.getState())){
+                    return String.valueOf(false);
+                }
+
+                SetupCommand setupCommand = new SetupCommand(country_id, myself.getID());
+                webClient.queueCommand(setupCommand);
+                return String.valueOf(true);
+
             case "trade_in":
-                if(!webClient.isReady()){
                     String[] cardIdsAsStrings = params.get("card");
                     ArrayList<Integer> cardIDs = new ArrayList<Integer>();
                     ArrayList<RiskCard> riskCards = new ArrayList<RiskCard>();
@@ -122,11 +149,7 @@ public class ParamHandler extends DefaultHandler {
                     PlayCardsCommand playCardsCommand = new PlayCardsCommand(cardTriplets, ta.calculateArmies(webClient.getState()), myself.getID());
                     webClient.queueCommand(playCardsCommand);
                     return String.valueOf(true);
-                }else{
-                    return String.valueOf(false);
-                }
             case "deploy_armies":
-                if(!webClient.isReady()){
                     ArrayList<DeployTuple> deployTuples = new ArrayList<DeployTuple>();
                     for(Country myCountry : myself.getOccupiedCountries()){
                         int myCountry_id = myCountry.getCountryId();
@@ -155,9 +178,6 @@ public class ParamHandler extends DefaultHandler {
                     DeployCommand deployCommand = new DeployCommand(deployTuples, myself.getID());
                     webClient.queueCommand(deployCommand);
                     return String.valueOf(true);
-                }else{
-                    return String.valueOf(false);
-                }
             default:
                 return "Unknown Action";
         }
@@ -186,7 +206,7 @@ public class ParamHandler extends DefaultHandler {
         }catch (NumberFormatException e){
             numOfPlayers = -1;
         }
-        if(port == -1)
+        if(numOfPlayers == -1)
             return "Error! Valid Number of Players not provided";
 
 
@@ -201,7 +221,7 @@ public class ParamHandler extends DefaultHandler {
         ServerSocketHandler host = new ServerSocketHandler(port, numOfPlayers, webClient, is_host_playing);
         Thread t = new Thread(host);
         t.start();
-        
+        webClient.setHostAndPlayingBooleans(true, is_host_playing);
         return "true";
     }
 

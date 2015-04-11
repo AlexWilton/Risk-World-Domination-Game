@@ -7,7 +7,7 @@ $( document ).ready(function(){
                 if(response.indexOf("true") == 0){
                     gotoGamePlayWhenReady();
                 }else{
-                    alert("Attempt to host game failed... (" + response + ")");
+                    alert(response);
                 }
 
             })

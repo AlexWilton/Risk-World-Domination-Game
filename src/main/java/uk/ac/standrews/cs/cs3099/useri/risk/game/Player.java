@@ -5,6 +5,7 @@ import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.Action;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 
 import java.util.ArrayList;
 
@@ -129,8 +130,13 @@ public class Player implements JSONAware{
             cardArray.add(c);
         player.put("cards", cardArray);
         player.put("unassignedArmies", unassignedArmies);
-         player.put("countryWhichMustBeDeployedTo", countryWhichMustBeDeployedTo);
+        player.put("countryWhichMustBeDeployedTo", countryWhichMustBeDeployedTo);
         player.put("inactive", inactive);
+        if(client instanceof WebClient){
+            WebClient webClient = (WebClient) client;
+            player.put("isHost", webClient.isHost());
+            player.put("isHostPlaying", webClient.isPlayingHost());
+        }
         return player.toJSONString();
     }
 }

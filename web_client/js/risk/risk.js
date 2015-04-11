@@ -150,11 +150,13 @@ var Risk = {
 	showArmyInfo: function(territory){
 
 			var layer = new Kinetic.Layer();
+            var armyCount = territory.mapped_game_state_territory.troop_count;
+            if(armyCount == -1) armyCount = "";
 			var armyNumText = new Kinetic.Text({
 				x: (territory.armyPoint.x) * 1,
 				y: (territory.armyPoint.y) * 1,
 				//        text: 'COMPLEX TEXT\n\nAll the world\'s a stage, and all the men and women merely players. They have their exits and their entrances.',
-				text: territory.mapped_game_state_territory.troop_count,
+				text: armyCount,
 				fontSize: 20,
 				fontFamily: 'Calibri',
 				fill: '#555',
@@ -169,7 +171,7 @@ var Risk = {
 				stroke: '#555',
 				strokeWidth: 1,
 				fill: '#ddd',
-				radius: 15,
+				radius: (armyCount == "") ? 0 : 15,
 				//height: complexText.getHeight(),
 				shadowColor: 'black',
 				shadowBlur: 1,
@@ -218,15 +220,25 @@ var Risk = {
 					path.setOpacity(0.4);
 					group.moveTo(Risk.mapLayer);
 					Risk.topLayer.draw();
-                    //updateDisplay();
+                    Risk.updateMap();
 				});
 
 				group.on('click', function() {
 					console.log(Risk.Territories[path.attrs.id]);
-                    var selectedCountry = Risk.Territories[path.attrs.id].mapped_game_state_territory;
-                    if($.inArray(selectedCountry,selectedTerriories == -1))
-                        selectedTerriories.push(Risk.Territories[path.attrs.id].mapped_game_state_territory);
-                    updateTurnPanel();
+                    if(game_state.currentPlayer.ID == my_player_id){
+                        switch (game_state.turn_stage){
+                            case "PRE_GAME_SELECTION":
+                                claimCountryDuringSetup(Risk.Territories[path.attrs.id].mapped_game_state_territory.country_id);
+                                break;
+                            case "STAGE_DEPLOYING":
+                                var selectedCountry = Risk.Territories[path.attrs.id].mapped_game_state_territory;
+                                if($.inArray(selectedCountry,selectedTerriories) == -1)
+                                    selectedTerriories.push(Risk.Territories[path.attrs.id].mapped_game_state_territory);
+                                updateTurnPanel();
+                                break;
+                        }
+                    }
+
 				});
 			})(path, t, group);
 

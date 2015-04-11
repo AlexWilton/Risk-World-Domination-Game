@@ -2,11 +2,14 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
 
 import uk.ac.standrews.cs.cs3099.useri.risk.action.Action;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.SetupAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.JettyServer;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.CountrySet;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.SetupCommand;
 
 import java.awt.*;
 import java.net.URI;
@@ -16,6 +19,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class WebClient extends Client {
 
     JettyServer jettyServer;
+    boolean isHost  = false;
+    boolean isPlayingHost = false;
     ArrayBlockingQueue<Command> commandQueue = new ArrayBlockingQueue<Command>(1); //can only hold one action at a time.
 
     public WebClient(){
@@ -29,7 +34,7 @@ public class WebClient extends Client {
 
         //Open Web interface in Browser
         int port = jettyServer.getServerPort();
-        openWebpage("http://localhost:" + port + "/play.html");
+        openWebpage("http://localhost:" + port + "/");
     }
 
     public static void openWebpage(String urlAsString) {
@@ -58,6 +63,13 @@ public class WebClient extends Client {
 
     @Override
     public Command popCommand() {
+        CountrySet uc = gameState.unoccupiedCountries();
+        if(uc.size() > 2){
+            for(Country c : uc){
+                SetupAction sa = new SetupAction(gameState.getPlayer(playerId), c);
+                if(sa.validateAgainstState(gameState)) return new SetupCommand(c.getCountryId(), playerId);
+            }
+        }
         try {
             return commandQueue.take();
         } catch (InterruptedException e) {
@@ -96,7 +108,10 @@ public class WebClient extends Client {
             return false;
     }
 
-
+    public void setHostAndPlayingBooleans(boolean isHost, boolean isPlayingHost){
+        this.isHost = isHost;
+        this.isPlayingHost = isPlayingHost;
+    }
 
 
     public State getState(){
@@ -110,5 +125,13 @@ public class WebClient extends Client {
     @Override
     public DefendCommand popDefendCommand(int origin, int target, int armies) {
         return new DefendCommand((gameState.getCountryByID(target).getTroops() > 1) ? 2 : 1, playerId);
+    }
+
+    public boolean isHost() {
+        return isHost;
+    }
+
+    public boolean isPlayingHost() {
+        return isPlayingHost;
     }
 }

@@ -1,7 +1,5 @@
 var game_state, my_player_id, selectedTerriories = [];
 
-//$( window ).load(setup);
-
 function setup(){
     $.ajax( "/?operation=get_player_id").done(function(id){
         my_player_id = parseInt(id);
@@ -11,10 +9,7 @@ function setup(){
             updateDisplay();
 
             //keep requesting state until it is your turn
-            setTimeout(function(){
-                if(game_state.currentPlayer.ID != my_player_id)
-                    getStateFromServer();
-            }, 500);
+            waitForMyTurn();
         });
     });
 }
@@ -46,8 +41,14 @@ function updatePlayerDisplay(){
 
 function updateTurnPanel(){
     if(game_state.currentPlayer.ID == my_player_id){ //my turn
+        if(game_state.all_countries_claimed === false){
+            game_state.turn_stage = "PRE_GAME_SELECTION";
+        }
         var panelHtml = "<strong>Your Turn</strong> (" + game_state.turn_stage + ")";
         switch(game_state.turn_stage){
+            case "PRE_GAME_SELECTION":
+                panelHtml += "<br/><br/>It is your turn to <strong>Select</strong> a country which you wish to claim!<div id='status'></div>";
+                break;
             case "STAGE_TRADING":
                 if(isTradePossibleForMe())
                     panelHtml += generateTradeInPanel();
@@ -148,9 +149,10 @@ function make_trade_in_request(){
             waitForServer();
         }else{
             $("#tradeOutcome").html('<div class="alert alert-danger" role="alert">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>' +
-                '<span class="sr-only">Error:</span>' +
-                    'Trade Not Allowed.' +
+            '<span class="sr-only">Error:</span>' +
+                'Trade Not Allowed.' +
             '</div>');
         }
     });
@@ -163,6 +165,33 @@ function waitForServer(){
             getStateFromServer(updateDisplay);
         }else{
             setTimeout(waitForServer, 1000);
+        }
+    });
+}
+
+function waitForMyTurn(){
+    getStateFromServer(function(){
+        if(game_state.currentPlayer.ID == my_player_id){
+            updateDisplay();
+        }else{
+            setTimeout(waitForMyTurn, 1000);
+        }
+    })
+}
+
+function claimCountryDuringSetup(country_id){
+    $.get('/?operation=perform_action&action=setup_claim_country&country_id=' + country_id, function(response){
+        console.log(response);
+        if(response.indexOf("true") == 0){
+            $("#turnPanel").html("<h4>Waiting for other players...</h4>");
+            waitForMyTurn();
+        }else{
+            $("#status").html('<div class="alert alert-danger" role="alert">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>' +
+            '<span class="sr-only">Error:</span>' +
+            'Selection not valid. Please try again.' +
+            '</div>');
         }
     });
 }

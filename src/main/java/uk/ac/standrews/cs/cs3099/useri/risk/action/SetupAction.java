@@ -55,6 +55,11 @@ public class SetupAction extends Action {
     @Override
     public void performOnState(State state) {
         country.setOwner(player);
+
+        //player must put one army in a country when claiming it
+        country.setTroops(1);
+        player.setUnassignedArmies(player.getUnassignedArmies() - 1);
+
         state.endTurn();
         System.out.println (player.getName() + " took possession of " + country.getCountryName());
     }

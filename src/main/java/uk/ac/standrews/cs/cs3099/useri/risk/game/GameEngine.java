@@ -161,21 +161,19 @@ public class GameEngine implements Runnable{
         //setup the countries in the normal game loop
 
         //TODO DEBUG: ASSIGN THE COUNTRIES RANDOMLY
-
-
-        //go through all countries
-        Iterator<Player> p = players.iterator();
-        int tc =2;
-
-        for (Country c : map.getAllCountries()){
-            if (!p.hasNext()){
-                p = players.iterator();
-            }
-            if (tc > 3) {
-                tc = 2;
-            }
-            p.next().occupyCountry(c, tc++);
-        }
+//        //go through all countries
+//        Iterator<Player> p = players.iterator();
+//        int tc =2;
+//
+//        for (Country c : map.getAllCountries()){
+//            if (!p.hasNext()){
+//                p = players.iterator();
+//            }
+//            if (tc > 3) {
+//                tc = 2;
+//            }
+//            p.next().occupyCountry(c, tc++);
+//        }
 
         csh.linkGameState(state);
 

@@ -89,5 +89,5 @@ public class JoinGameCommand extends Command {
         return i;
     }
 
-    public boolean requiresTimeout() {return false;}
+    public boolean requiresAcknowledgement() {return false;}
 }

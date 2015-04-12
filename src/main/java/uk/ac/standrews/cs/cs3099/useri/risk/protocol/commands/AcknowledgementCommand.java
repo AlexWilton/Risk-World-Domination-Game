@@ -8,11 +8,11 @@ public class AcknowledgementCommand extends Command {
 
     public static final String COMMAND_STRING = "acknowledgement";
 
-    public AcknowledgementCommand(int player_id) {
+    /*public AcknowledgementCommand(int player_id) {
         super(COMMAND_STRING);
         this.put("payload", ack_id++);
         this.put("player_id", player_id);
-    }
+    }*/
 
     public AcknowledgementCommand(int ack_id, int player_id) {
         super(COMMAND_STRING);
@@ -33,8 +33,9 @@ public class AcknowledgementCommand extends Command {
                 return null;
             }
             int playerId = Integer.parseInt(obj.get("player_id").toString());
-            System.out.println("AckCommand returned");
-            return new AcknowledgementCommand(playerId);
+            int ackID = Integer.parseInt(obj.get("payload").toString());
+            //System.out.println("AckCommand returned");
+            return new AcknowledgementCommand(ackID, playerId);
 
         } catch(ParseException e){
             System.out.println(commandJSON);
@@ -47,5 +48,5 @@ public class AcknowledgementCommand extends Command {
         return payload==null? -1 : payload;
     }
 
-    public boolean requiresTimeout() {return false;}
+    public boolean requiresAcknowledgement() {return false;}
 }

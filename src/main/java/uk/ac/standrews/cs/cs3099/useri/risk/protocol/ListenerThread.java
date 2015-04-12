@@ -47,12 +47,11 @@ public class ListenerThread implements Runnable {
      * Initialises the connection and returns whether it was successful.
      * @throws IOException
      */
-    private synchronized boolean initialiseConnection() throws IOException {
+    private synchronized boolean initialiseConnection() throws IOException, InitialisationException{
         Command command = Command.parseCommand(input.readLine());
         if(command == null) {
-            reply(new AcknowledgementCommand(ID));//TODO added hardcoded player id to make it work
-            purgeConnection();
-            return false;
+            //reply(new AcknowledgementCommand(ID));//TODO added hardcoded player id to make it work
+            throw new InitialisationException("Unparseable command received");
         }
         else if (command instanceof JoinGameCommand) {
             reply(new AcceptJoinGameCommand(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
@@ -80,13 +79,14 @@ public class ListenerThread implements Runnable {
     private void reply(Command command) {
         if (command == null)
             return;
+        System.out.println("Player " + ID + ": " + command);
         output.println(command);
         output.flush();
     }
 
-    private void rejectGame() throws IOException {
+    private void rejectGame() throws IOException, InitialisationException {
         if (JoinGameCommand.parse(input.readLine()) == null)
-            reply(new AcknowledgementCommand(0));//TODO added hardcoded player id to make it work
+            throw new InitialisationException("Unparseable command received");
         else
             reply(new RejectJoinGameCommand("Game already in progress"));
 
@@ -114,18 +114,17 @@ public class ListenerThread implements Runnable {
 
             Command reply = waitingOn(PingCommand.class);
             if (!(reply instanceof PingCommand)){
-                System.out.println("Error, no ping command received");
-                //error here
+                throw new InitialisationException("Ping command was not answered.");
             }
-            System.out.println("Ping reply received: "+ ID);
+            //System.out.println("Ping reply received: "+ ID);
             state = state.next();     // Ping reply received
 
             sock.setSoTimeout(ACK_TIMEOUT);
             reply = waitingOn(ReadyCommand.class);
             sock.setSoTimeout(MOVE_TIMEOUT);
 
-            if (!(reply instanceof AcknowledgementCommand) || ((AcknowledgementCommand)reply).getAcknowledgementId() != Command.getLastAckID()){
-                throw new InitialisationException("Acknowledgement error");
+            if (!(reply instanceof AcknowledgementCommand) /*|| ((AcknowledgementCommand)reply).getAcknowledgementId() != Command.getLastAckID()*/){
+                throw new InitialisationException("Ready command was not acknowledged in time.");
             }
             state = state.next();    // Ready acknowledgement received
 
@@ -140,20 +139,59 @@ public class ListenerThread implements Runnable {
             }
 
             // Start forwarding every message as is.
+            double timer = System.currentTimeMillis();
+            double diff = MOVE_TIMEOUT;
+            boolean ack_required = false;
+            int lastack = 0;
             while(true) {
+                if (ack_required && System.currentTimeMillis() > timer + diff) {
+                    throw new SocketTimeoutException();
+                }
                 Command comm;
-                while ((comm = messageQueue.probablygetMessage(ID)) != null){
+                while ((comm = messageQueue.probablygetMessage(ID)) != null) {
                     reply(comm);
-                    if (comm.requiresTimeout()){
-                        sock.setSoTimeout(ACK_TIMEOUT);
+                    if (comm.requiresAcknowledgement()){
+                        timer = System.currentTimeMillis();
+                        ack_required = true;
+                        diff = ACK_TIMEOUT;
+                        lastack = Integer.parseInt(comm.get("ack_id").toString());
+
+                    } else if (comm instanceof AcknowledgementCommand) {
+                        System.out.println(ID + ": Last Ack ID: " + lastack);
+                        System.out.println(ID + ": Recv Ack ID: " + ((AcknowledgementCommand) comm).getAcknowledgementId());
+                        if (((AcknowledgementCommand) comm).getAcknowledgementId() == lastack) {
+                            ack_required = false;
+                            timer = System.currentTimeMillis();
+                            diff = MOVE_TIMEOUT;
+                        }
+                    } else if (!ack_required) {
+                        timer = System.currentTimeMillis();
+                    } else {
+                        diff = MOVE_TIMEOUT;
                     }
                 }
                 if (input.ready()) {
                     reply = Command.parseCommand(input.readLine());
-
                     messageQueue.sendAll(reply, ID);
-                    System.out.println("Player " + ID + " received " + reply);
-                    sock.setSoTimeout(MOVE_TIMEOUT);
+                    //System.out.println("Player " + ID + " received " + reply);
+                    if (reply.requiresAcknowledgement()) {
+                        timer = System.currentTimeMillis();
+                        ack_required = true;
+                        diff = ACK_TIMEOUT;
+                        lastack = Integer.parseInt(reply.get("ack_id").toString());
+                    } else if (reply instanceof AcknowledgementCommand) {
+                        System.out.println(ID + ": Last Ack ID: " + lastack);
+                        System.out.println(ID + ": Recv Ack ID: " + ((AcknowledgementCommand) reply).getAcknowledgementId());
+                        if (((AcknowledgementCommand) reply).getAcknowledgementId() == lastack) {
+                            ack_required = false;
+                            timer = System.currentTimeMillis();
+                            diff = MOVE_TIMEOUT;
+                        }
+                    } else if (!ack_required){
+                        timer = System.currentTimeMillis();
+                    } else {
+                        diff = MOVE_TIMEOUT;
+                    }
                 }
             }
         } catch(InitialisationException | SocketTimeoutException f) {
@@ -174,10 +212,10 @@ public class ListenerThread implements Runnable {
                 continue;
             if (comm.getClass().equals(c)) {
                 try {
+                    while (!input.ready());
                     reply = Command.parseCommand(input.readLine());
                     reply(messageQueue.probablygetMessage(ID));
                     messageQueue.sendAll(reply, ID);
-                    System.out.println("Stuff " + ID);
                     break;
                 } catch (IOException e){
                     e.printStackTrace();
@@ -185,7 +223,6 @@ public class ListenerThread implements Runnable {
 
             }
         }
-        System.out.println("reply");
         return reply;
     }
 

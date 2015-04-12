@@ -22,12 +22,11 @@ public class JSONStringTest {
 
     @Test
     public void mapToJSONStringTest(){
-
         assertTrue(false);
     }
 
     @Test
-    public void CountrytoJSONStringTest(){
+    public void countryToJSONStringTest(){
         assertTrue(false);
     }
 

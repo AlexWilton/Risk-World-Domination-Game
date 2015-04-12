@@ -16,4 +16,9 @@ public class RollNumberCommand extends Command {
     public RollNumberCommand(JSONObject object){
         super(object);
     }
+
+    @Override
+    public boolean requiresAcknowledgement() {
+        return false;
+    }
 }

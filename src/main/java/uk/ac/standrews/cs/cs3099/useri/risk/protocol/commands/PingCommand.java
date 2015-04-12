@@ -41,5 +41,5 @@ public class PingCommand extends Command {
 
     }
 
-    public boolean requiresTimeout() {return false;}
+    public boolean requiresAcknowledgement() {return false;}
 }

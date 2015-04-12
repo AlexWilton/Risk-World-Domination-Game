@@ -1,7 +1,5 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.AcknowledgementCommand;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.JoinGameCommand;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.RejectJoinGameCommand;
 
 import java.io.BufferedReader;
@@ -29,10 +27,7 @@ public class RejectingThread implements Runnable {
                 Socket s = server.accept();
                 BufferedReader input = new BufferedReader(new InputStreamReader(s.getInputStream()));
                 PrintWriter output = new PrintWriter(s.getOutputStream());
-                if (JoinGameCommand.parse(input.readLine()) == null)
-                    output.print(new AcknowledgementCommand(0));
-                else
-                    output.print(new RejectJoinGameCommand("Game already in progress"));
+                output.print(new RejectJoinGameCommand("Game already in progress"));
 
                 input.close();
                 output.flush();

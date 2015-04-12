@@ -23,5 +23,5 @@ public class InitialiseGameCommand extends Command{
         super(object);
     }
 
-    public boolean requiresTimeout() {return false;}
+    public boolean requiresAcknowledgement() {return false;}
 }

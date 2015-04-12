@@ -33,7 +33,7 @@ public class MessageQueue {
         if (sentMessage[id])
             return null;
 
-        System.out.println("Sending " + command.toJSONString());
+        //System.out.println("Sending " + command.toJSONString());
         notifyAll();
         sentMessage[id] = true;
         if (sentAll()){
@@ -49,7 +49,7 @@ public class MessageQueue {
         if (sentMessage[id])
             return null;
 
-        System.out.println("Sending " + command.toJSONString());
+        //System.out.println("Sending " + command.toJSONString());
         sentMessage[id] = true;
         if (sentAll()){
             flag = false;
@@ -82,14 +82,14 @@ public class MessageQueue {
     public synchronized void sendAll(Command command, Integer id) {
         if (flag){
             try {
-                System.out.println("blocking " + command + "\n while still having " + this.command);
+                //System.out.println("blocking " + command + "\n while still having " + this.command);
                 wait();
             } catch (InterruptedException e){
                 e.printStackTrace();
             }
         }
         this.command = command;
-        System.out.println("Queued " + command + " by " + id);
+        //System.out.println("Queued " + command + " by " + id);
         flag = true;
         for (int i = 0; i<sentMessage.length; i++)
             sentMessage[i] = false;

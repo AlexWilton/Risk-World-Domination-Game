@@ -163,6 +163,6 @@ public class Command extends JSONObject {
         return envelope.toJSONString();
     }
 
-    public boolean requiresTimeout() {return true;}
+    public boolean requiresAcknowledgement() {return true;}
 
 }

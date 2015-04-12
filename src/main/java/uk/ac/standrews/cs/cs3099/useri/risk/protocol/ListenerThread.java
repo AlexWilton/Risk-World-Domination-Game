@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.exceptions.InitialisationException;
 
@@ -30,6 +31,7 @@ public class ListenerThread implements Runnable {
     private InitState state = InitState.STAGE_CONNECTING;
     private int version;
     private ArrayList<String> customs;
+    private static State gameState;
 
 
     public ListenerThread(Socket sock, int id, Client client, boolean gameInProgress, int ack_timeout, int move_timeout, MessageQueue q) {
@@ -139,62 +141,14 @@ public class ListenerThread implements Runnable {
             }
 
             // Start forwarding every message as is.
-            double timer = System.currentTimeMillis();
-            double diff = MOVE_TIMEOUT;
-            boolean ack_required = false;
-            int lastack = 0;
-            while(true) {
-                if (ack_required && System.currentTimeMillis() > timer + diff) {
-                    throw new SocketTimeoutException();
-                }
-                Command comm;
-                while ((comm = messageQueue.probablygetMessage(ID)) != null) {
-                    reply(comm);
-                    if (comm.requiresAcknowledgement()){
-                        timer = System.currentTimeMillis();
-                        ack_required = true;
-                        diff = ACK_TIMEOUT;
-                        lastack = Integer.parseInt(comm.get("ack_id").toString());
+            HostForwarder fw = new HostForwarder(messageQueue, MOVE_TIMEOUT, ACK_TIMEOUT, ID, input, output);
+            fw.playGame(gameState);
 
-                    } else if (comm instanceof AcknowledgementCommand) {
-                        System.out.println(ID + ": Last Ack ID: " + lastack);
-                        System.out.println(ID + ": Recv Ack ID: " + ((AcknowledgementCommand) comm).getAcknowledgementId());
-                        if (((AcknowledgementCommand) comm).getAcknowledgementId() == lastack) {
-                            ack_required = false;
-                            timer = System.currentTimeMillis();
-                            diff = MOVE_TIMEOUT;
-                        }
-                    } else if (!ack_required) {
-                        timer = System.currentTimeMillis();
-                    } else {
-                        diff = MOVE_TIMEOUT;
-                    }
-                }
-                if (input.ready()) {
-                    reply = Command.parseCommand(input.readLine());
-                    messageQueue.sendAll(reply, ID);
-                    //System.out.println("Player " + ID + " received " + reply);
-                    if (reply.requiresAcknowledgement()) {
-                        timer = System.currentTimeMillis();
-                        ack_required = true;
-                        diff = ACK_TIMEOUT;
-                        lastack = Integer.parseInt(reply.get("ack_id").toString());
-                    } else if (reply instanceof AcknowledgementCommand) {
-                        System.out.println(ID + ": Last Ack ID: " + lastack);
-                        System.out.println(ID + ": Recv Ack ID: " + ((AcknowledgementCommand) reply).getAcknowledgementId());
-                        if (((AcknowledgementCommand) reply).getAcknowledgementId() == lastack) {
-                            ack_required = false;
-                            timer = System.currentTimeMillis();
-                            diff = MOVE_TIMEOUT;
-                        }
-                    } else if (!ack_required){
-                        timer = System.currentTimeMillis();
-                    } else {
-                        diff = MOVE_TIMEOUT;
-                    }
-                }
-            }
         } catch(InitialisationException | SocketTimeoutException f) {
+            Command comm;
+            while ((comm = messageQueue.probablygetMessage(ID)) != null) {
+                reply(comm);
+            }
             messageQueue.sendAll(new TimeOutCommand(ID, null), null);
             reply(messageQueue.getMessage(ID));
         } catch(IOException e) {
@@ -203,10 +157,12 @@ public class ListenerThread implements Runnable {
 
     }
 
+
+
     private Command waitingOn(Class<?> c){
         Command reply;
         while(true){
-            Command comm = messageQueue.getMessage(ID);
+            Command comm = messageQueue.probablygetMessage(ID);
             reply(comm);
             if (comm == null)
                 continue;
@@ -214,7 +170,8 @@ public class ListenerThread implements Runnable {
                 try {
                     while (!input.ready());
                     reply = Command.parseCommand(input.readLine());
-                    reply(messageQueue.probablygetMessage(ID));
+                    while ((comm = messageQueue.probablygetMessage(ID)) != null);
+                        reply(comm);
                     messageQueue.sendAll(reply, ID);
                     break;
                 } catch (IOException e){
@@ -240,5 +197,9 @@ public class ListenerThread implements Runnable {
 
     public static ArrayList<Player> getPlayers() {
         return players;
+    }
+
+    public static void setState(State state) {
+        gameState = state;
     }
 }

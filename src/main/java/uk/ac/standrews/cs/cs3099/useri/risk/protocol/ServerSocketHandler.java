@@ -90,6 +90,7 @@ public class ServerSocketHandler implements Runnable {
         //TODO ListenerThread remove player if error occurs!
         State st = new State(new Map(), ListenerThread.getPlayers());
         webClient.setState(st);
+        ListenerThread.setState(st);
 
 
         // When all ListenerThreads finished, close the game gracefully.

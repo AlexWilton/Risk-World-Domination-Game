@@ -1,8 +1,5 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
@@ -11,6 +8,8 @@ import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
+
+import java.util.ArrayList;
 
 /**
  * runs the main game loop and gets turns from the players
@@ -48,13 +47,13 @@ public class GameEngine implements Runnable{
         Player currentPlayer;
         while(true) {
             currentPlayer = state.getCurrentPlayer();
-            System.out.println("Ask player " + currentPlayer.getName());
+            System.out.println("Ask player " + currentPlayer.getID() + " (" + currentPlayer.getName() + ")");
             Command currentCommand = currentPlayer.getClient().popCommand();
             //if its local, propagate
             if (csh != null && currentPlayer.getClient().isLocal()){
                csh.sendCommand(currentCommand);
             }
-            ArrayList<Action> playerActions = new ArrayList<Action>();
+            ArrayList<Action> playerActions = new ArrayList<>();
             if (currentCommand instanceof AttackCommand){
                 playerActions.add(processAttackCommand((AttackCommand) currentCommand));
             }
@@ -87,7 +86,7 @@ public class GameEngine implements Runnable{
                 if (playerAction.validateAgainstState(state)) {
                     playerAction.performOnState(state);
                 } else {
-                    System.out.println("Error move did not validate");
+                    System.out.println("Error move did not validate: " + currentCommand);
                     System.exit(1);
                 }
             }

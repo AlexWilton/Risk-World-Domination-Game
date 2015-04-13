@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.util.ArrayQueue;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import sun.swing.SwingUtilities2;
 import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
@@ -319,27 +320,17 @@ public class ClientSocketHandler implements Runnable{
 
 
     private void processRollHashCommand(RollHashCommand command){
-        try {
-            while (seed == null) Thread.sleep(10);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            System.exit(1);
-        }
-        int player = command.getPlayer();
+
         String rollHash = command.get("payload").toString();
 
-        seed.addSeedComponentHash(rollHash,player);
+        getClientById(command.getPlayer()).pushRollHash(rollHash);
 
 
     }
 
     private void processRollNumberCommand(RollNumberCommand command){
-        int player = command.getPlayer();
         String rollNumber = command.get("payload").toString();
-        seed.addSeedComponent(rollNumber, player);
-
-        seed.addSeedComponent(rollNumber, player);
+        getClientById(command.getPlayer()).pushRollNumber(rollNumber);
 
     }
 
@@ -442,12 +433,11 @@ public class ClientSocketHandler implements Runnable{
         seed.addSeedComponent(localClient.getHexSeed(),localClient.getPlayerId());
         sendCommand(new RollHashCommand(localClient.getHexSeedHash(),localClient.getPlayerId()));
 
-        try {
-            while (!seed.hasAllHashes()) Thread.sleep(10);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            System.exit(1);
+        for (Client c : getAllClients()){
+            if (c.getPlayerId() == localClient.getPlayerId()){
+                continue;
+            }
+            seed.addSeedComponentHash(c.popRollHash(),c.getPlayerId());
         }
 
         System.out.println("has all hashes");
@@ -455,12 +445,13 @@ public class ClientSocketHandler implements Runnable{
         sendCommand(new RollNumberCommand(localClient.getHexSeed(), localClient.getPlayerId()));
 
 
-        try {
-            while (!seed.hasAllNumbers()) Thread.sleep(10);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            System.exit(1);
+        for (Client c : getAllClients()){
+            if (c.getPlayerId() == localClient.getPlayerId()){
+                continue;
+            }
+            if (!seed.addSeedComponent(c.popRollNumber(),c.getPlayerId())){
+                System.out.println("Wrong number: hash doesnt match");
+            }
         }
 
         System.out.println("has all numbers");

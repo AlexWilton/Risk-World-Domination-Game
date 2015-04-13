@@ -7,6 +7,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
 
 import java.util.ArrayDeque;
+import java.util.Objects;
 import java.util.Queue;
 
 /**
@@ -27,6 +28,8 @@ public abstract class Client {
 
     private boolean playReady = false;
     private Queue<Command> commandQueue;
+    private Queue<String> hashQueue;
+    private Queue<String> numberQueue;
 
     private DefendCommand defendCommand;
 
@@ -34,6 +37,8 @@ public abstract class Client {
     public Client(State gamestate){
 
         commandQueue = new ArrayDeque<>();
+        hashQueue = new ArrayDeque<>();
+        numberQueue = new ArrayDeque<>();
 
         this.gameState = gamestate;
 
@@ -143,6 +148,32 @@ public abstract class Client {
         this.gameState = gameState;
     }
 
+    public void pushRollHash(String rollHash){
+        hashQueue.add(rollHash);
+    }
 
+    public void pushRollNumber(String rollNumber){
+        numberQueue.add(rollNumber);
+    }
+
+    public String popRollHash(){
+        try {
+             while (hashQueue.size() < 1) Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return hashQueue.remove();
+    }
+
+    public String popRollNumber(){
+        try {
+            while (numberQueue.size() < 1) Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return numberQueue.remove();
+    }
 
 }

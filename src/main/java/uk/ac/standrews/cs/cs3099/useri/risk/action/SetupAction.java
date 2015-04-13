@@ -34,9 +34,7 @@ public class SetupAction extends Action {
      */
     @Override
     public boolean validateAgainstState(State state) {
-        if(!state.hasUnassignedCountries())
-            return false;
-
+        //must be player's turn
         if(player != state.getCurrentPlayer())
             return false;
 
@@ -95,9 +93,10 @@ public class SetupAction extends Action {
         }else{
             //skip players until player with armies to deploy is left
             do{
-                state.endTurn();
+                state.nextPlayer();
             }while(state.getCurrentPlayer().getUnassignedArmies() == 0);
         }
+
     }
 
 

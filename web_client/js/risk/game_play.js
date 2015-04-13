@@ -60,13 +60,14 @@ function updateTurnPanel(){
                 "</strong> left to deploy.</h5>It is your turn to <strong>Select</strong> a country!<div id='status'></div>";
                 break;
             case "STAGE_TRADING":
-                if(isTradePossibleForMe())
+                //if(isTradePossibleForMe())
                     panelHtml += generateTradeInPanel();
-                else{
-                    game_state.turn_stage = "STAGE_DEPLOYING";
-                    updateTurnPanel();
-                    return;
-                }
+                //else{
+                //
+                //    game_state.turn_stage = "STAGE_DEPLOYING";
+                //    updateTurnPanel();
+                //    return;
+                //}
 
                 break;
             case "STAGE_DEPLOYING":
@@ -102,7 +103,8 @@ function generateTradeInPanel(){
         panelHtml += '<label class="btn btn-default"><input type="checkbox" name="card" value="'+ card.card_id +'" autocomplete="off"> ' + card.type +'</label><br/><br/>';
     });
     panelHtml += '</div>' +
-    '<br/><button type="button" onclick="make_trade_in_request()" class="btn btn-info">Make Trade</button></form>' +
+    '<br/><button type="button" onclick="make_trade_in_request()" class="btn btn-info">Make Trade</button> ' +
+    '<button type="button" onclick="no_trade_request()" class="btn btn-info">No Trade</button></form>' +
     '<div id="tradeOutcome"></div>';
     return panelHtml;
 }
@@ -168,6 +170,23 @@ function make_trade_in_request(){
     });
 }
 
+function no_trade_request(){
+    $.get('/?operation=perform_action&action=trade_in&no_trade=yes', function(response){
+        console.log(response);
+        if(response.indexOf("true") == 0){
+            $("#turnPanel").html("");
+            $("#tradeOutcome").html("<h4>Waiting for Server...</h4>");
+            waitForServer();
+        }else{
+            $("#tradeOutcome").html('<div class="alert alert-danger" role="alert">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>' +
+            '<span class="sr-only">Error:</span>' +
+            'No Trade Not Allowed. You must select a valid trade' +
+            '</div>');
+        }
+    });
+}
 
 function waitForServer(){
     $.get('/?operation=is_server_waiting_for_action', function(response){
@@ -195,8 +214,7 @@ function claimCountryDuringSetup(country_id){
         //getStateFromServer(Risk.updateMap());
 
         if(response.indexOf("true") == 0){
-            $("#turnPanel").html("<h4>Waiting for other players...</h4>" +
-            "<br/><h5>You still have <strong>" + game_state.players[my_player_id].unassignedArmies + "</strong> left to deploy.</h5>");
+            $("#turnPanel").html("<h4>Waiting for other players...</h4>");
             waitForMyTurn();
         }else{
             $("#status").html('<div class="alert alert-danger" role="alert">' +

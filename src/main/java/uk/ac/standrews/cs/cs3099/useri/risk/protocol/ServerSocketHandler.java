@@ -41,9 +41,10 @@ public class ServerSocketHandler implements Runnable {
     }
 
     public void run() {
-        int i = isServerPlaying ? 1 : 0;         //If the server is isServerPlaying, first client gets ID 1, otherwise 0.
+        int i = 0;// isServerPlaying ? 1 : 0;         //If the server is isServerPlaying, first client gets ID 1, otherwise 0.
         clientSocketPool = new ArrayList<>();
         MessageQueue s = new MessageQueue(NUMBER_OF_PLAYERS);
+
         while (!gameInProgress) {
             try {
                 // Open the gates!

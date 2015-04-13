@@ -34,10 +34,11 @@ public class SetupAction extends Action {
      */
     @Override
     public boolean validateAgainstState(State state) {
-        if(!state.hasUnassignedCountries())
-            return false;
 
         if(player != state.getCurrentPlayer())
+            return false;
+
+        if(player.getUnassignedArmies() < 1)
             return false;
 
         if (country.getOwner() != null)

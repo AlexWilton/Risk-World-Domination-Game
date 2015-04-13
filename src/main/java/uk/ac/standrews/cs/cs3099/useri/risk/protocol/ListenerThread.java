@@ -53,7 +53,8 @@ public class ListenerThread implements Runnable {
         Command command = Command.parseCommand(input.readLine());
         if (command instanceof JoinGameCommand) {
             reply(new AcceptJoinGameCommand(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
-            messageQueue.addPlayer(ID);
+            messageQueue.addPlayer(ID, output);
+            //System.out.println("Player " + ID +": " + output);
             client.setPlayerId(ID);
             String playerName = ((JoinGameCommand) command).getName();
             player = new Player(ID, client, playerName);
@@ -63,7 +64,7 @@ public class ListenerThread implements Runnable {
             version = ((JoinGameCommand) command).getVersion();
             // Send player list to all connected players.
             messageQueue.sendPlayerList(players);
-            reply(messageQueue.getMessage(ID));
+            //reply(messageQueue.getMessage(ID));
             return true;
         } else {
             throw new InitialisationException("Unrecognised command received");
@@ -105,9 +106,9 @@ public class ListenerThread implements Runnable {
             // Initialise the connection
             if(initialiseConnection()){
                 Command comm;
-                while ((comm = messageQueue.probablyGetMessage(ID)) != null){
+                /*while ((comm = messageQueue.probablyGetMessage(ID)) != null){
                     reply(comm);
-                }
+                }*/
                 state = state.next();
             }
 
@@ -128,14 +129,14 @@ public class ListenerThread implements Runnable {
             state = state.next();
 
             // here, the game is initialised with a final list of players.
-            while (true){
-                Command comm = messageQueue.getMessage(ID);
-                reply(comm);
+            /*while (true){
+                //Command comm = messageQueue.getMessage(ID);
+                /*reply(comm);
                 if (comm == null) continue;
                 if (comm.getClass().equals(InitialiseGameCommand.class)){
                     break;
-                }
-            }
+                }/
+            }*/
 
             // Start forwarding every message as is.
             HostForwarder fw = new HostForwarder(messageQueue, MOVE_TIMEOUT, ACK_TIMEOUT, ID, input, output);
@@ -143,11 +144,11 @@ public class ListenerThread implements Runnable {
 
         } catch(InitialisationException | SocketTimeoutException f) {
             Command comm;
-            while ((comm = messageQueue.probablyGetMessage(ID)) != null) {
+            /*while ((comm = messageQueue.probablyGetMessage(ID)) != null) {
                 reply(comm);
-            }
+            }*/
             messageQueue.sendAll(new TimeOutCommand(ID, null), null);
-            reply(messageQueue.getMessage(ID));
+            //reply(messageQueue.getMessage(ID));
             purgeConnection();
         } catch(IOException e) {
             e.printStackTrace();
@@ -161,16 +162,16 @@ public class ListenerThread implements Runnable {
     private Command waitingOn(Class<?> c){
         Command reply;
         while(true){
-            Command comm = messageQueue.probablyGetMessage(ID);
-            reply(comm);
-            if (comm == null)
-                continue;
-            if (comm.getClass().equals(c)) {
+            //Command comm = messageQueue.probablyGetMessage(ID);
+            //reply(comm);
+            //if (comm == null)
+                //continue;
+            //if (comm.getClass().equals(c)) {
                 try {
                     while (!input.ready());
                     reply = Command.parseCommand(input.readLine());
-                    while ((comm = messageQueue.probablyGetMessage(ID)) != null)
-                        reply(comm);
+                    //while ((comm = messageQueue.probablyGetMessage(ID)) != null)
+                     //   reply(comm);
                     messageQueue.sendAll(reply, ID);
                     break;
                 } catch (IOException e){
@@ -178,7 +179,7 @@ public class ListenerThread implements Runnable {
                 }
 
             }
-        }
+        //}
         return reply;
     }
 

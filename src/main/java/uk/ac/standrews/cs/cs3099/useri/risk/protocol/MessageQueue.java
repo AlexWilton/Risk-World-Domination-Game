@@ -6,7 +6,10 @@ import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.PingCommand;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.PlayersJoinedCommand;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.ReadyCommand;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MessageQueue {
     private boolean flag = false;
@@ -14,6 +17,7 @@ public class MessageQueue {
     private boolean[] player_connected;
     private boolean[] sentMessage;
     private final Integer ID;
+    private HashMap<Integer, PrintWriter> sockets = new HashMap<>();
 
     public MessageQueue(int players , boolean isHostPlaying) {
         sentMessage = new boolean[players];
@@ -22,25 +26,7 @@ public class MessageQueue {
     }
 
 
-    public synchronized Command getMessage(int id) {
-        if (!flag) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        if (sentMessage[id])
-            return null;
-
-        notifyAll();
-        sentMessage[id] = true;
-        if (sentAll()){
-            flag = false;
-        }
-        return command;
-    }
-
+    
     public synchronized Command probablyGetMessage(int id) {
         if (!flag) {
             return null;
@@ -79,22 +65,19 @@ public class MessageQueue {
     }
 
     public synchronized void sendAll(Command comm, Integer id) {
-        if (flag){
-            try {
-                wait();
-            } catch (InterruptedException e){
-                e.printStackTrace();
+        for (Map.Entry<Integer, PrintWriter> e : sockets.entrySet()){
+            if (e.getKey() != id){
+                PrintWriter w = e.getValue();
+                //System.out.println(e.getValue());
+                System.out.println("Player " + e.getKey() + ": " + comm);
+                w.println(comm);
+                w.flush();
             }
         }
-        command = comm;
-        flag = true;
-        for (int i = 0; i<sentMessage.length; i++)
-            sentMessage[i] = false;
-        if (id != null) sentMessage[id] = true;
-        notifyAll();
     }
 
-    public synchronized void addPlayer(int id){
+    public synchronized void addPlayer(int id, PrintWriter out){
         player_connected[id] = true;
+        sockets.put(id, out);
     }
 }

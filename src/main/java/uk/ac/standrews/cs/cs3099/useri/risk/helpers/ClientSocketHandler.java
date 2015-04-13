@@ -443,10 +443,7 @@ public class ClientSocketHandler implements Runnable{
             }
             seed.addSeedComponentHash(c.popRollHash(),c.getPlayerId());
         }
-        catch (Exception e){
-            e.printStackTrace();
-            System.exit(1);
-        }
+
 
         System.out.println("has all hashes");
 

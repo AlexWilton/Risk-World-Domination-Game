@@ -19,4 +19,8 @@ public class RollCommand extends Command {
         super(object);
     }
 
+    @Override
+    public boolean requiresAcknowledgement() {
+        return false;
+    }
 }

@@ -13,10 +13,12 @@ public class MessageQueue {
     private static Command command;
     private boolean[] player_connected;
     private boolean[] sentMessage;
+    private final Integer ID;
 
-    public MessageQueue(int players) {
+    public MessageQueue(int players , boolean isHostPlaying) {
         sentMessage = new boolean[players];
         player_connected = new boolean[players];
+        ID = isHostPlaying? 0 : null;
     }
 
 
@@ -31,7 +33,7 @@ public class MessageQueue {
         if (sentMessage[id])
             return null;
 
-        System.out.println("Sending " + command.toJSONString());
+        //System.out.println("Sending " + command.toJSONString());
         notifyAll();
         sentMessage[id] = true;
         if (sentAll()){
@@ -47,7 +49,7 @@ public class MessageQueue {
         if (sentMessage[id])
             return null;
 
-        System.out.println("Sending " + command.toJSONString());
+        //System.out.println("Sending " + command.toJSONString());
         sentMessage[id] = true;
         if (sentAll()){
             flag = false;
@@ -66,28 +68,28 @@ public class MessageQueue {
     }
 
     public synchronized void sendPlayerList(ArrayList<Player> players){
-        sendAll(new PlayersJoinedCommand(players), null);
+        sendAll(new PlayersJoinedCommand(players), ID);
     }
 
-    public synchronized void sendPing(int payload, Integer id) {
-        sendAll(new PingCommand(id, payload), id);
+    public synchronized void sendPing(int payload) {
+        sendAll(new PingCommand(ID, payload), ID);
     }
 
-    public synchronized void sendReady(Integer id) {
-        sendAll(new ReadyCommand(id, 1), id);
+    public synchronized void sendReady() {
+        sendAll(new ReadyCommand(ID, 1), ID);
     }
 
     public synchronized void sendAll(Command command, Integer id) {
         if (flag){
             try {
-                System.out.println("blocking " + command + "\n while still having " + this.command);
+                //System.out.println("blocking " + command + "\n while still having " + this.command);
                 wait();
             } catch (InterruptedException e){
                 e.printStackTrace();
             }
         }
         this.command = command;
-        System.out.println("Queued " + command + " by " + id);
+        //System.out.println("Queued " + command + " by " + id);
         flag = true;
         for (int i = 0; i<sentMessage.length; i++)
             sentMessage[i] = false;

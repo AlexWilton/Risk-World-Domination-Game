@@ -34,7 +34,7 @@ public class DeployCommand extends Command{
         }
         this.put("payload",payload);
         this.put("player_id", player);
-        this.put("ack_id", "1");
+        this.put("ack_id", ack_id++);
 
     }
 }

@@ -1,19 +1,9 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
-import org.json.simple.JSONArray;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.CLIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.JoinGameCommand;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Stack;
 
 public class ClientApp {
 

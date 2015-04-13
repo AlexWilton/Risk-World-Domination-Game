@@ -1,6 +1,5 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -41,4 +40,6 @@ public class PingCommand extends Command {
         }
 
     }
+
+    public boolean requiresAcknowledgement() {return false;}
 }

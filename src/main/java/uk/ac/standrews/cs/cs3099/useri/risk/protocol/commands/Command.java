@@ -3,12 +3,11 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
-
-import java.text.ParseException;
 
 
 public class Command extends JSONObject {
+
+    static int ack_id = 0;
 
     public Command(String command){
         this.put("command", command);
@@ -16,6 +15,10 @@ public class Command extends JSONObject {
 
     public Command(JSONObject object){
         super(object);
+    }
+
+    public static int getLastAckID() {
+        return ack_id - 1;
     }
 
     public JSONObject getPayload(){
@@ -159,4 +162,7 @@ public class Command extends JSONObject {
         envelope.put("signature",""); //TODO
         return envelope.toJSONString();
     }
+
+    public boolean requiresAcknowledgement() {return true;}
+
 }

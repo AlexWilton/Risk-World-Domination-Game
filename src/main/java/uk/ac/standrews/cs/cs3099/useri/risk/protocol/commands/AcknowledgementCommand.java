@@ -8,12 +8,15 @@ public class AcknowledgementCommand extends Command {
 
     public static final String COMMAND_STRING = "acknowledgement";
 
-    private static int ACK_ID;
-
-    public AcknowledgementCommand(int id, int player_id) {
+    /*public AcknowledgementCommand(int player_id) {
         super(COMMAND_STRING);
-        ACK_ID = id;
-        this.put("payload", ACK_ID);
+        this.put("payload", ack_id++);
+        this.put("player_id", player_id);
+    }*/
+
+    public AcknowledgementCommand(int ack_id, int player_id) {
+        super(COMMAND_STRING);
+        this.put("payload", ack_id);
         this.put("player_id", player_id);
     }
 
@@ -29,11 +32,10 @@ public class AcknowledgementCommand extends Command {
             if (!obj.get("command").equals("acknowledgement")) {
                 return null;
             }
-            Long payload = (Long) obj.get("payload");
-            int ack_id = payload==null? -1 : payload.intValue();
             int playerId = Integer.parseInt(obj.get("player_id").toString());
-            System.out.println("AckCommand returned");
-            return new AcknowledgementCommand(ack_id, playerId);
+            int ackID = Integer.parseInt(obj.get("payload").toString());
+            //System.out.println("AckCommand returned");
+            return new AcknowledgementCommand(ackID, playerId);
 
         } catch(ParseException e){
             System.out.println(commandJSON);
@@ -42,6 +44,9 @@ public class AcknowledgementCommand extends Command {
     }
 
     public int getAcknowledgementId() {
-    return ACK_ID;
+        Integer payload = (Integer) get("payload");
+        return payload==null? -1 : payload;
     }
+
+    public boolean requiresAcknowledgement() {return false;}
 }

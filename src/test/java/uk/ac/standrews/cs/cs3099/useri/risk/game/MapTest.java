@@ -3,6 +3,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 import static org.junit.Assert.assertFalse;
@@ -67,11 +68,29 @@ public class MapTest {
         Country gb = defaultCountries.get(16);
         assertFalse(gb.getNeighbours().contains(25));
 
+        //check continents contains correct countries:
+        Continent northAmerica = defaultContinents.get(0);
+        CountrySet northernAmerica = northAmerica.getCountries();
+        ArrayList<Integer> idlist = northernAmerica.getIDList();
+        assertTrue(idlist.contains(0)
+                && idlist.contains(1)
+            && idlist.contains(2)
+            && idlist.contains(3)
+            && idlist.contains(4)
+            && idlist.contains(5)
+            && idlist.contains(6)
+            && idlist.contains(7)
+            && idlist.contains(8));
     }
 
     @Test
     public void testCardParsing(){
         Stack<RiskCard> riskCards = defaultMap.getCardsFromMapData();
+        assertFalse(riskCards.isEmpty());
+
+
+
     }
+
 
 }

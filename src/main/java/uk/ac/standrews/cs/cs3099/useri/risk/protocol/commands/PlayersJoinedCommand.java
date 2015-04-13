@@ -25,4 +25,6 @@ public class PlayersJoinedCommand extends Command {
     public PlayersJoinedCommand(JSONObject object){
         super(object);
     }
+
+    public boolean requiresAcknowledgement() {return false;}
 }

@@ -20,7 +20,9 @@ public class ServerSocketHandler implements Runnable {
     private WebClient webClient;
     private ServerSocket server;
     private ArrayList<ListenerThread> clientSocketPool;
+    private ArrayList<Thread> threads = new ArrayList<>();
     private boolean isServerPlaying;
+    private RejectingThread reject;
 
     private boolean gameInProgress = false;
     private ArrayList<Player> players = new ArrayList<>();
@@ -43,8 +45,7 @@ public class ServerSocketHandler implements Runnable {
     public void run() {
         int i = 0;// isServerPlaying ? 1 : 0;         //If the server is isServerPlaying, first client gets ID 1, otherwise 0.
         clientSocketPool = new ArrayList<>();
-        MessageQueue s = new MessageQueue(NUMBER_OF_PLAYERS);
-
+        MessageQueue s = new MessageQueue(NUMBER_OF_PLAYERS, isServerPlaying);
         while (!gameInProgress) {
             try {
                 // Open the gates!
@@ -56,12 +57,14 @@ public class ServerSocketHandler implements Runnable {
                 // Make new Thread for client.
                 Thread t = new Thread(client);
                 t.start();
+                threads.add(t);
 
-                // Decide whether we want to start the game already, partially randomly.
-                //Random r = new Random(System.nanoTime());
-                if (i == NUMBER_OF_PLAYERS) {
-
+                if (ListenerThread.getPlayers().size() == NUMBER_OF_PLAYERS || i == NUMBER_OF_PLAYERS) {
                     gameInProgress = true;
+                    // From this stage on, any new connection will be rejected.
+                    reject = new RejectingThread(server);
+                    Thread th = new Thread(reject);
+                    th.start();
                 }
                 //if (i>MIN_PLAYER_COUNT && r.nextDouble()>=0.5)
                     //gameInProgress = true;
@@ -77,32 +80,34 @@ public class ServerSocketHandler implements Runnable {
         }
 
         while (!allInitialised(InitState.STAGE_PING));  //wait for all clients to pass the init stage.
-        s.sendPing(i, isServerPlaying?0:null);
+        s.sendPing(i);
         while (!allInitialised(InitState.STAGE_READY));  //wait on ping commands to be received.
-        s.sendReady(isServerPlaying?0:null);
+        s.sendReady();
         while (!allInitialised(InitState.STAGE_PLAYING));  //wait on acknowledgements
         InitialiseGameCommand command = generateInitGame();
-        //System.out.println(command);
-        s.sendAll(command, isServerPlaying?0:null);
-        //System.out.println("Stuff seems to be working");
+        s.sendAll(command, isServerPlaying? 0 : null);
 
         //TODO ListenerThread remove player if error occurs!
         State st = new State(new Map(), ListenerThread.getPlayers());
         webClient.setState(st);
+        ListenerThread.setState(st);
 
-        while (true) {
-            try {
-                Socket temp = server.accept();
-                System.out.println("New client connected");
-                //TODO GAME STATE!!
-                ListenerThread client = new ListenerThread(temp, i, new NetworkClient(null), gameInProgress, ACK_TIMEOUT, MOVE_TIMEOUT, s);
-                // Make new Thread for client.
-                Thread t = new Thread(client);
-                t.start();
-            } catch (IOException e) {
-                //e.printStackTrace();
+
+        // When all ListenerThreads finished, close the game gracefully.
+        try {
+            for (Thread t : threads) {
+                try {
+                    t.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
+            reject.stop();
+            server.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
     }
 
     private InitialiseGameCommand generateInitGame() {

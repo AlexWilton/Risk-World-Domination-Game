@@ -16,4 +16,8 @@ public class RollHashCommand extends Command {
     public RollHashCommand(JSONObject object){
         super(object);
     }
+
+    public boolean requiresAcknowledgement() {
+        return false;
+    }
 }

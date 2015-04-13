@@ -2,16 +2,13 @@ package uk.ac.standrews.cs.cs3099.useri.risk.helpers;
 
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.ArrayQueue;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.ClientApp;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
@@ -19,10 +16,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-
 import java.net.Socket;
-import java.security.spec.ECField;
-import java.util.*;
+import java.util.ArrayList;
 
 
 /**
@@ -143,7 +138,7 @@ public class ClientSocketHandler implements Runnable{
 
         }
         catch (IOException e){
-            System.out.println("Cant connect to server");
+            System.out.println("Can't connect to server");
             return ClientApp.BAD_ADDRESS;
         }
 
@@ -182,7 +177,7 @@ public class ClientSocketHandler implements Runnable{
                     return ClientApp.JOIN_REJECTED;
                 }
                 else {
-                    System.out.println("Wromg Protocol");
+                    System.out.println("Wrong Protocol");
                     protocolState = ProtocolState.FAILED;
                     return ClientApp.PROTOCOL_ERROR_DETECTED;
                 }

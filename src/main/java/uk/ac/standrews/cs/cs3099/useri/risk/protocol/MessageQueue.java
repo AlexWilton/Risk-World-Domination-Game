@@ -33,7 +33,6 @@ public class MessageQueue {
         if (sentMessage[id])
             return null;
 
-        //System.out.println("Sending " + command.toJSONString());
         notifyAll();
         sentMessage[id] = true;
         if (sentAll()){
@@ -42,14 +41,13 @@ public class MessageQueue {
         return command;
     }
 
-    public synchronized Command probablygetMessage(int id) {
+    public synchronized Command probablyGetMessage(int id) {
         if (!flag) {
             return null;
         }
         if (sentMessage[id])
             return null;
 
-        //System.out.println("Sending " + command.toJSONString());
         sentMessage[id] = true;
         if (sentAll()){
             flag = false;
@@ -79,35 +77,20 @@ public class MessageQueue {
         sendAll(new ReadyCommand(ID, 1), ID);
     }
 
-    public synchronized void sendAll(Command command, Integer id) {
+    public synchronized void sendAll(Command comm, Integer id) {
         if (flag){
             try {
-                //System.out.println("blocking " + command + "\n while still having " + this.command);
                 wait();
             } catch (InterruptedException e){
                 e.printStackTrace();
             }
         }
-        this.command = command;
-        //System.out.println("Queued " + command + " by " + id);
+        command = comm;
         flag = true;
         for (int i = 0; i<sentMessage.length; i++)
             sentMessage[i] = false;
         if (id != null) sentMessage[id] = true;
         notifyAll();
-    }
-
-    public synchronized boolean probablySendAll(Command command, Integer id) {
-        if (flag){
-            return false;
-        }
-        this.command = command;
-        flag = true;
-        for (int i = 0; i<sentMessage.length; i++)
-            sentMessage[i] = false;
-        if (id != null) sentMessage[id] = true;
-        notifyAll();
-        return true;
     }
 
     public synchronized void addPlayer(int id){

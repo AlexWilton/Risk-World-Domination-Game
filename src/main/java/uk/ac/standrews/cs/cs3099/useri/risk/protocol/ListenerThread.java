@@ -19,30 +19,30 @@ import java.util.ArrayList;
  * All fields are final and protected.
  */
 public class ListenerThread implements Runnable {
-    private MessageQueue messageQueue;
     private static ArrayList<Player> players = new ArrayList<>();
+    private static State gameState;
+
     private final int ACK_TIMEOUT, MOVE_TIMEOUT;
-    protected final Socket sock;
-    protected final int ID;
-    protected final Client client;
-    private final boolean gameInProgress;
+    private final Socket sock;
+    private final int ID;
+
+    private Client client;
+    private Player player;
     private PrintWriter output;
     private BufferedReader input;
     private InitState state = InitState.STAGE_CONNECTING;
+    private MessageQueue messageQueue;
     private int version;
     private ArrayList<String> customs;
-    private static State gameState;
 
 
-    public ListenerThread(Socket sock, int id, Client client, boolean gameInProgress, int ack_timeout, int move_timeout, MessageQueue q) {
-        this.messageQueue = q;
+    public ListenerThread(Socket sock, int id, Client client, int ack_timeout, int move_timeout, MessageQueue q) {
+        ACK_TIMEOUT = ack_timeout * 1000;
+        MOVE_TIMEOUT = move_timeout * 1000;
+        ID = id;
         this.sock = sock;
-        this.ID = id;
         this.client = client;
-        this.gameInProgress = gameInProgress;
-        this.ACK_TIMEOUT = ack_timeout * 1000;
-        this.MOVE_TIMEOUT = move_timeout * 1000;
-
+        this.messageQueue = q;
     }
 
     /**
@@ -51,31 +51,35 @@ public class ListenerThread implements Runnable {
      */
     private synchronized boolean initialiseConnection() throws IOException, InitialisationException{
         Command command = Command.parseCommand(input.readLine());
-        if(command == null) {
-            //reply(new AcknowledgementCommand(ID));//TODO added hardcoded player id to make it work
-            throw new InitialisationException("Unparseable command received");
-        }
-        else if (command instanceof JoinGameCommand) {
+        if (command instanceof JoinGameCommand) {
             reply(new AcceptJoinGameCommand(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
             messageQueue.addPlayer(ID);
             client.setPlayerId(ID);
             String playerName = ((JoinGameCommand) command).getName();
-            players.add(new Player(ID, client, playerName));
+            player = new Player(ID, client, playerName);
+            players.add(player);
+
             customs = ((JoinGameCommand) command).getFeatures();
             version = ((JoinGameCommand) command).getVersion();
             // Send player list to all connected players.
             messageQueue.sendPlayerList(players);
             reply(messageQueue.getMessage(ID));
             return true;
+        } else {
+            throw new InitialisationException("Unrecognised command received");
         }
-        return false;
     }
 
-    private void purgeConnection() throws IOException {
-        output.flush();
-        output.close();
-        input.close();
-        sock.close();
+    private void purgeConnection(){
+        try {
+            output.flush();
+            output.close();
+            input.close();
+            sock.close();
+            players.remove(player);
+        } catch (IOException e) {
+            System.err.println("Error occurred while closing connection, this is not fatal.");
+        }
     }
 
     private void reply(Command command) {
@@ -86,17 +90,6 @@ public class ListenerThread implements Runnable {
         output.flush();
     }
 
-    private void rejectGame() throws IOException, InitialisationException {
-        if (JoinGameCommand.parse(input.readLine()) == null)
-            throw new InitialisationException("Unparseable command received");
-        else
-            reply(new RejectJoinGameCommand("Game already in progress"));
-
-        purgeConnection();
-    }
-
-
-
     /**
      * non-javadoc
      * This implements runnable. In fact, it will only handle exceptions basically.
@@ -104,31 +97,29 @@ public class ListenerThread implements Runnable {
     @Override
     public void run() {
         try {
+            // Set up the socket i/o and the default timeout
             sock.setSoTimeout(MOVE_TIMEOUT);
             input = new BufferedReader(new InputStreamReader(sock.getInputStream()));
             output = new PrintWriter(sock.getOutputStream());
 
-            if (gameInProgress) {
-                rejectGame();
-            } else {
-                if(initialiseConnection()) state = state.next();
-            }
+            // Initialise the connection
+            if(initialiseConnection()) state = state.next();
 
+            // Send ping and receive pong.
             Command reply = waitingOn(PingCommand.class);
             if (!(reply instanceof PingCommand)){
                 throw new InitialisationException("Ping command was not answered.");
             }
-            //System.out.println("Ping reply received: "+ ID);
-            state = state.next();     // Ping reply received
+            state = state.next();
 
+            // Send ready and receive ack.
             sock.setSoTimeout(ACK_TIMEOUT);
             reply = waitingOn(ReadyCommand.class);
             sock.setSoTimeout(MOVE_TIMEOUT);
-
             if (!(reply instanceof AcknowledgementCommand) /*|| ((AcknowledgementCommand)reply).getAcknowledgementId() != Command.getLastAckID()*/){
                 throw new InitialisationException("Ready command was not acknowledged in time.");
             }
-            state = state.next();    // Ready acknowledgement received
+            state = state.next();
 
             // here, the game is initialised with a final list of players.
             while (true){
@@ -146,15 +137,17 @@ public class ListenerThread implements Runnable {
 
         } catch(InitialisationException | SocketTimeoutException f) {
             Command comm;
-            while ((comm = messageQueue.probablygetMessage(ID)) != null) {
+            while ((comm = messageQueue.probablyGetMessage(ID)) != null) {
                 reply(comm);
             }
             messageQueue.sendAll(new TimeOutCommand(ID, null), null);
             reply(messageQueue.getMessage(ID));
+            purgeConnection();
         } catch(IOException e) {
             e.printStackTrace();
         }
 
+        purgeConnection();
     }
 
 
@@ -162,7 +155,7 @@ public class ListenerThread implements Runnable {
     private Command waitingOn(Class<?> c){
         Command reply;
         while(true){
-            Command comm = messageQueue.probablygetMessage(ID);
+            Command comm = messageQueue.probablyGetMessage(ID);
             reply(comm);
             if (comm == null)
                 continue;
@@ -170,7 +163,7 @@ public class ListenerThread implements Runnable {
                 try {
                     while (!input.ready());
                     reply = Command.parseCommand(input.readLine());
-                    while ((comm = messageQueue.probablygetMessage(ID)) != null);
+                    while ((comm = messageQueue.probablyGetMessage(ID)) != null)
                         reply(comm);
                     messageQueue.sendAll(reply, ID);
                     break;

@@ -12,7 +12,7 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 /**
- * Created by bs44 on 12/04/15.
+ * Class only for forwarding messages from all clients to this client and vice versa.
  */
 public class HostForwarder  {
     private MessageQueue messageQueue;
@@ -50,7 +50,7 @@ public class HostForwarder  {
             if (!acks_received() && System.currentTimeMillis() > timer + diff) {
                 throw new SocketTimeoutException();
             }
-            while ((comm = messageQueue.probablygetMessage(ID)) != null) {
+            while ((comm = messageQueue.probablyGetMessage(ID)) != null) {
                 reply(comm);
                 checkAckCases(comm);
             }
@@ -58,7 +58,6 @@ public class HostForwarder  {
                 comm = Command.parseCommand(input.readLine());
                 messageQueue.sendAll(comm, ID);
                 performOnState(comm, state);
-                //System.out.println("Player " + ID + " received " + reply);
                 checkAckCases(comm);
             }
         }
@@ -67,6 +66,8 @@ public class HostForwarder  {
     private void performOnState(Command comm, State state) {
         if (comm instanceof AcknowledgementCommand) {
             return;
+        } else {
+
         }
     }
 

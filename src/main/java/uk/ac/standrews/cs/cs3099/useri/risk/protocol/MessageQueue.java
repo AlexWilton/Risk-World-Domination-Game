@@ -26,7 +26,7 @@ public class MessageQueue {
     }
 
 
-    
+
     public synchronized Command probablyGetMessage(int id) {
         if (!flag) {
             return null;
@@ -51,11 +51,6 @@ public class MessageQueue {
         return true;
     }
 
-    public synchronized void sendPlayerList(ArrayList<Player> players){
-
-        sendAll(new PlayersJoinedCommand(players), null);
-    }
-
     public synchronized void sendPing(int payload) {
         sendAll(new PingCommand(ID, payload), ID);
     }
@@ -76,8 +71,11 @@ public class MessageQueue {
         }
     }
 
-    public synchronized void addPlayer(int id, PrintWriter out){
+    public synchronized void addPlayer(int id, PrintWriter out, Player player){
         player_connected[id] = true;
         sockets.put(id, out);
+        ArrayList<Player> players = new ArrayList<>();
+        players.add(player);
+        sendAll(new PlayersJoinedCommand(players), id);
     }
 }

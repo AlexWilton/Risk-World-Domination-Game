@@ -53,17 +53,17 @@ public class ListenerThread implements Runnable {
         Command command = Command.parseCommand(input.readLine());
         if (command instanceof JoinGameCommand) {
             reply(new AcceptJoinGameCommand(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
-            messageQueue.addPlayer(ID, output);
+
             //System.out.println("Player " + ID +": " + output);
             client.setPlayerId(ID);
             String playerName = ((JoinGameCommand) command).getName();
             player = new Player(ID, client, playerName);
             players.add(player);
-
             customs = ((JoinGameCommand) command).getFeatures();
             version = ((JoinGameCommand) command).getVersion();
             // Send player list to all connected players.
-            messageQueue.sendPlayerList(players);
+            messageQueue.addPlayer(ID, output, player);
+            reply(new PlayersJoinedCommand(players));
             //reply(messageQueue.getMessage(ID));
             return true;
         } else {

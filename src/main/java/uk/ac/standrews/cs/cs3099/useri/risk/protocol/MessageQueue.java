@@ -66,7 +66,8 @@ public class MessageQueue {
     }
 
     public synchronized void sendPlayerList(ArrayList<Player> players){
-        sendAll(new PlayersJoinedCommand(players), ID);
+
+        sendAll(new PlayersJoinedCommand(players), null);
     }
 
     public synchronized void sendPing(int payload) {

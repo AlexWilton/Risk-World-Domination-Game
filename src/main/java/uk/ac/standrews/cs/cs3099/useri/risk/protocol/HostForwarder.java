@@ -55,10 +55,15 @@ public class HostForwarder  {
                 checkAckCases(comm);
             }
             if (input.ready()) {
-                comm = Command.parseCommand(input.readLine());
-                messageQueue.sendAll(comm, ID);
-                performOnState(comm, state);
-                checkAckCases(comm);
+                Command reply = Command.parseCommand(input.readLine());
+                System.out.println("in Player " + ID + ": " + reply);
+                while ((comm = messageQueue.probablyGetMessage(ID)) != null) {
+                    reply(comm);
+                    checkAckCases(comm);
+                }
+                messageQueue.sendAll(reply, ID);
+                //performOnState(reply, state);
+                checkAckCases(reply);
             }
         }
     }

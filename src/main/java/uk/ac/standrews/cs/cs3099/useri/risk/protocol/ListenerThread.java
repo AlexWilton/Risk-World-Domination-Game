@@ -20,7 +20,7 @@ import java.util.ArrayList;
  */
 public class ListenerThread implements Runnable {
     private static ArrayList<Player> players = new ArrayList<>();
-    private static State gameState;
+    //private static State gameState;
 
     private final int ACK_TIMEOUT, MOVE_TIMEOUT;
     private final Socket sock;
@@ -103,7 +103,13 @@ public class ListenerThread implements Runnable {
             output = new PrintWriter(sock.getOutputStream());
 
             // Initialise the connection
-            if(initialiseConnection()) state = state.next();
+            if(initialiseConnection()){
+                Command comm;
+                while ((comm = messageQueue.probablyGetMessage(ID)) != null){
+                    reply(comm);
+                }
+                state = state.next();
+            }
 
             // Send ping and receive pong.
             Command reply = waitingOn(PingCommand.class);
@@ -133,7 +139,7 @@ public class ListenerThread implements Runnable {
 
             // Start forwarding every message as is.
             HostForwarder fw = new HostForwarder(messageQueue, MOVE_TIMEOUT, ACK_TIMEOUT, ID, input, output);
-            fw.playGame(gameState);
+            fw.playGame(null);
 
         } catch(InitialisationException | SocketTimeoutException f) {
             Command comm;
@@ -193,6 +199,6 @@ public class ListenerThread implements Runnable {
     }
 
     public static void setState(State state) {
-        gameState = state;
+        //gameState = state;
     }
 }

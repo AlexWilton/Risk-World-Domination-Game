@@ -316,6 +316,8 @@ public class ClientSocketHandler implements Runnable{
     private void processRollHashCommand(RollHashCommand command){
         try {
             while (seed == null) Thread.sleep(10);
+            while (seed.hasHash(command.getPlayer())) Thread.sleep(10);
+            while (seed == null) Thread.sleep(10);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -345,7 +347,7 @@ public class ClientSocketHandler implements Runnable{
         for (Object playerObject : playersJSON){
             JSONArray onePlayerJSON = (JSONArray) playerObject;
             int playerNr = Integer.parseInt(onePlayerJSON.get(0).toString());
-            if (playerNr == localClient.getPlayerId())
+            if (playerNr == localClient.getPlayerId() || getClientById(playerNr) != null)
                 continue;
             String playerName = onePlayerJSON.get(1).toString();
             String playerSig = null;
@@ -377,7 +379,7 @@ public class ClientSocketHandler implements Runnable{
     }
 
     private void processPingCommand(PingCommand command){
-        getClientById(command.getPlayer()).markPlayReady(true);
+       // getClientById(command.getPlayer()).markPlayReady(true);
     }
 
     private void processReadyCommand(ReadyCommand command){
@@ -419,6 +421,8 @@ public class ClientSocketHandler implements Runnable{
             sendCommand(ack);
         }
 
+        System.err.println(command.toJSONString());
+
 
         return command;
     }
@@ -432,6 +436,13 @@ public class ClientSocketHandler implements Runnable{
 
         localClient.newSeedComponent();
 
+        try {
+            while (seed != null) Thread.sleep(10);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
         seed = new RNGSeed(getPlayerAmount());
         seed.addSeedComponentHash(localClient.getHexSeedHash(),localClient.getPlayerId());
         seed.addSeedComponent(localClient.getHexSeed(),localClient.getPlayerId());

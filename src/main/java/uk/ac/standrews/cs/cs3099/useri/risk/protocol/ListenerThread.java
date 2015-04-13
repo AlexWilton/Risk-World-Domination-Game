@@ -140,7 +140,7 @@ public class ListenerThread implements Runnable {
 
             // Start forwarding every message as is.
             HostForwarder fw = new HostForwarder(messageQueue, MOVE_TIMEOUT, ACK_TIMEOUT, ID, input, output);
-            fw.playGame(null);
+            fw.playGame();
 
         } catch(InitialisationException | SocketTimeoutException f) {
             Command comm;
@@ -171,7 +171,7 @@ public class ListenerThread implements Runnable {
                     while (!input.ready());
                     reply = Command.parseCommand(input.readLine());
                     //while ((comm = messageQueue.probablyGetMessage(ID)) != null)
-                     //   reply(comm);
+                    //    reply(comm);
                     messageQueue.sendAll(reply, ID);
                     break;
                 } catch (IOException e){
@@ -197,9 +197,5 @@ public class ListenerThread implements Runnable {
 
     public static ArrayList<Player> getPlayers() {
         return players;
-    }
-
-    public static void setState(State state) {
-        //gameState = state;
     }
 }

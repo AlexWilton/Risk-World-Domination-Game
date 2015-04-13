@@ -38,16 +38,14 @@ public class ServerSocketHandler implements Runnable {
     }
 
     public void run() {
-        int i = 0;// isServerPlaying ? 1 : 0;         //If the server is isServerPlaying, first client gets ID 1, otherwise 0.
+        int i = 0;
         clientSocketPool = new ArrayList<>();
         MessageQueue s = new MessageQueue(NUMBER_OF_PLAYERS, isServerPlaying);
-        //State st = new State(new Map(), ListenerThread.getPlayers());
         while (!gameInProgress) {
             try {
                 // Open the gates!
                 Socket temp = server.accept();
                 System.out.println("New client connected");
-                //TODO GAMESTATE!!
                 ListenerThread client = new ListenerThread(temp, i, new NetworkClient(null), ACK_TIMEOUT, MOVE_TIMEOUT, s);
                 clientSocketPool.add(i++, client);
                 // Make new Thread for client.
@@ -76,9 +74,6 @@ public class ServerSocketHandler implements Runnable {
         s.sendAll(command, isServerPlaying? 0 : null);
 
         //TODO ListenerThread remove player if error occurs!
-        //webClient.setState(st);
-        //ListenerThread.setState(st);
-
 
         // When all ListenerThreads finished, close the game gracefully.
         try {

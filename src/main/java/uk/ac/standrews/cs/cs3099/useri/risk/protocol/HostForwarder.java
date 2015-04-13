@@ -42,7 +42,7 @@ public class HostForwarder  {
         ack_received = new boolean[players.size()];
     }
 
-    void playGame(State state) throws IOException {
+    void playGame() throws IOException {
         Command comm;
         while(true) {
             if (System.currentTimeMillis() > timer + MOVE_TIMEOUT)
@@ -62,17 +62,8 @@ public class HostForwarder  {
                     checkAckCases(comm);
                 }
                 messageQueue.sendAll(reply, ID);
-                //performOnState(reply, state);
                 checkAckCases(reply);
             }
-        }
-    }
-
-    private void performOnState(Command comm, State state) {
-        if (comm instanceof AcknowledgementCommand) {
-            return;
-        } else {
-
         }
     }
 

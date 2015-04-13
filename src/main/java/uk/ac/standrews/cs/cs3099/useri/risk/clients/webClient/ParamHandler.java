@@ -255,6 +255,7 @@ public class ParamHandler extends DefaultHandler {
         if(ClientApp.run(address, port, webClient) != ClientApp.SUCCESS)
             return "Connect to " + address + ":" + port + " failed!";
 
+        webClient.setHostAndPlayingBooleans(false, false);
         return "true";
     }
 }

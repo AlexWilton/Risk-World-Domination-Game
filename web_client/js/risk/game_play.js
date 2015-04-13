@@ -33,6 +33,12 @@ function updateDisplay(){
 
 function updatePlayerDisplay(){
     var playerInfo = "";
+    if(typeof game_state.players[my_player_id].isHost != 'undefined' && game_state.players[my_player_id].isHost == true){ //if this is the host
+        playerInfo += "<br/><h5><strong>You are the host!</strong></h5>";
+    }else
+        playerInfo += "<br/><h5><strong>You are connected to the host!</strong></h5>"
+
+    playerInfo += "<h3>Players</h3>";
     game_state.players.forEach(function(player){
         playerInfo += "<h5><small>Player " + player.ID + ":</small> <strong style='color: " + colors[player.ID] + "'>" + player.name + "</strong>";
         if(player.ID == game_state.currentPlayer.ID) playerInfo += " <small>(Current Player)</small>";
@@ -43,13 +49,15 @@ function updatePlayerDisplay(){
 
 function updateTurnPanel(){
     if(game_state.currentPlayer.ID == my_player_id){ //my turn
-        if(game_state.all_countries_claimed === false){
-            game_state.turn_stage = "PRE_GAME_SELECTION";
+        if(game_state.pre_game_play === true){
+            game_state.turn_stage = "STAGE_SETUP";
         }
+
         var panelHtml = "<strong>Your Turn</strong> (" + game_state.turn_stage + ")";
         switch(game_state.turn_stage){
-            case "PRE_GAME_SELECTION":
-                panelHtml += "<br/><br/>It is your turn to <strong>Select</strong> a country which you wish to claim!<div id='status'></div>";
+            case "STAGE_SETUP":
+                panelHtml += "<br/><h5>You still have <strong>" + game_state.players[my_player_id].unassignedArmies +
+                "</strong> left to deploy.</h5>It is your turn to <strong>Select</strong> a country!<div id='status'></div>";
                 break;
             case "STAGE_TRADING":
                 if(isTradePossibleForMe())
@@ -72,7 +80,7 @@ function updateTurnPanel(){
         }
         $("#turnPanel").html(panelHtml);
     }else{
-        $("#turnPanel").html("");
+        $("#turnPanel").html("<h4>Waiting for other players...</h4>");
     }
 }
 
@@ -176,16 +184,19 @@ function waitForMyTurn(){
         if(game_state.currentPlayer.ID == my_player_id){
             updateDisplay();
         }else{
-            setTimeout(waitForMyTurn, 1000);
+            setTimeout(waitForMyTurn, 300);
         }
     })
 }
 
 function claimCountryDuringSetup(country_id){
     $.get('/?operation=perform_action&action=setup_claim_country&country_id=' + country_id, function(response){
-        console.log(response);
+
+        //getStateFromServer(Risk.updateMap());
+
         if(response.indexOf("true") == 0){
-            $("#turnPanel").html("<h4>Waiting for other players...</h4>");
+            $("#turnPanel").html("<h4>Waiting for other players...</h4>" +
+            "<br/><h5>You still have <strong>" + game_state.players[my_player_id].unassignedArmies + "</strong> left to deploy.</h5>");
             waitForMyTurn();
         }else{
             $("#status").html('<div class="alert alert-danger" role="alert">' +

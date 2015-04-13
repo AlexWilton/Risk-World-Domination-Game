@@ -114,9 +114,7 @@ public class WebClient extends Client {
     }
 
 
-    public State getState(){
-        return gameState;
-    }
+
 
     public boolean isLocal(){
         return true;

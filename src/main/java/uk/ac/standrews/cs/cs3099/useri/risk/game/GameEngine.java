@@ -146,7 +146,7 @@ public class GameEngine implements Runnable{
         int firstPlayer = csh.determineFirstPlayer();
 
         System.out.println("Player " + gamestate.getPlayer(firstPlayer).getName() + " goes first!");
-
+        gamestate.setFirstPlayer(gamestate.getPlayer(firstPlayer));
         gamestate.setCurrentPlayer(firstPlayer);
 
         //now shuffle cards
@@ -344,4 +344,8 @@ public class GameEngine implements Runnable{
         return act;
 
     }
+
+
+
+
 }

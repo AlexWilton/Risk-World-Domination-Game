@@ -227,7 +227,7 @@ var Risk = {
 					console.log(Risk.Territories[path.attrs.id]);
                     if(game_state.currentPlayer.ID == my_player_id){
                         switch (game_state.turn_stage){
-                            case "PRE_GAME_SELECTION":
+                            case "STAGE_SETUP":
                                 claimCountryDuringSetup(Risk.Territories[path.attrs.id].mapped_game_state_territory.country_id);
                                 break;
                             case "STAGE_DEPLOYING":

@@ -144,6 +144,10 @@ public abstract class Client {
 
     public abstract boolean isLocal();
 
+    public State getState(){
+        return gameState;
+    }
+
     public void setState(State gameState){
         this.gameState = gameState;
     }

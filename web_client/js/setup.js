@@ -1,3 +1,5 @@
+var nonPlayingHost = false;
+
 $( document ).ready(function(){
 
     $("#hostButton").click(function(){
@@ -5,6 +7,8 @@ $( document ).ready(function(){
         $.ajax( "/?operation=host_game&" + requestParams )
             .done(function(response) {
                 if(response.indexOf("true") == 0){
+                    if(!$("#hostForm").find(":input[name=is_host_playing]").val()== "true")
+                        nonPlayingHost = true;
                     gotoGamePlayWhenReady();
                 }else{
                     alert(response);
@@ -40,7 +44,10 @@ function gotoGamePlayWhenReady(){
         .done(function(response) {
             if(response.indexOf("true") == 0){
                 alert("Game Started!");
-                window.location.href = "/play.html"
+                if(nonPlayingHost)
+                    window.location.href = "/server.html";
+                else
+                    window.location.href = "/play.html";
             }else{
                 setTimeout(gotoGamePlayWhenReady, 1000);
             }

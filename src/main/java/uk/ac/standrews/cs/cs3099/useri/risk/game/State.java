@@ -21,11 +21,13 @@ public class State implements JSONAware{
     //TODO: Data structure changed from ArrayList to Stack -> Adjust other part of codes to work with Stack
     private Stack<RiskCard> cardsDeck;
 	private Player currentPlayer;
+    private Player firstPlayer;
     private Player winner = null;
     private TurnStage stage = TurnStage.STAGE_TRADING;;
     private boolean wonBattle = false;
     private int cardSetstradedIn = 0;
     private boolean preGamePlay = true;
+
 
     public State(){}
 
@@ -40,7 +42,7 @@ public class State implements JSONAware{
         this.currentPlayer = players.get(0);
 
         //set number of inital troops for each player (based on the total number of players in the game)
-        int armiesForEachPlayer = 20 + (6 - players.size()) * 5;
+        int armiesForEachPlayer = 20 + (6 - players.size()) * 5 - 17; //TODO remove -17
         for(Player p : players){
             p.setUnassignedArmies(armiesForEachPlayer);
         }
@@ -71,6 +73,8 @@ public class State implements JSONAware{
 
     public void endTurn(){
         nextPlayer();
+        if(!preGamePlay)
+            preTurnCalculateUnassignedArmies(currentPlayer);
         stage = TurnStage.STAGE_FINISH.next();
         wonBattle = false;
     }
@@ -125,6 +129,10 @@ public class State implements JSONAware{
         return map.getAllCountries().get(id);
     }
 
+    public ContinentSet getContinents(){
+        return map.getContinents();
+    }
+
     public ArrayList<Player> getPlayers (){
         return players;
     }
@@ -165,6 +173,10 @@ public class State implements JSONAware{
 
     public void endPreGame(){
         preGamePlay = false;
+        currentPlayer = firstPlayer;
+        preTurnCalculateUnassignedArmies(currentPlayer);
+        stage = TurnStage.STAGE_FINISH.next();
+        wonBattle = false;
     }
 
     public void shuffleRiskCards(RNGSeed seed){
@@ -205,5 +217,32 @@ public class State implements JSONAware{
         return getPlayers().size();
     }
 
+
+    public void setFirstPlayer(Player firstPlayer) {
+        this.firstPlayer = firstPlayer;
+    }
+
+    public Player getFirstPlayer() {
+        return firstPlayer;
+    }
+
+    public void preTurnCalculateUnassignedArmies(Player player) {
+        int territoryCount = player.getOccupiedCountries().size();
+        int amount = territoryCount / 3;
+        if(amount < 3) amount = 3;
+
+        for(Continent continent : getContinents()){
+            boolean wholeContinentOwned = true;
+            for(Country country : continent.getCountries()){
+                if(country.getOwner() != player){
+                    wholeContinentOwned = false;
+                }
+            }
+            if(wholeContinentOwned)
+                amount += continent.getReinforcementValue();
+        }
+
+        player.setUnassignedArmies(amount);
+    }
 
 }

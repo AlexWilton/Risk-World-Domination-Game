@@ -217,11 +217,16 @@ public class ParamHandler extends DefaultHandler {
                 return "Error! Valid is Host Playing boolean not provided";
             is_host_playing = Boolean.parseBoolean(is_host_playingArray[0]);
 
-
-        ServerSocketHandler host = new ServerSocketHandler(port, numOfPlayers, webClient, is_host_playing);
+        ServerSocketHandler host = new ServerSocketHandler(port, numOfPlayers, webClient, false);
         Thread t = new Thread(host);
         t.start();
         webClient.setHostAndPlayingBooleans(true, is_host_playing);
+
+        if(is_host_playing) {
+            if (ClientApp.run("127.0.0.1", port, webClient) != ClientApp.SUCCESS)
+                return "Connect to myself on " + port + "!";
+        }
+
         return "true";
     }
 

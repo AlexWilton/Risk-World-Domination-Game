@@ -319,7 +319,7 @@ public class GameEngine implements Runnable{
             int armies = Integer.parseInt(pairArray.get(1).toString());
 
             //create deploy action
-            deployArmyActions.add(new DeployArmyAction(state.getPlayers().get(player),state.getCountryByID(countryId),armies));
+            deployArmyActions.add(new DeployArmyAction(state.getPlayer(player),state.getCountryByID(countryId),armies));
 //
 //            //push to client
 //

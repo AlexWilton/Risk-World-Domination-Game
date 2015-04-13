@@ -42,7 +42,7 @@ public class State implements JSONAware{
         this.currentPlayer = players.get(0);
 
         //set number of inital troops for each player (based on the total number of players in the game)
-        int armiesForEachPlayer = 20 + (6 - players.size()) * 5 - 17; //TODO remove -17
+        int armiesForEachPlayer = 20 + (6 - players.size()) * 5 - 18; //TODO remove -17
         for(Player p : players){
             p.setUnassignedArmies(armiesForEachPlayer);
         }

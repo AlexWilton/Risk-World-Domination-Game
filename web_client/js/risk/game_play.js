@@ -56,7 +56,7 @@ function updateTurnPanel(){
         var panelHtml = "<strong>Your Turn</strong> (" + game_state.turn_stage + ")";
         switch(game_state.turn_stage){
             case "STAGE_SETUP":
-                panelHtml += "<br/><h5>You still have <strong>" + game_state.players[my_player_id].unassignedArmies +
+                panelHtml += "<br/><h5>You still have <strong>" + game_state.currentPlayer.unassignedArmies +
                 "</strong> left to deploy.</h5>It is your turn to <strong>Select</strong> a country!<div id='status'></div>";
                 break;
             case "STAGE_TRADING":

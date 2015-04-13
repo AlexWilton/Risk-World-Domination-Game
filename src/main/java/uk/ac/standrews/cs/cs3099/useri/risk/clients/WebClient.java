@@ -64,7 +64,7 @@ public class WebClient extends Client {
     @Override
     public Command popCommand() {
         CountrySet uc = gameState.unoccupiedCountries();
-        if(uc.size() > 2){
+        if(uc.size() > 0){
             for(Country c : uc){
                 SetupAction sa = new SetupAction(gameState.getPlayer(playerId), c);
                 if(sa.validateAgainstState(gameState)) return new SetupCommand(c.getCountryId(), playerId);

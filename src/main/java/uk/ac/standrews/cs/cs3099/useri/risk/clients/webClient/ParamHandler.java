@@ -132,6 +132,11 @@ public class ParamHandler extends DefaultHandler {
                 return String.valueOf(true);
 
             case "trade_in":
+                    if((params.get("no_trade") != null && params.get("no_trade").equals("yes")) || params.get("card") == null){
+                        webClient.getState().nextStage();
+                        return "true";
+                    }
+
                     String[] cardIdsAsStrings = params.get("card");
                     ArrayList<Integer> cardIDs = new ArrayList<Integer>();
                     ArrayList<RiskCard> riskCards = new ArrayList<RiskCard>();

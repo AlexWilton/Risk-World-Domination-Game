@@ -2,17 +2,14 @@ package uk.ac.standrews.cs.cs3099.useri.risk.helpers;
 
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.ArrayQueue;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import sun.swing.SwingUtilities2;
 import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.ClientApp;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
@@ -20,10 +17,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-
 import java.net.Socket;
-import java.security.spec.ECField;
-import java.util.*;
+import java.util.ArrayList;
 
 
 /**
@@ -144,7 +139,7 @@ public class ClientSocketHandler implements Runnable{
 
         }
         catch (IOException e){
-            System.out.println("Cant connect to server");
+            System.out.println("Can't connect to server");
             return ClientApp.BAD_ADDRESS;
         }
 
@@ -183,7 +178,7 @@ public class ClientSocketHandler implements Runnable{
                     return ClientApp.JOIN_REJECTED;
                 }
                 else {
-                    System.out.println("Wromg Protocol");
+                    System.out.println("Wrong Protocol");
                     protocolState = ProtocolState.FAILED;
                     return ClientApp.PROTOCOL_ERROR_DETECTED;
                 }
@@ -341,7 +336,7 @@ public class ClientSocketHandler implements Runnable{
         for (Object playerObject : playersJSON){
             JSONArray onePlayerJSON = (JSONArray) playerObject;
             int playerNr = Integer.parseInt(onePlayerJSON.get(0).toString());
-            if (playerNr == localClient.getPlayerId())
+            if (playerNr == localClient.getPlayerId() || getClientById(playerNr) != null)
                 continue;
             String playerName = onePlayerJSON.get(1).toString();
             String playerSig = null;
@@ -373,7 +368,7 @@ public class ClientSocketHandler implements Runnable{
     }
 
     private void processPingCommand(PingCommand command){
-        getClientById(command.getPlayer()).markPlayReady(true);
+       // getClientById(command.getPlayer()).markPlayReady(true);
     }
 
     private void processReadyCommand(ReadyCommand command){
@@ -415,6 +410,8 @@ public class ClientSocketHandler implements Runnable{
             sendCommand(ack);
         }
 
+        System.err.println(command.toJSONString());
+
 
         return command;
     }
@@ -428,6 +425,13 @@ public class ClientSocketHandler implements Runnable{
 
         localClient.newSeedComponent();
 
+        try {
+            while (seed != null) Thread.sleep(10);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
         seed = new RNGSeed(getPlayerAmount());
         seed.addSeedComponentHash(localClient.getHexSeedHash(),localClient.getPlayerId());
         seed.addSeedComponent(localClient.getHexSeed(),localClient.getPlayerId());
@@ -438,6 +442,10 @@ public class ClientSocketHandler implements Runnable{
                 continue;
             }
             seed.addSeedComponentHash(c.popRollHash(),c.getPlayerId());
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
         }
 
         System.out.println("has all hashes");

@@ -55,7 +55,6 @@ public class State implements JSONAware{
     }
 
     public boolean winConditionsMet() {
-        //TODO Consider: Extra tests to be on the safe side? making sure nobody is breaking the rule?
         for(Player p : players){
             if(p.getOccupiedCountries().size()
                 == map.getAllCountries().size()){

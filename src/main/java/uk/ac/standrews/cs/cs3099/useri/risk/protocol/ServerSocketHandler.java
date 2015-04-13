@@ -3,19 +3,15 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 import org.json.simple.JSONArray;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Map;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.InitialiseGameCommand;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 public class ServerSocketHandler implements Runnable {
-    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 1, MOVE_TIMEOUT = 30;
+    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 100000, MOVE_TIMEOUT = 300000;
     public static final int MAX_PLAYER_COUNT = 6, MIN_PLAYER_COUNT = 2; //needed for web client to know the range of allowed number of players. (needs to be public)
     private WebClient webClient;
     private ServerSocket server;
@@ -25,7 +21,6 @@ public class ServerSocketHandler implements Runnable {
     private RejectingThread reject;
 
     private boolean gameInProgress = false;
-    private ArrayList<Player> players = new ArrayList<>();
 
     public ServerSocketHandler(int port, int numberOfPlayers, WebClient webClient, boolean isServerPlaying) {
         this.webClient = webClient;
@@ -43,37 +38,30 @@ public class ServerSocketHandler implements Runnable {
     }
 
     public void run() {
-        int i = isServerPlaying ? 1 : 0;         //If the server is isServerPlaying, first client gets ID 1, otherwise 0.
+        int i = 0;// isServerPlaying ? 1 : 0;         //If the server is isServerPlaying, first client gets ID 1, otherwise 0.
         clientSocketPool = new ArrayList<>();
         MessageQueue s = new MessageQueue(NUMBER_OF_PLAYERS, isServerPlaying);
+        //State st = new State(new Map(), ListenerThread.getPlayers());
         while (!gameInProgress) {
             try {
                 // Open the gates!
                 Socket temp = server.accept();
                 System.out.println("New client connected");
                 //TODO GAMESTATE!!
-                ListenerThread client = new ListenerThread(temp, i, new NetworkClient(null), gameInProgress, ACK_TIMEOUT, MOVE_TIMEOUT, s);
+                ListenerThread client = new ListenerThread(temp, i, new NetworkClient(null), ACK_TIMEOUT, MOVE_TIMEOUT, s);
                 clientSocketPool.add(i++, client);
                 // Make new Thread for client.
                 Thread t = new Thread(client);
                 t.start();
                 threads.add(t);
 
-                if (ListenerThread.getPlayers().size() == NUMBER_OF_PLAYERS || i == NUMBER_OF_PLAYERS) {
+                if (i == NUMBER_OF_PLAYERS) {
                     gameInProgress = true;
                     // From this stage on, any new connection will be rejected.
                     reject = new RejectingThread(server);
-                    Thread th = new Thread(reject);
-                    th.start();
+                    t = new Thread(reject);
+                    t.start();
                 }
-                //if (i>MIN_PLAYER_COUNT && r.nextDouble()>=0.5)
-                    //gameInProgress = true;
-
-            } catch (SocketTimeoutException timeout) {
-                // No more clients wanted to connect, so just carry on working.
-                // TODO Probably not final here.
-                //gameInProgress = true;
-                //break;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -88,8 +76,8 @@ public class ServerSocketHandler implements Runnable {
         s.sendAll(command, isServerPlaying? 0 : null);
 
         //TODO ListenerThread remove player if error occurs!
-        State st = new State(new Map(), ListenerThread.getPlayers());
-        webClient.setState(st);
+        //webClient.setState(st);
+        //ListenerThread.setState(st);
 
 
         // When all ListenerThreads finished, close the game gracefully.

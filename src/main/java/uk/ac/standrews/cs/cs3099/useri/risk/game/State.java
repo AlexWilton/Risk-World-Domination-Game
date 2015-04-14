@@ -193,9 +193,10 @@ public class State implements JSONAware{
             cardsDeck.set(swapPos,c1);
         }
 
+        /* Print card list for debugging purposes.
         for (RiskCard c : cardsDeck){
             System.err.println(c.toJSONString());
-        }
+        }*/
     }
 
     public boolean hasUnassignedCountries(){

@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.exceptions.InitialisationException;
 
@@ -19,6 +20,7 @@ import java.util.ArrayList;
  */
 public class ListenerThread implements Runnable {
     private static ArrayList<Player> players = new ArrayList<>();
+    private static State gameState;
     //private static State gameState;
 
     private final int ACK_TIMEOUT, MOVE_TIMEOUT;
@@ -54,8 +56,6 @@ public class ListenerThread implements Runnable {
         if (command instanceof JoinGameCommand) {
             reply(new AcceptJoinGameCommand(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
 
-            //System.out.println("Player " + ID +": " + output);
-            //client.setPlayerId(ID);
             String playerName = ((JoinGameCommand) command).getName();
             player = new Player(ID, client, playerName);
             players.add(player);
@@ -124,8 +124,16 @@ public class ListenerThread implements Runnable {
             }
             state = state.next();
 
+
+
             // Start forwarding every message as is.
             fw = new HostForwarder(messageQueue, MOVE_TIMEOUT, ACK_TIMEOUT, ID, input);
+            while (!fw.hasSeed()) Thread.sleep(10);
+            fw.getFirstPlayer();
+            state = InitState.FIRST_PLAYER_ELECTABLE;
+            while (!fw.hasSeed()) Thread.sleep(10);
+            fw.shuffleDeck();
+            state = InitState.DECK_SHUFFLED;
             fw.playGame();
 
         } catch(InitialisationException | SocketTimeoutException f) {
@@ -136,6 +144,8 @@ public class ListenerThread implements Runnable {
                 System.err.println("Error when sending timeout");
             }
         } catch(IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -183,5 +193,9 @@ public class ListenerThread implements Runnable {
 
     public void signalMove(){
         fw.signalMove();
+    }
+
+    public static void setState(State gameState){
+        ListenerThread.gameState = gameState;
     }
 }

@@ -1,7 +1,11 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import org.json.simple.JSONArray;
+import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.Map;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.InitialiseGameCommand;
 
 import java.io.IOException;
@@ -72,6 +76,31 @@ public class ServerSocketHandler implements Runnable {
             while (!allInitialised(InitState.STAGE_PLAYING)) ;  //wait on acknowledgements
             InitialiseGameCommand command = generateInitGame();
             s.sendAll(command, isServerPlaying ? 0 : null);
+
+            // Setting up the initial game state
+            State gameState = new State();
+            Map map = new Map();
+            gameState.setup(map, ListenerThread.getPlayers());
+            ListenerThread.setState(gameState);
+            HostForwarder.setState(gameState);
+            RNGSeed seed = new RNGSeed(ListenerThread.getPlayers().size());
+            HostForwarder.setSeed(seed);
+
+            while (!allInitialised(InitState.FIRST_PLAYER_ELECTABLE));
+            RandomNumbers r = new RandomNumbers(seed.getHexSeed());
+            int startingPlayer = (r.getRandomByte()+128)%ListenerThread.getPlayers().size();
+            gameState.setFirstPlayer(gameState.getPlayer(startingPlayer));
+
+            System.err.println("STARTING PLAYER IS " + startingPlayer);
+
+            seed = new RNGSeed(ListenerThread.getPlayers().size());
+            HostForwarder.setSeed(seed);
+            while (!allInitialised(InitState.DECK_SHUFFLED));
+            gameState.shuffleRiskCards(seed);
+
+            System.err.println("SHUFFLED CARD DECK");
+
+
         } catch (IOException e){
             System.err.println("Error while initialising game");
         }

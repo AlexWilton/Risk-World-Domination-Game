@@ -7,7 +7,8 @@ public enum InitState {
     STAGE_CONNECTING,
     STAGE_PING,
     STAGE_READY,
-    STAGE_PLAYING;
+    STAGE_PLAYING,
+    FIRST_PLAYER_ELECTABLE, DECK_SHUFFLED;
 
     private static InitState[] vals = values();
 

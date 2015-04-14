@@ -1,5 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.PingCommand;
@@ -14,9 +15,11 @@ import java.util.Map;
 public class MessageQueue {
     private final Integer ID;
     private HashMap<Integer, ListenerThread> sockets = new HashMap<>();
+    private WebClient client;
 
-    public MessageQueue(boolean isHostPlaying) {
+    public MessageQueue(boolean isHostPlaying, WebClient client) {
         ID = isHostPlaying? 0 : null;
+        this.client = client;
     }
 
     public synchronized void sendPing(int payload) throws IOException {
@@ -32,12 +35,13 @@ public class MessageQueue {
         int ack_id = -1;
         if (signal_ack)
             ack_id = Integer.parseInt(comm.get("ack_id").toString());
+
         for (Map.Entry<Integer, ListenerThread> e : sockets.entrySet()){
             if (e.getKey() != id){
                 ListenerThread w = e.getValue();
                 w.reply(comm);
                 if (signal_ack){
-                    w.signal(ack_id);
+                    w.signalAck(ack_id);
                 }
             }
         }

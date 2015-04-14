@@ -1,7 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import org.json.simple.JSONArray;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.InitialiseGameCommand;
 
@@ -11,7 +10,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class ServerSocketHandler implements Runnable {
-    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 1000000, MOVE_TIMEOUT = 3000000;
+    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 1, MOVE_TIMEOUT = 3;
     public static final int MAX_PLAYER_COUNT = 6, MIN_PLAYER_COUNT = 2; //needed for web client to know the range of allowed number of players. (needs to be public)
     private WebClient webClient;
     private ServerSocket server;
@@ -40,13 +39,13 @@ public class ServerSocketHandler implements Runnable {
     public void run() {
         int i = 0;
         clientSocketPool = new ArrayList<>();
-        MessageQueue s = new MessageQueue(isServerPlaying);
+        MessageQueue s = new MessageQueue(isServerPlaying, webClient);
         while (!gameInProgress) {
             try {
                 // Open the gates!
                 Socket temp = server.accept();
                 System.out.println("New client connected");
-                ListenerThread client = new ListenerThread(temp, i, new NetworkClient(null), ACK_TIMEOUT, MOVE_TIMEOUT, s);
+                ListenerThread client = new ListenerThread(temp, i, webClient, ACK_TIMEOUT, MOVE_TIMEOUT, s);
                 clientSocketPool.add(i++, client);
                 // Make new Thread for client.
                 Thread t = new Thread(client);

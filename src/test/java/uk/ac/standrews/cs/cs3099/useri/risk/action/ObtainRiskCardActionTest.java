@@ -57,7 +57,7 @@ public class ObtainRiskCardActionTest {
         assertTrue(action.validateAgainstState(testState));
         action.performOnState(testState);
         assertEquals(1, playerA.getCards().size());
-        assertEquals(0, playerA.getCards().get(0).getCardID());
+        //assertEquals(0, playerA.getCards().get(0).getCardID()); Unfortunately the order cannot be tested anymore since it's random.
 
     }
 }

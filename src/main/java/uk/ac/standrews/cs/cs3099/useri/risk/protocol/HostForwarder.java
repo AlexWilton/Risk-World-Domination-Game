@@ -17,6 +17,7 @@ public class HostForwarder  {
     private final int ID;
     private BufferedReader input;
     private boolean ack_received;
+    private boolean move_required;
 
     private double timer = System.currentTimeMillis();
     private double diff;
@@ -34,8 +35,9 @@ public class HostForwarder  {
 
     void playGame() throws IOException {
         while(true) {
-            if (System.currentTimeMillis() > timer + MOVE_TIMEOUT)
+            if (move_required && System.currentTimeMillis() > timer + diff) {
                 throw new SocketTimeoutException();
+            }
             if (!ack_received && System.currentTimeMillis() > timer + diff) {
                 throw new SocketTimeoutException();
             }
@@ -55,13 +57,22 @@ public class HostForwarder  {
                 timer = System.currentTimeMillis();
                 diff = MOVE_TIMEOUT;
             }
+        } else {
+            move_required = false;
+            timer = System.currentTimeMillis();
         }
     }
 
-    public void signal(int ack_id) {
+    public void signalAck(int ack_id) {
         last_ack = ack_id;
         timer = System.currentTimeMillis();
         ack_received = false;
         diff = ACK_TIMEOUT;
+    }
+
+    public void signalMove() {
+        move_required = true;
+        timer = System.currentTimeMillis();
+        diff = MOVE_TIMEOUT;
     }
 }

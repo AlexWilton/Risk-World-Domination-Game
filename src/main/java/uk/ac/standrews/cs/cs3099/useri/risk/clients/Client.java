@@ -7,7 +7,6 @@ import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
 
 import java.util.ArrayDeque;
-import java.util.Objects;
 import java.util.Queue;
 
 /**
@@ -150,6 +149,7 @@ public abstract class Client {
 
     public void setState(State gameState){
         this.gameState = gameState;
+        System.out.println("Got new State!");
     }
 
     public void pushRollHash(String rollHash){

@@ -55,7 +55,7 @@ public class ListenerThread implements Runnable {
             reply(new AcceptJoinGameCommand(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
 
             //System.out.println("Player " + ID +": " + output);
-            client.setPlayerId(ID);
+            //client.setPlayerId(ID);
             String playerName = ((JoinGameCommand) command).getName();
             player = new Player(ID, client, playerName);
             players.add(player);
@@ -176,8 +176,12 @@ public class ListenerThread implements Runnable {
         return players;
     }
 
-    public void signal(int ack_id) throws IOException{
+    public void signalAck(int ack_id) throws IOException{
         if (fw != null)
-            fw.signal(ack_id);
+            fw.signalAck(ack_id);
+    }
+
+    public void signalMove(){
+        fw.signalMove();
     }
 }

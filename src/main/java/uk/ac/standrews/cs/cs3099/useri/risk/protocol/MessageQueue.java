@@ -6,74 +6,45 @@ import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.PingCommand;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.PlayersJoinedCommand;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.ReadyCommand;
 
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MessageQueue {
-    private boolean flag = false;
-    private static Command command;
-    private boolean[] player_connected;
-    private boolean[] sentMessage;
     private final Integer ID;
-    private HashMap<Integer, PrintWriter> sockets = new HashMap<>();
+    private HashMap<Integer, ListenerThread> sockets = new HashMap<>();
 
-    public MessageQueue(int players , boolean isHostPlaying) {
-        sentMessage = new boolean[players];
-        player_connected = new boolean[players];
+    public MessageQueue(boolean isHostPlaying) {
         ID = isHostPlaying? 0 : null;
     }
 
-
-
-    public synchronized Command probablyGetMessage(int id) {
-        if (!flag) {
-            return null;
-        }
-        if (sentMessage[id])
-            return null;
-
-        sentMessage[id] = true;
-        if (sentAll()){
-            flag = false;
-        }
-        notifyAll();
-        return command;
-    }
-
-    private synchronized boolean sentAll() {
-        for (int i = 0; i<sentMessage.length; i++){
-            if (!sentMessage[i] && player_connected[i]){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public synchronized void sendPing(int payload) {
+    public synchronized void sendPing(int payload) throws IOException {
         sendAll(new PingCommand(ID, payload), ID);
     }
 
-    public synchronized void sendReady() {
-        sendAll(new ReadyCommand(ID, 1), ID);
+    public synchronized void sendReady() throws IOException {
+        sendAll(new ReadyCommand(ID), ID);
     }
 
-    public synchronized void sendAll(Command comm, Integer id) {
-        for (Map.Entry<Integer, PrintWriter> e : sockets.entrySet()){
+    public synchronized void sendAll(Command comm, Integer id)  throws IOException {
+        boolean signal_ack = comm.requiresAcknowledgement();
+        int ack_id = -1;
+        if (signal_ack)
+            ack_id = Integer.parseInt(comm.get("ack_id").toString());
+        for (Map.Entry<Integer, ListenerThread> e : sockets.entrySet()){
             if (e.getKey() != id){
-                PrintWriter w = e.getValue();
-                //System.out.println(e.getValue());
-                System.out.println("Player " + e.getKey() + ": " + comm);
-                w.println(comm);
-                w.flush();
+                ListenerThread w = e.getValue();
+                w.reply(comm);
+                if (signal_ack){
+                    w.signal(ack_id);
+                }
             }
         }
     }
 
-    public synchronized void addPlayer(int id, PrintWriter out, Player player){
-        player_connected[id] = true;
-        sockets.put(id, out);
+    public synchronized void addPlayer(int id, ListenerThread t, Player player) throws IOException {
+        sockets.put(id, t);
         ArrayList<Player> players = new ArrayList<>();
         players.add(player);
         sendAll(new PlayersJoinedCommand(players), id);

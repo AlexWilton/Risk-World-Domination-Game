@@ -2,7 +2,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.exceptions.InitialisationException;
 
@@ -34,6 +33,7 @@ public class ListenerThread implements Runnable {
     private MessageQueue messageQueue;
     private int version;
     private ArrayList<String> customs;
+    private HostForwarder fw;
 
 
     public ListenerThread(Socket sock, int id, Client client, int ack_timeout, int move_timeout, MessageQueue q) {
@@ -62,7 +62,7 @@ public class ListenerThread implements Runnable {
             customs = ((JoinGameCommand) command).getFeatures();
             version = ((JoinGameCommand) command).getVersion();
             // Send player list to all connected players.
-            messageQueue.addPlayer(ID, output, player);
+            messageQueue.addPlayer(ID, this, player);
             reply(new PlayersJoinedCommand(players));
             //reply(messageQueue.getMessage(ID));
             return true;
@@ -83,7 +83,7 @@ public class ListenerThread implements Runnable {
         }
     }
 
-    private void reply(Command command) {
+    protected void reply(Command command) {
         if (command == null)
             return;
         System.out.println("Player " + ID + ": " + command);
@@ -105,10 +105,6 @@ public class ListenerThread implements Runnable {
 
             // Initialise the connection
             if(initialiseConnection()){
-                Command comm;
-                /*while ((comm = messageQueue.probablyGetMessage(ID)) != null){
-                    reply(comm);
-                }*/
                 state = state.next();
             }
 
@@ -128,28 +124,17 @@ public class ListenerThread implements Runnable {
             }
             state = state.next();
 
-            // here, the game is initialised with a final list of players.
-            /*while (true){
-                //Command comm = messageQueue.getMessage(ID);
-                /*reply(comm);
-                if (comm == null) continue;
-                if (comm.getClass().equals(InitialiseGameCommand.class)){
-                    break;
-                }/
-            }*/
-
             // Start forwarding every message as is.
-            HostForwarder fw = new HostForwarder(messageQueue, MOVE_TIMEOUT, ACK_TIMEOUT, ID, input, output);
+            fw = new HostForwarder(messageQueue, MOVE_TIMEOUT, ACK_TIMEOUT, ID, input);
             fw.playGame();
 
         } catch(InitialisationException | SocketTimeoutException f) {
-            Command comm;
-            /*while ((comm = messageQueue.probablyGetMessage(ID)) != null) {
-                reply(comm);
-            }*/
-            messageQueue.sendAll(new TimeOutCommand(ID, null), null);
-            //reply(messageQueue.getMessage(ID));
-            purgeConnection();
+            try {
+                messageQueue.sendAll(new TimeOutCommand(ID, null), null);
+                purgeConnection();
+            } catch (Exception e) {
+                System.err.println("Error when sending timeout");
+            }
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -162,16 +147,9 @@ public class ListenerThread implements Runnable {
     private Command waitingOn(Class<?> c){
         Command reply;
         while(true){
-            //Command comm = messageQueue.probablyGetMessage(ID);
-            //reply(comm);
-            //if (comm == null)
-                //continue;
-            //if (comm.getClass().equals(c)) {
                 try {
                     while (!input.ready());
                     reply = Command.parseCommand(input.readLine());
-                    //while ((comm = messageQueue.probablyGetMessage(ID)) != null)
-                    //    reply(comm);
                     messageQueue.sendAll(reply, ID);
                     break;
                 } catch (IOException e){
@@ -179,7 +157,6 @@ public class ListenerThread implements Runnable {
                 }
 
             }
-        //}
         return reply;
     }
 
@@ -197,5 +174,10 @@ public class ListenerThread implements Runnable {
 
     public static ArrayList<Player> getPlayers() {
         return players;
+    }
+
+    public void signal(int ack_id) throws IOException{
+        if (fw != null)
+            fw.signal(ack_id);
     }
 }

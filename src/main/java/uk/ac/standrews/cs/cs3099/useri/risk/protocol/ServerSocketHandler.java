@@ -11,7 +11,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class ServerSocketHandler implements Runnable {
-    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 100000, MOVE_TIMEOUT = 300000;
+    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 1000000, MOVE_TIMEOUT = 3000000;
     public static final int MAX_PLAYER_COUNT = 6, MIN_PLAYER_COUNT = 2; //needed for web client to know the range of allowed number of players. (needs to be public)
     private WebClient webClient;
     private ServerSocket server;
@@ -40,7 +40,7 @@ public class ServerSocketHandler implements Runnable {
     public void run() {
         int i = 0;
         clientSocketPool = new ArrayList<>();
-        MessageQueue s = new MessageQueue(NUMBER_OF_PLAYERS, isServerPlaying);
+        MessageQueue s = new MessageQueue(isServerPlaying);
         while (!gameInProgress) {
             try {
                 // Open the gates!
@@ -65,14 +65,17 @@ public class ServerSocketHandler implements Runnable {
             }
         }
 
-        while (!allInitialised(InitState.STAGE_PING));  //wait for all clients to pass the init stage.
-        s.sendPing(i);
-        while (!allInitialised(InitState.STAGE_READY));  //wait on ping commands to be received.
-        s.sendReady();
-        while (!allInitialised(InitState.STAGE_PLAYING));  //wait on acknowledgements
-        InitialiseGameCommand command = generateInitGame();
-        s.sendAll(command, isServerPlaying? 0 : null);
-
+        try {
+            while (!allInitialised(InitState.STAGE_PING)) ;  //wait for all clients to pass the init stage.
+            s.sendPing(i);
+            while (!allInitialised(InitState.STAGE_READY)) ;  //wait on ping commands to be received.
+            s.sendReady();
+            while (!allInitialised(InitState.STAGE_PLAYING)) ;  //wait on acknowledgements
+            InitialiseGameCommand command = generateInitGame();
+            s.sendAll(command, isServerPlaying ? 0 : null);
+        } catch (IOException e){
+            System.err.println("Error while initialising game");
+        }
         //TODO ListenerThread remove player if error occurs!
 
         // When all ListenerThreads finished, close the game gracefully.

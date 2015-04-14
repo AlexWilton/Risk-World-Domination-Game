@@ -10,7 +10,7 @@ public class ReadyCommand extends Command {
 
     public static final String COMMAND_STRING = "ready";
     
-    public ReadyCommand(Integer id, int ack_id) {
+    public ReadyCommand(Integer id) {
         super("ready");
         this.put("payload", null);
         this.put("player_id", id);

@@ -14,7 +14,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class ServerSocketHandler implements Runnable {
-    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 1, MOVE_TIMEOUT = 30;
+    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 100, MOVE_TIMEOUT = 3000;
     public static final int MAX_PLAYER_COUNT = 6, MIN_PLAYER_COUNT = 2; //needed for web client to know the range of allowed number of players. (needs to be public)
     private WebClient webClient;
     private ServerSocket server;
@@ -79,6 +79,7 @@ public class ServerSocketHandler implements Runnable {
 
             // Setting up the initial game state
             State gameState = new State();
+            webClient.setState(gameState);
             Map map = new Map();
             gameState.setup(map, ListenerThread.getPlayers());
             ListenerThread.setState(gameState);

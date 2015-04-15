@@ -37,7 +37,6 @@ function updatePlayerDisplay(){
     playerInfo += "<h3>Players</h3>";
     game_state.players.forEach(function(player){
         playerInfo += "<h5><small>Player " + player.ID + ":</small> <strong style='color: " + colors[player.ID] + "'>" + player.name + "</strong>";
-        if(player.ID == game_state.currentPlayer.ID) playerInfo += " <small>(Myself)</small>";
         playerInfo += "</h5>";
     });
     $("#playerInfo").html(playerInfo);

@@ -52,7 +52,7 @@ public class HostForwarder {
         HostForwarder.seed = seed;
     }
 
-    void getFirstPlayer() throws IOException {
+    protected void getRolls() throws IOException, InterruptedException {
         Command comm = Command.parseCommand(input.readLine());
         messageQueue.sendAll(comm, ID);
         if (!(comm instanceof RollHashCommand)) {
@@ -62,7 +62,7 @@ public class HostForwarder {
         String hashStr = hash.get("payload").toString();
         seed.addSeedComponentHash(hashStr, ID);
 
-        while (!seed.hasAllHashes());
+        while (!seed.hasAllHashes()) Thread.sleep(10);
 
         comm = Command.parseCommand(input.readLine());
         messageQueue.sendAll(comm, ID);
@@ -76,30 +76,8 @@ public class HostForwarder {
         //seed = null;
     }
 
-    void shuffleDeck() throws IOException {
-        Command comm = Command.parseCommand(input.readLine());
-        messageQueue.sendAll(comm, ID);
-        if (!(comm instanceof RollHashCommand)) {
-            throw new RollException();
-        }
-        RollHashCommand hash = (RollHashCommand) comm;
-        String hashStr = hash.get("payload").toString();
-        seed.addSeedComponentHash(hashStr, ID);
-
-        while (!seed.hasAllHashes());
-
-        comm = Command.parseCommand(input.readLine());
-        messageQueue.sendAll(comm, ID);
-        if (!(comm instanceof RollNumberCommand)) {
-            throw new RollException();
-        }
-        RollNumberCommand roll = (RollNumberCommand) comm;
-        String rollStr = roll.get("payload").toString();
-        seed.addSeedComponent(rollStr, ID);
-    }
-
-    void playGame() throws IOException {
-        //System.err.println(state.getCurrentPlayer().getID() == state.getFirstPlayer().getID());
+    protected void playGame() throws IOException {
+        //System.err.println(state.getCurrentPlayer().getID() == state.getRolls().getID());
         while(true) {
             if (move_required && System.currentTimeMillis() > timer + MOVE_TIMEOUT) {
                 System.err.println("Mov from " + ID + " timed out");
@@ -119,7 +97,6 @@ public class HostForwarder {
                 System.out.println("in Player " + ID + ": " + reply);
                 messageQueue.sendAll(reply, ID);
                 checkAckCases(reply);
-
             }
         }
     }
@@ -158,6 +135,9 @@ public class HostForwarder {
         else if (currentCommand instanceof PlayCardsCommand){
             playerActions.addAll(processPlayCardsCommand((PlayCardsCommand) currentCommand));
         }
+        else if (currentCommand instanceof DefendCommand){
+            processDefendCommand((DefendCommand) currentCommand);
+        }
         else {
             System.out.println("cant process command " + currentCommand.toJSONString());
             return;
@@ -187,6 +167,10 @@ public class HostForwarder {
         move_required = false;
         //state.nextPlayer();
         timer = System.currentTimeMillis();
+    }
+
+    private void processDefendCommand(DefendCommand currentCommand) {
+        state.getPlayer(ID).getClient().pushCommand(currentCommand);
     }
 
     private ArrayList<TradeAction> processPlayCardsCommand(PlayCardsCommand command){
@@ -241,12 +225,13 @@ public class HostForwarder {
         int attackArmies = Integer.parseInt(attackPlan.get(2).toString());
 
         // TODO Need to pull the defendCommand from somewhere, but how?
-        DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId,objectiveId,attackArmies);
-        //if its local, propagate
-        if (state.getCountryByID(objectiveId).getOwner().getClient().isLocal()) {
-            //csh.sendCommand(def);
-        }
+        // Now if a DefendCommand arrives then we need Stuff.
+        DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId, objectiveId, attackArmies);
         int defendArmies = def.getPayloadAsInt();
+
+        // Get rolls from all clients...
+        messageQueue.getRolls();
+
         RandomNumbers rng = new RandomNumbers(seed.getHexSeed());
 
         int[] attackDice = new int [attackArmies];

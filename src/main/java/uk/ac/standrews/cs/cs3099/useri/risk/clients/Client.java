@@ -101,7 +101,6 @@ public abstract class Client {
         if (command instanceof DefendCommand){
             defendCommand=(DefendCommand)command;
         }
-
         else{
             commandQueue.add(command);
         }
@@ -123,22 +122,15 @@ public abstract class Client {
 
     public DefendCommand popDefendCommand(int origin, int target, int armies) {
         while (defendCommand == null){
-
-
-
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-
         DefendCommand ret = defendCommand;
-
         defendCommand = null;
-
         return ret;
-
     }
 
     public abstract boolean isLocal();

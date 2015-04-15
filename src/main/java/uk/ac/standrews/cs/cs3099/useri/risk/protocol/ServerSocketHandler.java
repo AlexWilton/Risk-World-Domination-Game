@@ -33,7 +33,7 @@ public class ServerSocketHandler implements Runnable {
         try {
             this.server = new ServerSocket(PORT);
             // Initially, the socket timeout would be 1s.
-            server.setSoTimeout(1000);
+            // server.setSoTimeout(1000);
         } catch (IOException e) {
             System.err.print("The server could not be started:\n\t");
             System.err.println(e.getMessage());
@@ -86,20 +86,22 @@ public class ServerSocketHandler implements Runnable {
             RNGSeed seed = new RNGSeed(ListenerThread.getPlayers().size());
             HostForwarder.setSeed(seed);
 
+            // Elect first player by dice roll and shuffle cards deck.
             while (!allInitialised(InitState.FIRST_PLAYER_ELECTABLE));
             RandomNumbers r = new RandomNumbers(seed.getHexSeed());
             int startingPlayer = (r.getRandomByte()+128)%ListenerThread.getPlayers().size();
             gameState.setFirstPlayer(gameState.getPlayer(startingPlayer));
-
+            gameState.setCurrentPlayer(startingPlayer);
+            HostForwarder.setSeed(null);
             System.err.println("STARTING PLAYER IS " + startingPlayer);
 
             seed = new RNGSeed(ListenerThread.getPlayers().size());
             HostForwarder.setSeed(seed);
+            ListenerThread.shuffleCards();
             while (!allInitialised(InitState.DECK_SHUFFLED));
+            System.err.println("STUFF");
             gameState.shuffleRiskCards(seed);
-
             System.err.println("SHUFFLED CARD DECK");
-
 
         } catch (IOException e){
             System.err.println("Error while initialising game");

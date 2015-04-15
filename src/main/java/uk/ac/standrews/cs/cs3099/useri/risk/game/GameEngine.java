@@ -16,20 +16,17 @@ import java.util.ArrayList;
  *
  */
 public class GameEngine implements Runnable{
-	private State state;
-	
-	
-	/**
-	 * This method runs the main game loop
-	 * 
-	 * 1. polls an action from the active client
-	 * 2. verify the action against the current game state
-	 * 3. execute action
-	 * 4. checks win conditions
-	 * 5. sends out update notification to all clients
-	 * 
-	 */
-
+    /**
+     * This method runs the main game loop
+     *
+     * 1. polls an action from the active client
+     * 2. verify the action against the current game state
+     * 3. execute action
+     * 4. checks win conditions
+     * 5. sends out update notification to all clients
+     *
+     */
+    private State state;
     private ClientSocketHandler csh;
 
     public GameEngine(ClientSocketHandler csh){
@@ -42,77 +39,9 @@ public class GameEngine implements Runnable{
         gameLoop();
     }
 
-	public void gameLoop(){
-		System.out.println("Game Loop running...");
-        Player currentPlayer;
-        while(true) {
-            currentPlayer = state.getCurrentPlayer();
-            System.out.println("Ask player " + currentPlayer.getID() + " (" + currentPlayer.getName() + ")");
-            Command currentCommand = currentPlayer.getClient().popCommand();
-            //if its local, propagate
-            if (csh != null && currentPlayer.getClient().isLocal()){
-               csh.sendCommand(currentCommand);
-            }
-            ArrayList<Action> playerActions = new ArrayList<>();
-            if (currentCommand instanceof AttackCommand){
-                playerActions.add(processAttackCommand((AttackCommand) currentCommand));
-            }
-            else if (currentCommand instanceof DeployCommand){
-                playerActions.addAll(processDeployCommand((DeployCommand) currentCommand));
-            }
-            else if (currentCommand instanceof FortifyCommand){
-                playerActions.add(processFortifyCommand((FortifyCommand) currentCommand));
-            }
-            else if (currentCommand instanceof DrawCardCommand){
-                playerActions.add(processDrawCardCommand((DrawCardCommand) currentCommand));
-            }
-            else if (currentCommand instanceof SetupCommand){
-                playerActions.add(processSetupCommand((SetupCommand) currentCommand));
-            }
-            else if (currentCommand instanceof PlayCardsCommand){
-                playerActions.add(processPlayCardsCommand((PlayCardsCommand) currentCommand));
-            }
-            else {
-                System.out.println("cant process command " + currentCommand.toJSONString());
-                continue;
-            }
-
-            if (playerActions.size() == 0){
-                System.out.println("End turn");
-                playerActions.add(new FortifyAction(currentPlayer));
-            }
-
-            for(Action playerAction : playerActions) {
-                if (playerAction.validateAgainstState(state)) {
-                    playerAction.performOnState(state);
-                } else {
-                    System.out.println("Error move did not validate: " + currentCommand);
-                    System.exit(1);
-                }
-            }
-
-            if(state.winConditionsMet()){
-                Player winner = state.getWinner();
-
-                System.out.println("Winner is " + winner.getID());
-                //TODO follow endGame protocol
-                System.exit(0);
-            }
-
-        }
-	}
-
-
-	public void initialise(State state){
+    public void initialise(State state){
         this.state = state;
     }
-
-
-    public void initialise(State state, ArrayList<Client> clients){
-        this.state=state;
-    }
-
-
 
     public void initialise(){
         //create gamestate
@@ -161,6 +90,70 @@ public class GameEngine implements Runnable{
 
         csh.linkGameState(state);
 
+    }
+
+	public void gameLoop(){
+		System.out.println("Game Loop running...");
+        Player currentPlayer;
+        while(true) {
+            currentPlayer = state.getCurrentPlayer();
+            System.out.println("Ask player " + currentPlayer.getID() + " (" + currentPlayer.getName() + ")");
+            Command currentCommand = currentPlayer.getClient().popCommand();
+            //if its local, propagate
+            if (csh != null && currentPlayer.getClient().isLocal()){
+               csh.sendCommand(currentCommand);
+            }
+            processCommand(currentPlayer, currentCommand);
+
+        }
+	}
+
+    private void processCommand(Player currentPlayer, Command currentCommand) {
+        ArrayList<Action> playerActions = new ArrayList<>();
+        if (currentCommand instanceof AttackCommand){
+            playerActions.add(processAttackCommand((AttackCommand) currentCommand));
+        }
+        else if (currentCommand instanceof DeployCommand){
+            playerActions.addAll(processDeployCommand((DeployCommand) currentCommand));
+        }
+        else if (currentCommand instanceof FortifyCommand){
+            playerActions.add(processFortifyCommand((FortifyCommand) currentCommand));
+        }
+        else if (currentCommand instanceof DrawCardCommand){
+            playerActions.add(processDrawCardCommand((DrawCardCommand) currentCommand));
+        }
+        else if (currentCommand instanceof SetupCommand){
+            playerActions.add(processSetupCommand((SetupCommand) currentCommand));
+        }
+        else if (currentCommand instanceof PlayCardsCommand){
+            playerActions.add(processPlayCardsCommand((PlayCardsCommand) currentCommand));
+        }
+        else {
+            System.out.println("cant process command " + currentCommand.toJSONString());
+            return;
+        }
+
+        if (playerActions.size() == 0){
+            System.out.println("End turn");
+            playerActions.add(new FortifyAction(currentPlayer));
+        }
+
+        for(Action playerAction : playerActions) {
+            if (playerAction.validateAgainstState(state)) {
+                playerAction.performOnState(state);
+            } else {
+                System.out.println("Error move did not validate: " + currentCommand);
+                System.exit(1);
+            }
+        }
+
+        if(state.winConditionsMet()){
+            Player winner = state.getWinner();
+
+            System.out.println("Winner is " + winner.getID());
+            //TODO follow endGame protocol
+            System.exit(0);
+        }
     }
 
 

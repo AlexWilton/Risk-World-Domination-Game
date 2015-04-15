@@ -69,7 +69,7 @@ public class HostForwarder {
         String rollStr = roll.get("payload").toString();
         seed.addSeedComponent(rollStr, ID);
 
-        seed = null;
+        //seed = null;
     }
 
     void shuffleDeck() throws IOException {
@@ -95,12 +95,20 @@ public class HostForwarder {
     }
 
     void playGame() throws IOException {
+        //System.err.println(state.getCurrentPlayer().getID() == state.getFirstPlayer().getID());
         while(true) {
-            if (move_required && System.currentTimeMillis() > timer + diff) {
+            if (move_required && System.currentTimeMillis() > timer + MOVE_TIMEOUT) {
+                System.err.println("Mov from " + ID + " timed out");
                 throw new SocketTimeoutException();
             }
-            if (!ack_received && System.currentTimeMillis() > timer + diff) {
+            if (!ack_received && System.currentTimeMillis() > timer + ACK_TIMEOUT) {
+                System.err.println("Ack from " + ID + " timed out");
                 throw new SocketTimeoutException();
+            }
+            if (!move_required && state.getCurrentPlayer().getID() == ID){
+                move_required = true;
+                System.out.println("Player " + ID + "'s turn'");
+                timer = System.currentTimeMillis();
             }
             if (input.ready()) {
                 Command reply = Command.parseCommand(input.readLine());
@@ -116,10 +124,11 @@ public class HostForwarder {
             if (((AcknowledgementCommand) comm).getAcknowledgementId() == last_ack) {
                 ack_received = true;
                 timer = System.currentTimeMillis();
-                diff = MOVE_TIMEOUT;
+                //diff = MOVE_TIMEOUT;
             }
         } else {
             move_required = false;
+            state.nextPlayer();
             timer = System.currentTimeMillis();
         }
     }
@@ -128,13 +137,7 @@ public class HostForwarder {
         last_ack = ack_id;
         timer = System.currentTimeMillis();
         ack_received = false;
-        diff = ACK_TIMEOUT;
-    }
-
-    public void signalMove() {
-        move_required = true;
-        timer = System.currentTimeMillis();
-        diff = MOVE_TIMEOUT;
+        //diff = ACK_TIMEOUT;
     }
 
     boolean hasSeed() {

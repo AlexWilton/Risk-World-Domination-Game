@@ -1,5 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
@@ -52,5 +53,18 @@ public class MessageQueue {
         ArrayList<Player> players = new ArrayList<>();
         players.add(player);
         sendAll(new PlayersJoinedCommand(players), id);
+    }
+
+    public void getRolls(){
+        HostForwarder.setSeed(new RNGSeed(sockets.size()));
+        try {
+            for (ListenerThread l : sockets.values()) {
+                l.getRolls();
+            }
+        } catch(IOException | InterruptedException e) {
+            //There is nothing to do here, just exit, the protocol has failed.
+            System.err.println("Could not get dice rolls, protocol failed");
+            System.exit(1);
+        }
     }
 }

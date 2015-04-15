@@ -7,7 +7,7 @@ $( document ).ready(function(){
         $.ajax( "/?operation=host_game&" + requestParams )
             .done(function(response) {
                 if(response.indexOf("true") == 0){
-                    if(!$("#hostForm").find(":input[name=is_host_playing]").val()== "true")
+                    if($("#hostForm").find("input:checked[name=is_host_playing]").val() == "false")
                         nonPlayingHost = true;
                     gotoGamePlayWhenReady();
                 }else{

@@ -21,6 +21,8 @@ import java.util.ArrayList;
 public class ListenerThread implements Runnable {
     private static ArrayList<Player> players = new ArrayList<>();
     private static State gameState;
+    private static boolean shuffle;
+    private static boolean play;
     //private static State gameState;
 
     private final int ACK_TIMEOUT, MOVE_TIMEOUT;
@@ -129,10 +131,11 @@ public class ListenerThread implements Runnable {
             // Start forwarding every message as is.
             fw = new HostForwarder(messageQueue, MOVE_TIMEOUT, ACK_TIMEOUT, ID, input);
             while (!fw.hasSeed()) Thread.sleep(10);
-            fw.getFirstPlayer();
+            fw.getRolls();
             state = InitState.FIRST_PLAYER_ELECTABLE;
-            while (!fw.hasSeed()) Thread.sleep(10);
-            fw.shuffleDeck();
+            //HostForwarder.setSeed(null);
+            while (!(fw.hasSeed() && shuffle)) Thread.sleep(10);
+            fw.getRolls();
             state = InitState.DECK_SHUFFLED;
             fw.playGame();
 
@@ -143,9 +146,7 @@ public class ListenerThread implements Runnable {
             } catch (Exception e) {
                 System.err.println("Error when sending timeout");
             }
-        } catch(IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch(IOException | InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -191,11 +192,15 @@ public class ListenerThread implements Runnable {
             fw.signalAck(ack_id);
     }
 
-    public void signalMove(){
-        fw.signalMove();
-    }
-
     public static void setState(State gameState){
         ListenerThread.gameState = gameState;
+    }
+
+    public static void shuffleCards() {
+        shuffle = true;
+    }
+
+    public void getRolls() throws IOException, InterruptedException {
+        fw.getRolls();
     }
 }

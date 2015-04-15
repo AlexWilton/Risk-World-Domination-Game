@@ -8,12 +8,22 @@ import java.util.HashSet;
 
 public class ContinentSet  extends HashSet<Continent> implements JSONAware{
 
+    /**
+     * Checks whether given Object obj is an instance of the Continent object and whether it is in this ContinentSet or not
+     * @param obj : object to be checked
+     * @return boolean
+     */
     public boolean contains(Object obj){
         if(obj instanceof Continent)
             return contains((Continent) obj);
         return false;
     }
 
+    /**
+     * Checks whether given Continent continent is in this particular ContinentSet by comparing the ID.
+     * @param continent : Continent object to be checked
+     * @return boolean
+     */
     public boolean contains(Continent continent){
         for(Continent c : this){
             if(c.getId() == continent.getId()) return true;
@@ -22,6 +32,12 @@ public class ContinentSet  extends HashSet<Continent> implements JSONAware{
 
     }
 
+
+    /**
+     * Returns Continent Object in the continent set with matching given id.
+     * @param id
+     * @return Continent which matches with the given id
+     */
     public Continent get(int id) {
         for(Continent c : this){
             if(c.getId() == id)
@@ -30,6 +46,10 @@ public class ContinentSet  extends HashSet<Continent> implements JSONAware{
         return null;
     }
 
+    /**
+     *
+     * @return list of ids that exists in this set
+     */
     public ArrayList<Integer> getIDList(){
         ArrayList<Integer> ids = new ArrayList<Integer>();
         for(Continent c : this){

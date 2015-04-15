@@ -15,6 +15,14 @@ public class ClientApp {
     public static final int COMMUNICATION_FAILED = -4;
     public static final int PROTOCOL_ERROR_DETECTED = -5;
 
+
+    /**
+     * Main Thread of the Executable
+     * @param address of the server
+     * @param port of the connecting server
+     * @param localClient Client instance
+     * @return state of initialisation of the game
+     */
     public static int run (String address, int port, Client localClient) {
         ClientSocketHandler socketHandler = new ClientSocketHandler();
         float[] versions = {1};

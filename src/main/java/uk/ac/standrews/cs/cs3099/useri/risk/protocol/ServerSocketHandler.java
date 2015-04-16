@@ -43,7 +43,7 @@ public class ServerSocketHandler implements Runnable {
     public void run() {
         int i = 0;
         clientSocketPool = new ArrayList<>();
-        MessageQueue s = new MessageQueue(isServerPlaying, webClient);
+        MessageQueue s = new MessageQueue(isServerPlaying);
         while (!gameInProgress) {
             try {
                 // Open the gates!
@@ -82,7 +82,6 @@ public class ServerSocketHandler implements Runnable {
             webClient.setState(gameState);
             Map map = new Map();
             gameState.setup(map, ListenerThread.getPlayers());
-            ListenerThread.setState(gameState);
             HostForwarder.setState(gameState);
             RNGSeed seed = new RNGSeed(ListenerThread.getPlayers().size());
             HostForwarder.setSeed(seed);
@@ -100,7 +99,6 @@ public class ServerSocketHandler implements Runnable {
             HostForwarder.setSeed(seed);
             ListenerThread.shuffleCards();
             while (notAllInitialised(InitState.DECK_SHUFFLED));
-            System.err.println("STUFF");
             gameState.shuffleRiskCards(seed);
             System.err.println("SHUFFLED CARD DECK");
 

@@ -2,7 +2,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.exceptions.InitialisationException;
 
@@ -20,10 +19,7 @@ import java.util.ArrayList;
  */
 class ListenerThread implements Runnable {
     private static ArrayList<Player> players = new ArrayList<>();
-    private static State gameState;
     private static boolean shuffle;
-    private static boolean play;
-    //private static State gameState;
 
     private final int ACK_TIMEOUT, MOVE_TIMEOUT;
     private final Socket sock;
@@ -130,11 +126,11 @@ class ListenerThread implements Runnable {
 
             // Start forwarding every message as is.
             fw = new HostForwarder(messageQueue, MOVE_TIMEOUT, ACK_TIMEOUT, ID, input);
-            while (fw.hasNoSeed()) Thread.sleep(10);
+            while (!fw.hasSeed()) Thread.sleep(10);
             fw.getRolls();
             state = InitState.FIRST_PLAYER_ELECTABLE;
             //HostForwarder.setSeed(null);
-            while (!(!fw.hasNoSeed() && shuffle)) Thread.sleep(10);
+            while (!(fw.hasSeed() && shuffle)) Thread.sleep(10);
             fw.getRolls();
             state = InitState.DECK_SHUFFLED;
             fw.playGame();
@@ -190,10 +186,6 @@ class ListenerThread implements Runnable {
     public void signalAck(int ack_id) throws IOException{
         if (fw != null)
             fw.signalAck(ack_id);
-    }
-
-    public static void setState(State gameState){
-        ListenerThread.gameState = gameState;
     }
 
     public static void shuffleCards() {

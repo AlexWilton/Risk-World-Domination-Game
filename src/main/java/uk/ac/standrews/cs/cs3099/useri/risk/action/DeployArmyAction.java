@@ -3,7 +3,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.action;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 
 /**
  * Deploying armies at the beginning of the turn. This is compulsory!
@@ -14,7 +13,7 @@ public class DeployArmyAction extends Action{
     private final Country country;
 
     public DeployArmyAction(Player player, Country country, int armies) {
-        super(player, TurnStage.STAGE_DEPLOYING);
+        super(player);
         this.armies = armies;
         this.country = country;
     }

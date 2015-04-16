@@ -21,7 +21,7 @@ public class State implements JSONAware{
 	private Player currentPlayer;
     private Player firstPlayer;
     private Player winner = null;
-    private TurnStage stage = TurnStage.STAGE_TRADING;;
+    private TurnStage stage = TurnStage.STAGE_TRADING;
     private boolean wonBattle = false;
     private int cardSetstradedIn = 0;
     private boolean preGamePlay = true;
@@ -127,7 +127,7 @@ public class State implements JSONAware{
         return map.getAllCountries().get(id);
     }
 
-    public ContinentSet getContinents(){
+    ContinentSet getContinents(){
         return map.getContinents();
     }
 
@@ -216,7 +216,7 @@ public class State implements JSONAware{
         currentPlayer = getPlayer((currentPlayer.getID()+1)%getPlayerAmount());
     }
 
-    public int getPlayerAmount(){
+    int getPlayerAmount(){
         return getPlayers().size();
     }
 
@@ -229,7 +229,7 @@ public class State implements JSONAware{
         return firstPlayer;
     }
 
-    public void preTurnCalculateUnassignedArmies(Player player) {
+    void preTurnCalculateUnassignedArmies(Player player) {
         int territoryCount = player.getOccupiedCountries().size();
         int amount = territoryCount / 3;
         if(amount < 3) amount = 3;

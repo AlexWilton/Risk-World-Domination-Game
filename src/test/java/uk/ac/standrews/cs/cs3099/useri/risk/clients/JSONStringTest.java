@@ -10,7 +10,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.helpers.TestGameStateFactory;
  */
 
 public class JSONStringTest {
-    State testState;
+    private State testState;
 
     @Before
     public void setup(){

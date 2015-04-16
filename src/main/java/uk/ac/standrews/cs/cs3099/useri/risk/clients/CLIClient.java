@@ -15,8 +15,8 @@ import java.util.*;
 
 public class CLIClient extends Client {
 
-    InputStream in;
-    PrintStream out;
+    private InputStream in;
+    private PrintStream out;
 
 
 
@@ -254,7 +254,7 @@ public class CLIClient extends Client {
 
 
 
-    public SetupCommand setupMenu(){
+    SetupCommand setupMenu(){
         out.println("SETUP MENU: SELECT COUNTRY TO OCCUPY");
         Country target = selectCountry(gameState.unoccupiedCountries(),true,true,true);
 

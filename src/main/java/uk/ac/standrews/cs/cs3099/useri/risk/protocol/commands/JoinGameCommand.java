@@ -11,9 +11,9 @@ public class JoinGameCommand extends Command {
 
     public static final String COMMAND_STRING = "join_game";
 
-    JSONArray versions;
-    JSONArray features;
-    String name;
+    private JSONArray versions;
+    private JSONArray features;
+    private String name;
 
 
 

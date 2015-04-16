@@ -9,11 +9,11 @@ public class Command extends JSONObject {
 
     static int ack_id = 0;
 
-    public Command(String command){
+    Command(String command){
         this.put("command", command);
     }
 
-    public Command(JSONObject object){
+    Command(JSONObject object){
         super(object);
     }
 

@@ -3,7 +3,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.action;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 
 /**
  * Voluntary
@@ -17,14 +16,14 @@ public class FortifyAction extends Action {
     private boolean isEndTurnOnly;
 
     public FortifyAction(Player player, Country from, Country to, int armies) {
-        super(player, TurnStage.STAGE_FORTIFY);
+        super(player);
         this.from = from;
         this.to = to;
         this.armies = armies;
     }
 
     public FortifyAction(Player player){
-        super(player,TurnStage.STAGE_FORTIFY);
+        super(player);
         isEndTurnOnly = true;
     }
 
@@ -38,7 +37,7 @@ public class FortifyAction extends Action {
      */
     @Override
     public boolean validateAgainstState(State state) {
-        if (isEndTurnOnly == true){
+        if (isEndTurnOnly){
             return true;
         }
         if (super.validateAgainstState(state)){

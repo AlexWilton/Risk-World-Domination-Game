@@ -4,7 +4,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 import org.json.simple.JSONObject;
 
 public class RollCommand extends Command {
-    public static final String COMMAND_STRING = "roll";
+    private static final String COMMAND_STRING = "roll";
 
     public RollCommand(int diceCount, int diceFaces, int player_id){
         super(COMMAND_STRING);

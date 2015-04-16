@@ -13,7 +13,7 @@ public class MiscUnitTest {
 
     @Test
     public void testRiskCard(){
-        testCard = new RiskCard();
+        //testCard = new RiskCard();
 
     }
 

@@ -4,7 +4,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.GameEngine;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.TestGameStateFactory;
 
-public class ServerTester {
+class ServerTester {
 
     public static void main(String[] args) {
 

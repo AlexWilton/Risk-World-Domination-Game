@@ -69,11 +69,11 @@ public class ServerSocketHandler implements Runnable {
         }
 
         try {
-            while (!allInitialised(InitState.STAGE_PING)) ;  //wait for all clients to pass the init stage.
+            while (notAllInitialised(InitState.STAGE_PING)) ;  //wait for all clients to pass the init stage.
             s.sendPing(i);
-            while (!allInitialised(InitState.STAGE_READY)) ;  //wait on ping commands to be received.
+            while (notAllInitialised(InitState.STAGE_READY)) ;  //wait on ping commands to be received.
             s.sendReady();
-            while (!allInitialised(InitState.STAGE_PLAYING)) ;  //wait on acknowledgements
+            while (notAllInitialised(InitState.STAGE_PLAYING)) ;  //wait on acknowledgements
             InitialiseGameCommand command = generateInitGame();
             s.sendAll(command, isServerPlaying ? 0 : null);
 
@@ -88,7 +88,7 @@ public class ServerSocketHandler implements Runnable {
             HostForwarder.setSeed(seed);
 
             // Elect first player by dice roll and shuffle cards deck.
-            while (!allInitialised(InitState.FIRST_PLAYER_ELECTABLE));
+            while (notAllInitialised(InitState.FIRST_PLAYER_ELECTABLE));
             RandomNumbers r = new RandomNumbers(seed.getHexSeed());
             int startingPlayer = (r.getRandomByte()+128)%ListenerThread.getPlayers().size();
             gameState.setFirstPlayer(gameState.getPlayer(startingPlayer));
@@ -99,7 +99,7 @@ public class ServerSocketHandler implements Runnable {
             seed = new RNGSeed(ListenerThread.getPlayers().size());
             HostForwarder.setSeed(seed);
             ListenerThread.shuffleCards();
-            while (!allInitialised(InitState.DECK_SHUFFLED));
+            while (notAllInitialised(InitState.DECK_SHUFFLED));
             System.err.println("STUFF");
             gameState.shuffleRiskCards(seed);
             System.err.println("SHUFFLED CARD DECK");
@@ -144,14 +144,14 @@ public class ServerSocketHandler implements Runnable {
 
     }
 
-    private boolean allInitialised(InitState state) {
+    private boolean notAllInitialised(InitState state) {
         for (ListenerThread t : clientSocketPool){
             if (!t.initialised(state)){
-                return false;
+                return true;
             }
         }
         System.out.println("All initialised, advancing to next stage");
-        return true;
+        return false;
     }
 
 

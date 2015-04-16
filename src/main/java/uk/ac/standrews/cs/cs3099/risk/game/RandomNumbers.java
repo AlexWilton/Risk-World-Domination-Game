@@ -17,7 +17,7 @@ public class RandomNumbers {
      * Seeds the "random" number generator using a variable length seed
      * @param	seed	the seed to use (in byte array)
      */
-    public void initRng(byte[] seed)
+    void initRng(byte[] seed)
     {
         char i, j, tmp; // Using chars because bytes are signed in java
         int len = seed.length;

@@ -9,7 +9,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import java.util.ArrayList;
 
 public class GameEngineTest {
-    GameEngine engine;
+    private GameEngine engine;
 
     @Before
     public void setUp() throws Exception {

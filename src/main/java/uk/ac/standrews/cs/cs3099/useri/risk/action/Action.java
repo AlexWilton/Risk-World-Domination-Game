@@ -2,7 +2,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.action;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 
 /**
  * abstract Action class
@@ -13,12 +12,12 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
  *
  */
 public abstract class Action {
-    protected Player player;
-    protected TurnStage stage;
+    Player player;
 
-    public Action(Player player, TurnStage stage){
+
+    Action(Player player){
         this.player = player;
-        this.stage = stage;
+
     }
 	/**
 	 * Validates whether the action can be made against the current game state.
@@ -29,13 +28,8 @@ public abstract class Action {
 	 * true if it is valid
 	 * false if there is an error
 	 */
-	public boolean validateAgainstState(State state){
-        if (player.getID() == state.getCurrentPlayer().getID()) {
-            //if (state.getTurnStage().equals(stage)) {
-                return true;
-           // }
-        }
-        return false;
+	public boolean validateAgainstState(State state) {
+        return (player.getID() == state.getCurrentPlayer().getID());
     }
 
 	/**
@@ -43,7 +37,7 @@ public abstract class Action {
 	 */
 	public abstract void performOnState(State state);
 
-    public Player getPlayer() {
+    Player getPlayer() {
         return player;
     }
 }

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MessageQueue {
+class MessageQueue {
     private final Integer ID;
     private HashMap<Integer, ListenerThread> sockets = new HashMap<>();
     private WebClient client;

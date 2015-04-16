@@ -88,7 +88,7 @@ public class ClientSocketHandler implements Runnable{
         return ret;
     }
 
-    public Client getClientById(int id){
+    Client getClientById(int id){
         for (Client c : remoteClients){
             if (c.getPlayerId() == id){
                 return c;
@@ -202,9 +202,7 @@ public class ClientSocketHandler implements Runnable{
         RNGSeed fpSeed = popSeed();
         RandomNumbers r = new RandomNumbers(fpSeed.getHexSeed());
 
-        int startingPlayer = (r.getRandomByte()+128)%getPlayerAmount();
-
-        return startingPlayer;
+        return (r.getRandomByte()+128)%getPlayerAmount();
 
 
     }
@@ -256,7 +254,7 @@ public class ClientSocketHandler implements Runnable{
 
     }
 
-    public void processCommandWaitingPing(Command command){
+    void processCommandWaitingPing(Command command){
         if (command instanceof PlayersJoinedCommand){
             processPlayersJoinedCommand((PlayersJoinedCommand) command);
         }
@@ -269,7 +267,7 @@ public class ClientSocketHandler implements Runnable{
         }
     }
 
-    public void processCommandWaitingReady(Command command) {
+    void processCommandWaitingReady(Command command) {
         if (command instanceof ReadyCommand){
             processReadyCommand((ReadyCommand) command);
         }
@@ -282,7 +280,7 @@ public class ClientSocketHandler implements Runnable{
             System.out.println(command.toJSONString());
         }
     }
-    public void processCommandWaitingInit(Command command){
+    void processCommandWaitingInit(Command command){
 
         if (command instanceof InitialiseGameCommand){
             processInitialiseGameCommand((InitialiseGameCommand) command);
@@ -294,7 +292,7 @@ public class ClientSocketHandler implements Runnable{
 
     }
 
-    public void processCommandRunning (Command command){
+    void processCommandRunning(Command command){
 
         if (command instanceof RollHashCommand){
             processRollHashCommand((RollHashCommand) command);
@@ -361,7 +359,7 @@ public class ClientSocketHandler implements Runnable{
 
         //TODO supposed to ask for ready
         sendCommand(new PingCommand(localClient.getPlayerId(), null));
-        localClient.markPlayReady(true);
+        localClient.markPlayReady();
         protocolState = ProtocolState.WAITING_FOR_READY;
         processCommandRunning(command);
     }
@@ -392,7 +390,7 @@ public class ClientSocketHandler implements Runnable{
         out.flush();
 
     }
-    public Command getNextCommand () throws IOException{
+    Command getNextCommand() throws IOException{
 
         String currentIn = "";
         while (StringUtils.countMatches(currentIn,"{") != StringUtils.countMatches(currentIn,"}") || StringUtils.countMatches(currentIn,"{") == 0){

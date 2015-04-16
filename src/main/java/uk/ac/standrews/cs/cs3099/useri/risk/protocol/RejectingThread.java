@@ -12,7 +12,7 @@ import java.net.Socket;
 /**
  * Thread rejecting new connections after the game has already started. It really doesn't do anything else.
  */
-public class RejectingThread implements Runnable {
+class RejectingThread implements Runnable {
     private ServerSocket server;
     private boolean running = true;
 

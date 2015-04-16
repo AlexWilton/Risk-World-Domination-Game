@@ -3,7 +3,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.action;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 
 import java.util.Arrays;
 
@@ -26,7 +25,7 @@ public class AttackAction extends Action {
 
 
     public AttackAction (Player player, Country attackingCountry, Country defendingCountry, int[] attackerDice, int[] defenderDice) {
-        super(player, TurnStage.STAGE_BATTLES);
+        super(player);
         this.attackingCountry = attackingCountry;
         this.defendingCountry = defendingCountry;
         this.attackerDice = attackerDice;

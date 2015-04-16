@@ -7,7 +7,7 @@ import java.util.Arrays;
 /**
  * Created by patrick on 08/04/15.
  */
-public class MakeRandomAndHashTuples {
+class MakeRandomAndHashTuples {
     public static void main (String argv[]){
         for (int i = 0; i<10;i++){
             byte[] random = RNGSeed.makeRandom256BitNumber();

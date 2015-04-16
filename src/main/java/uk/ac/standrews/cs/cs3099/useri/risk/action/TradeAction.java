@@ -12,7 +12,7 @@ public class TradeAction extends Action {
     private ArrayList<RiskCard> list;
 
     public TradeAction(Player player, ArrayList<RiskCard> list) {
-        super(player, TurnStage.STAGE_TRADING);
+        super(player);
         this.list = list;
 
     }

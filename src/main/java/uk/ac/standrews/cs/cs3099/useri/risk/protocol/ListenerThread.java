@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * Wrapper class for each client socket. This class is used by the server to keep track of connections to clients.
  * All fields are final and protected.
  */
-public class ListenerThread implements Runnable {
+class ListenerThread implements Runnable {
     private static ArrayList<Player> players = new ArrayList<>();
     private static State gameState;
     private static boolean shuffle;
@@ -85,7 +85,7 @@ public class ListenerThread implements Runnable {
         }
     }
 
-    protected void reply(Command command) {
+    void reply(Command command) {
         if (command == null)
             return;
         System.out.println("Player " + ID + ": " + command);
@@ -130,18 +130,18 @@ public class ListenerThread implements Runnable {
 
             // Start forwarding every message as is.
             fw = new HostForwarder(messageQueue, MOVE_TIMEOUT, ACK_TIMEOUT, ID, input);
-            while (!fw.hasSeed()) Thread.sleep(10);
+            while (fw.hasNoSeed()) Thread.sleep(10);
             fw.getRolls();
             state = InitState.FIRST_PLAYER_ELECTABLE;
             //HostForwarder.setSeed(null);
-            while (!(fw.hasSeed() && shuffle)) Thread.sleep(10);
+            while (!(!fw.hasNoSeed() && shuffle)) Thread.sleep(10);
             fw.getRolls();
             state = InitState.DECK_SHUFFLED;
             fw.playGame();
 
         } catch(InitialisationException | SocketTimeoutException f) {
             try {
-                messageQueue.sendAll(new TimeOutCommand(ID, null), null);
+                messageQueue.sendAll(new TimeOutCommand(ID), null);
                 purgeConnection();
             } catch (Exception e) {
                 System.err.println("Error when sending timeout");

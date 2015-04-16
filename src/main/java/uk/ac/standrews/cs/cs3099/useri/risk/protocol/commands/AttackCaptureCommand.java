@@ -5,7 +5,7 @@ import org.json.simple.JSONObject;
 /**
  * Created by po26 on 05/03/15.
  */
-public class AttackCaptureCommand extends Command {
+class AttackCaptureCommand extends Command {
 
     public static final String COMMAND_STRING = "attack_capture";
 

@@ -17,9 +17,9 @@ import java.util.Queue;
 public abstract class Client {
 
 
-    protected State gameState;
+    State gameState;
 
-    protected int playerId;
+    int playerId;
 
     private String playerName;
 
@@ -33,7 +33,7 @@ public abstract class Client {
     private DefendCommand defendCommand;
 
 
-    public Client(State gamestate){
+    Client(State gamestate){
 
         commandQueue = new ArrayDeque<>();
         hashQueue = new ArrayDeque<>();
@@ -92,8 +92,8 @@ public abstract class Client {
         return playReady;
     }
 
-    public void markPlayReady(boolean set){
-        this.playReady = set;
+    public void markPlayReady(){
+        this.playReady = true;
     }
 
 

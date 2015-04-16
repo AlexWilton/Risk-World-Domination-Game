@@ -3,7 +3,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.Action;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 
@@ -101,9 +100,7 @@ public class Player implements JSONAware{
     }
 
     public boolean equals(Player player){
-        if(player.getID() == ID)
-            return true;
-        return false;
+        return (player.getID() == ID);
     }
 
     public RiskCard getRiskCardById(int id){

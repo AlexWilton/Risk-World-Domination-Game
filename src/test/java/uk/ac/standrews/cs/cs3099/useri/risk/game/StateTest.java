@@ -7,7 +7,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.helpers.TestGameStateFactory;
 import static org.junit.Assert.*;
 
 public class StateTest {
-    State testState;
+    private State testState;
 
 
     @Before

@@ -109,7 +109,7 @@ public class RNGSeed {
         return ret;
     }
 
-    public static byte[] hexStringToByteArray(String s) {
+    private static byte[] hexStringToByteArray(String s) {
         int len = s.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
@@ -119,7 +119,7 @@ public class RNGSeed {
         return data;
     }
 
-    public static byte[] calcHash(byte[] numbers){
+    private static byte[] calcHash(byte[] numbers){
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             digest.update(numbers);

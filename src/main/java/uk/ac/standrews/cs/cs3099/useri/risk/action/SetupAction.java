@@ -3,9 +3,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.action;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
-
-import java.util.Arrays;
 
 /**
  * seting up countries
@@ -18,7 +15,7 @@ public class SetupAction extends Action {
     private Player player;
 
     public SetupAction (Player player, Country country) {
-        super(player, TurnStage.STAGE_TRADING);
+        super(player);
         this.country = country;
         this.player = player;
 

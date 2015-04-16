@@ -19,7 +19,7 @@ import java.util.ArrayList;
 /**
  * Class only for forwarding messages from all clients to this client and vice versa.
  */
-public class HostForwarder {
+class HostForwarder {
     private static State state;
     private static RNGSeed seed;
 
@@ -52,7 +52,7 @@ public class HostForwarder {
         HostForwarder.seed = seed;
     }
 
-    protected void getRolls() throws IOException, InterruptedException {
+    void getRolls() throws IOException, InterruptedException {
         Command comm = Command.parseCommand(input.readLine());
         messageQueue.sendAll(comm, ID);
         if (!(comm instanceof RollHashCommand)) {
@@ -76,7 +76,7 @@ public class HostForwarder {
         //seed = null;
     }
 
-    protected void playGame() throws IOException {
+    void playGame() throws IOException {
         //System.err.println(state.getCurrentPlayer().getID() == state.getRolls().getID());
         while(true) {
             if (move_required && System.currentTimeMillis() > timer + MOVE_TIMEOUT) {
@@ -98,6 +98,7 @@ public class HostForwarder {
                 messageQueue.sendAll(reply, ID);
                 checkAckCases(reply);
             }
+            if (state.winConditionsMet()) break;
         }
     }
 
@@ -244,9 +245,7 @@ public class HostForwarder {
             defendDice[i] = (rng.getRandomByte()+128)%6;
         }
 
-        AttackAction act = new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
-
-        return act;
+        return new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
     }
 
     private FortifyAction processFortifyCommand(FortifyCommand command){
@@ -309,9 +308,7 @@ public class HostForwarder {
 
     private SetupAction processSetupCommand(SetupCommand command){
         int countryId = command.getPayloadAsInt();
-        SetupAction act = new SetupAction(state.getPlayer(command.getPlayer()),state.getCountryByID(countryId));
-        return act;
-
+        return new SetupAction(state.getPlayer(command.getPlayer()),state.getCountryByID(countryId));
     }
 
     public void signalAck(int ack_id) {
@@ -320,7 +317,7 @@ public class HostForwarder {
         ack_received = false;
     }
 
-    boolean hasSeed() {
-        return seed != null;
+    boolean hasNoSeed() {
+        return seed == null;
     }
 }

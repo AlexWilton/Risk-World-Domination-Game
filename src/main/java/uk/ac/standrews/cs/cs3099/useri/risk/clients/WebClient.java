@@ -1,13 +1,10 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
 
-import uk.ac.standrews.cs.cs3099.useri.risk.action.SetupAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.JettyServer;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.CountrySet;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.SetupCommand;
 
 import java.awt.*;
 import java.net.URI;
@@ -16,10 +13,10 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class WebClient extends Client {
 
-    JettyServer jettyServer;
-    boolean isHost  = false;
-    boolean isPlayingHost = false;
-    ArrayBlockingQueue<Command> commandQueue = new ArrayBlockingQueue<Command>(1); //can only hold one action at a time.
+    private JettyServer jettyServer;
+    private boolean isHost  = false;
+    private boolean isPlayingHost = false;
+    private ArrayBlockingQueue<Command> commandQueue = new ArrayBlockingQueue<Command>(1); //can only hold one action at a time.
 
     public WebClient(){
         super(null);
@@ -35,7 +32,7 @@ public class WebClient extends Client {
         openWebpage("http://localhost:" + port + "/");
     }
 
-    public static void openWebpage(String urlAsString) {
+    private static void openWebpage(String urlAsString) {
         try {
             URI uri = new URL(urlAsString).toURI();
             Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
@@ -100,10 +97,7 @@ public class WebClient extends Client {
 
     @Override
     public boolean isReady(){
-        if(commandQueue.size() > 0)
-            return true;
-        else
-            return false;
+        return (commandQueue.size() > 0);
     }
 
     public void setHostAndPlayingBooleans(boolean isHost, boolean isPlayingHost){

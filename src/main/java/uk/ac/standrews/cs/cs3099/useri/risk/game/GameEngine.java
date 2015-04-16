@@ -50,7 +50,7 @@ public class GameEngine implements Runnable{
     /**
      * Constructs a game state and stored in GameEngine object
      */
-    public void initialise(){
+    void initialise(){
         //create gamestate
         State gamestate = new State();
         state = gamestate;
@@ -102,7 +102,7 @@ public class GameEngine implements Runnable{
     /**
      * Main loops to run game
      */
-	public void gameLoop(){
+    void gameLoop(){
 		System.out.println("Game Loop running...");
         Player currentPlayer;
         while(true) {
@@ -114,6 +114,8 @@ public class GameEngine implements Runnable{
                csh.sendCommand(currentCommand);
             }
             processCommand(currentPlayer, currentCommand);
+
+            if (state.winConditionsMet()) break;
 
         }
 	}
@@ -136,7 +138,7 @@ public class GameEngine implements Runnable{
             playerActions.add(processSetupCommand((SetupCommand) currentCommand));
         }
         else if (currentCommand instanceof PlayCardsCommand){
-            playerActions.add(processPlayCardsCommand((PlayCardsCommand) currentCommand));
+            playerActions.addAll(processPlayCardsCommand((PlayCardsCommand) currentCommand));
         }
         else {
             System.out.println("cant process command " + currentCommand.toJSONString());
@@ -161,13 +163,12 @@ public class GameEngine implements Runnable{
             Player winner = state.getWinner();
 
             System.out.println("Winner is " + winner.getID());
-            //TODO follow endGame protocol
             System.exit(0);
         }
     }
 
 
-    private TradeAction processPlayCardsCommand(PlayCardsCommand command){
+    private ArrayList<TradeAction> processPlayCardsCommand(PlayCardsCommand command){
         /*{
             "command": "play_cards",
             "payload": {
@@ -197,16 +198,15 @@ public class GameEngine implements Runnable{
             triplets.add(triplet);
         }
 
+        ArrayList<TradeAction> acts = new ArrayList<>();
         for (ArrayList<RiskCard> triplet : triplets){
             TradeAction act = new TradeAction(state.getPlayers().get(player),triplet);
 
             System.out.println("Interpreted trade command");
-            return act;
+            acts.add(act);
         }
 
-
-        //TODO ret multiple
-        return null;
+        return acts;
 
     }
 
@@ -251,13 +251,7 @@ public class GameEngine implements Runnable{
             defendDice[i] = (rng.getRandomByte()+128)%6;
         }
 
-        AttackAction act = new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
-
-        return act;
-
-
-
-
+        return  new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
     }
 
     private FortifyAction processFortifyCommand(FortifyCommand command){
@@ -343,9 +337,7 @@ public class GameEngine implements Runnable{
 
     private SetupAction processSetupCommand(SetupCommand command){
         int countryId = command.getPayloadAsInt();
-        SetupAction act = new SetupAction(state.getPlayer(command.getPlayer()),state.getCountryByID(countryId));
-        return act;
-
+        return  new SetupAction(state.getPlayer(command.getPlayer()),state.getCountryByID(countryId));
     }
 
 

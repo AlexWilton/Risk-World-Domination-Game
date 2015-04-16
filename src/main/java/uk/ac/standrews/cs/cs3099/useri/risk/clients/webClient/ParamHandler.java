@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class ParamHandler extends DefaultHandler {
+class ParamHandler extends DefaultHandler {
     private WebClient webClient;
 
     public ParamHandler(WebClient webClient){

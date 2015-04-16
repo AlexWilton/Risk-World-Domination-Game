@@ -17,8 +17,6 @@ public class State implements JSONAware{
 
 	private Map map;
 	private ArrayList<Player> players;
-    //TODO set this to be a queue or something.
-    //TODO: Data structure changed from ArrayList to Stack -> Adjust other part of codes to work with Stack
     private Stack<RiskCard> cardsDeck;
 	private Player currentPlayer;
     private Player firstPlayer;

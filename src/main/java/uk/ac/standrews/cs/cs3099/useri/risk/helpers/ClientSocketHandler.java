@@ -118,7 +118,7 @@ public class ClientSocketHandler implements Runnable{
      * @param localClient
      * @param versions
      * @param features
-     * @return
+     * @return state of client app
      */
 
     public int initialise(String address, int port, Client localClient, float[] versions, String[] features, String name){

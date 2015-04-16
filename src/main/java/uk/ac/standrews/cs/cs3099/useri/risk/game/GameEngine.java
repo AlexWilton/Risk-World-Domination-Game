@@ -39,10 +39,17 @@ public class GameEngine implements Runnable{
         gameLoop();
     }
 
+    /**
+     * initialises game state with given state
+     * @param state : game's state object
+     */
     public void initialise(State state){
         this.state = state;
     }
 
+    /**
+     * Constructs a game state and stored in GameEngine object
+     */
     public void initialise(){
         //create gamestate
         State gamestate = new State();
@@ -92,6 +99,9 @@ public class GameEngine implements Runnable{
 
     }
 
+    /**
+     * Main loops to run game
+     */
 	public void gameLoop(){
 		System.out.println("Game Loop running...");
         Player currentPlayer;

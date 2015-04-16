@@ -116,6 +116,9 @@ class HostForwarder {
                 checkAckCases(reply);
             }
             if (state.winConditionsMet()) break;
+            try {
+                Thread.sleep(1); // Just sleep a bit to prevent busy looping
+            } catch (InterruptedException e) {}
         }
     }
 
@@ -335,7 +338,7 @@ class HostForwarder {
         ack_received = false;
     }
 
-    protected boolean hasNoSeed() {
-        return seed == null;
+    protected boolean hasSeed() {
+        return seed != null;
     }
 }

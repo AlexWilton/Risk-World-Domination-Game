@@ -50,10 +50,8 @@ public class AttackAction extends Action {
         if(!attackerOK() || !defenderOK())
             return false;
 
-        if(!attackingCountry.getNeighbours().contains(defendingCountry))
-            return false;
+        return attackingCountry.getNeighbours().contains(defendingCountry);
 
-        return true;
     }
 
     /**
@@ -73,10 +71,8 @@ public class AttackAction extends Action {
         if (defenderDice.length < MINIMUM_ARMIES)
             return false;
 
-        if (defenderDice.length > MAXIMUM_DEFEND)
-            return false;
+        return defenderDice.length <= MAXIMUM_DEFEND;
 
-        return true;
     }
 
     /**
@@ -96,10 +92,8 @@ public class AttackAction extends Action {
         if (attackerDice.length < MINIMUM_ARMIES)
             return false;
 
-        if (attackerDice.length > MAXIMUM_ATTACK)
-            return false;
+        return attackerDice.length <= MAXIMUM_ATTACK;
 
-        return true;
     }
 
     /**

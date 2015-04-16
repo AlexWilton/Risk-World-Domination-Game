@@ -191,8 +191,8 @@ public class GameEngine implements Runnable{
         for (Object tripletObject : cards) {
             JSONArray tripletJSON = (JSONArray) tripletObject;
             ArrayList<RiskCard> triplet = new ArrayList<RiskCard>();
-            for (int i = 0; i<tripletJSON.size();i++){
-                int cardId = Integer.parseInt(tripletJSON.get(i).toString());
+            for (Object aTripletJSON : tripletJSON) {
+                int cardId = Integer.parseInt(aTripletJSON.toString());
                 triplet.add(state.getPlayers().get(player).getRiskCardById(cardId));
             }
             triplets.add(triplet);

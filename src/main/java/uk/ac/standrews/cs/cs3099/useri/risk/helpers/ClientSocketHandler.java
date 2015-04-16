@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 /**
@@ -149,9 +150,7 @@ public class ClientSocketHandler implements Runnable{
                 versionsJSON.add(version);
             }
             JSONArray featuresJSON = new JSONArray();
-            for (String feature : features){
-                featuresJSON.add(feature);
-            }
+            Collections.addAll(featuresJSON, features);
             JoinGameCommand joinCommand = new JoinGameCommand(versionsJSON,featuresJSON,name);
             System.out.println(joinCommand.toJSONString());
             sendCommand(joinCommand);

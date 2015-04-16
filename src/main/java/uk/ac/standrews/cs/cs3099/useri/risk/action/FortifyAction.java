@@ -53,9 +53,7 @@ public class FortifyAction extends Action {
             return false;
         if (! from.getOwner().equals(player))
             return false;
-        if (! to.getOwner().equals(player))
-            return false;
-        return true;
+        return to.getOwner().equals(player);
     }
 
     /**

@@ -1,7 +1,8 @@
-package uk.ac.standrews.cs.cs3099.useri.risk.game;
+package uk.ac.standrews.cs.cs3099.useri.risk.main;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.CLIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.GameEngine;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
 
 
@@ -52,7 +53,7 @@ public class ClientApp {
         String address = "localhost";
 
         //try to connect to server
-        run(address,port, new CLIClient(null));
+        run(address,port, new WebClient());
 
 
     }

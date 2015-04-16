@@ -8,7 +8,7 @@ import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.ClientApp;
+import uk.ac.standrews.cs.cs3099.useri.risk.main.ClientApp;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 

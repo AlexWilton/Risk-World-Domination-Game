@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 /**
  * represents a player in the game, and keeps track of the occupied countries and risk cards
+ * this is just a logical player, doesn't implement any of the mechanisms required for user interaction.
  *
  */
 public class Player implements JSONAware{
@@ -47,8 +48,6 @@ public class Player implements JSONAware{
         occupiedCountries.remove(c);
     }
 
-
-
     public int getUnassignedArmies(){
         return unassignedArmies;
     }
@@ -69,7 +68,9 @@ public class Player implements JSONAware{
         return client;
     }
 
-    public ArrayList<RiskCard> getCards() { return cards; }
+    public ArrayList<RiskCard> getCards() {
+        return cards;
+    }
 
     /**
      * Choose between countries to place 2 extra armies on when trading in risk cards.
@@ -82,27 +83,32 @@ public class Player implements JSONAware{
             countryWhichMustBeDeployedTo = chosen;
             return chosen; //use first one found - to be improved!
         }
-        //TODO unimplemented method, required for TradeAction!
         return null;
     }
 
     public void removeCards(ArrayList<RiskCard> list) {
         cards.removeAll(list);
     }
+
     public void occupyCountry (Country c, int troops) {
         c.setOwner(this);
         c.setTroops(troops);
         occupiedCountries.add(c);
     }
 
-    public boolean equals(Object obj){
-        return obj instanceof Player && equals( (Player) obj);
+    public boolean equals(Object obj) {
+        return obj instanceof Player && equals((Player) obj);
     }
 
     public boolean equals(Player player){
         return (player.getID() == ID);
     }
 
+    /**
+     * Gets a risk card from the list of cards this player holds by its id.
+     * @param id ID of the risk card that needs to be looked up
+     * @return RiskCard with ID id, if the player holds that risk card, null otherwise.
+     */
     public RiskCard getRiskCardById(int id){
         for (RiskCard r : cards) {
             if (r.getCardID() == id) {

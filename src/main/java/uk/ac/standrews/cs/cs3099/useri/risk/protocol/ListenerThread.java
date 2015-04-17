@@ -192,7 +192,7 @@ class ListenerThread implements Runnable {
         shuffle = true;
     }
 
-    public void getRolls() throws IOException, InterruptedException {
-        fw.getRolls();
+    public void getRollsLater() throws IOException, InterruptedException {
+        fw.getRollsLater();
     }
 }

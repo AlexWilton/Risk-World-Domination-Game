@@ -52,11 +52,14 @@ class MessageQueue {
         sendAll(new PlayersJoinedCommand(players), id);
     }
 
-    public void getRolls(){
+    public void getRolls(int id){
         HostForwarder.setSeed(new RNGSeed(sockets.size()));
         try {
-            for (ListenerThread l : sockets.values()) {
-                l.getRolls();
+            for (Map.Entry<Integer, ListenerThread> e : sockets.entrySet()){
+                if (e.getKey() != id){
+                    ListenerThread w = e.getValue();
+                    w.getRollsLater();
+                }
             }
         } catch(IOException | InterruptedException e) {
             //There is nothing to do here, just exit, the protocol has failed.

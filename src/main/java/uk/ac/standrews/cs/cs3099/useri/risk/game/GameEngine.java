@@ -9,6 +9,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -33,10 +34,18 @@ public class GameEngine implements Runnable{
         this.csh = csh;
     }
 
+    public GameEngine() {
+
+    }
+
     @Override
     public void run(){
         initialise();
         gameLoop();
+    }
+
+    public void initialise(State state, ArrayList<Client> clients) {
+        this.state = state;
     }
 
     /**
@@ -242,13 +251,15 @@ public class GameEngine implements Runnable{
         int[] attackDice = new int [attackArmies];
 
         for (int i = 0; i<attackArmies; i++){
-            attackDice[i] = (rng.getRandomByte()+128)%6;
+            attackDice[i] = (rng.getRandomInt()) % 6 + 1;
+            System.out.println(attackDice[i]);
         }
 
         int[] defendDice = new int [defendArmies];
 
         for (int i = 0; i<defendArmies; i++){
-            defendDice[i] = (rng.getRandomByte()+128)%6;
+            defendDice[i] = (rng.getRandomInt()) % 6 + 1;
+            System.out.println(defendDice[i]);
         }
 
         return  new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);

@@ -44,8 +44,11 @@ public class AttackAction extends Action {
      */
     @Override
     public boolean validateAgainstState(State state) {
-        if(!super.validateAgainstState(state))
+        if(!super.validateAgainstState(state)){
+            System.out.println("Error basic");
             return false;
+        }
+
 
         if(!attackerOK() || !defenderOK())
             return false;
@@ -65,8 +68,10 @@ public class AttackAction extends Action {
         if (defendingCountry.getOwner().equals(player))
             return false; //cannot attack yourself
 
-        if (defendingCountry.getTroops() < defenderDice.length)
+        if (defendingCountry.getTroops() < defenderDice.length) {
+            System.out.println("Defender doesnt have enough armies");
             return false;
+        }
 
         if (defenderDice.length < MINIMUM_ARMIES)
             return false;

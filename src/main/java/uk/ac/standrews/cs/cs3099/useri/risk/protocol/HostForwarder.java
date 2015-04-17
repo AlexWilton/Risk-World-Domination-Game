@@ -36,6 +36,7 @@ class HostForwarder {
 
     private double timer = System.currentTimeMillis();
     private int last_ack = 0;
+    private boolean getrolls;
 
     public HostForwarder(MessageQueue q, int move_timeout, int ack_timeout, int id, BufferedReader input) {
         messageQueue = q;
@@ -80,6 +81,7 @@ class HostForwarder {
             //throw new RollException();
         }
         RollHashCommand hash = (RollHashCommand) comm;
+        System.out.println("Got hash from " + ID);
         String hashStr = hash.get("payload").toString();
         seed.addSeedComponentHash(hashStr, ID);
 
@@ -101,6 +103,13 @@ class HostForwarder {
      */
     protected void playGame() throws IOException {
         while(true) {
+            if (getrolls) {
+                try {
+                    getRolls();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             if (move_required && System.currentTimeMillis() > timer + MOVE_TIMEOUT) {
                 System.err.println("Mov from " + ID + " timed out");
                 throw new SocketTimeoutException();
@@ -173,7 +182,7 @@ class HostForwarder {
             processDefendCommand((DefendCommand) comm);
         }
         else {
-            System.out.println("cant process command " + comm.toJSONString());
+            System.out.println("Player " + ID + " cant process command " + comm.toJSONString());
             return;
         }
 
@@ -205,6 +214,7 @@ class HostForwarder {
      * @param comm The command to be processed
      */
     private void processDefendCommand(DefendCommand comm) {
+        System.out.println("Processed Defend command by player " + ID);
         state.getPlayer(ID).getClient().pushCommand(comm);
     }
 
@@ -250,24 +260,31 @@ class HostForwarder {
         int objectiveId = Integer.parseInt(attackPlan.get(1).toString());
         int attackArmies = Integer.parseInt(attackPlan.get(2).toString());
 
-        // Now if a DefendCommand arrives then we need Stuff.
-        DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId, objectiveId, attackArmies);
-        int defendArmies = def.getPayloadAsInt();
-
         // Get rolls from all clients...
-        HostForwarder.setSeed(new RNGSeed(ListenerThread.getPlayers().size()));
-        messageQueue.getRolls();
+        // HostForwarder.setSeed(new RNGSeed(ListenerThread.getPlayers().size()));
+        messageQueue.getRolls(ID);
+        try {
+            getRolls();
+            while (!seed.hasAllNumbers()) Thread.sleep(1);
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
+        }
 
         RandomNumbers rng = new RandomNumbers(seed.getHexSeed());
 
+        DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId, objectiveId, attackArmies);
+        int defendArmies = def.getPayloadAsInt();
+        System.out.println("Defend armies: " + defendArmies);
         int[] attackDice = new int [attackArmies];
         for (int i = 0; i<attackArmies; i++){
-            attackDice[i] = (rng.getRandomByte()+128)%6;
+            attackDice[i] = (rng.getRandomInt()) % 6 + 1;
+            System.out.println(attackDice[i]);
         }
 
         int[] defendDice = new int [defendArmies];
         for (int i = 0; i<defendArmies; i++){
-            defendDice[i] = (rng.getRandomByte()+128)%6;
+            defendDice[i] = (rng.getRandomInt()) % 6 + 1;
+            System.out.println(defendDice[i]);
         }
 
         return new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
@@ -346,5 +363,9 @@ class HostForwarder {
 
     protected boolean hasSeed() {
         return seed != null;
+    }
+
+    public void getRollsLater(){
+        getrolls = true;
     }
 }

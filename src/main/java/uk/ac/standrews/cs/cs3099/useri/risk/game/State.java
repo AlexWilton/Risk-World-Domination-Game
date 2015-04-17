@@ -31,6 +31,10 @@ public class State implements JSONAware {
         setup(map, players);
     }
 
+    public State() {
+
+    }
+
     public void setup(Map map, ArrayList<Player> players){
         this.map = map;
         this.players = players;

@@ -76,13 +76,7 @@ public class WebClient extends Client {
         return null;
     }
 
-    /**
-     * notify player that game state has changed
-     */
-    @Override
-    public void pushGameState() {
 
-    }
 
     @Override
     public int getDefenders(Country attackingCountry, Country defendingCountry, int attackingArmies) {

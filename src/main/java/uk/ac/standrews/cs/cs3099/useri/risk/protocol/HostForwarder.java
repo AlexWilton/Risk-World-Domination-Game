@@ -71,8 +71,13 @@ class HostForwarder {
     void getRolls() throws IOException, InterruptedException {
         Command comm = Command.parseCommand(input.readLine());
         messageQueue.sendAll(comm, ID);
-        if (!(comm instanceof RollHashCommand)) {
-            throw new RollException();
+        while (!(comm instanceof RollHashCommand)) {
+            System.out.println(comm instanceof RollHashCommand);
+            checkAckCases(comm);
+            comm = Command.parseCommand(input.readLine());
+            messageQueue.sendAll(comm, ID);
+            //System.err.println(comm);
+            //throw new RollException();
         }
         RollHashCommand hash = (RollHashCommand) comm;
         String hashStr = hash.get("payload").toString();
@@ -250,6 +255,7 @@ class HostForwarder {
         int defendArmies = def.getPayloadAsInt();
 
         // Get rolls from all clients...
+        HostForwarder.setSeed(new RNGSeed(ListenerThread.getPlayers().size()));
         messageQueue.getRolls();
 
         RandomNumbers rng = new RandomNumbers(seed.getHexSeed());

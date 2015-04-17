@@ -11,7 +11,7 @@ import java.util.Queue;
 
 /**
  * represents one client.
- * can take multiple forms, eg local, network or AI
+ * can take multiple forms, eg local, network or AIClient
  *
  */
 public abstract class Client {
@@ -47,8 +47,6 @@ public abstract class Client {
     /**
      * notify player that game state has changed
      */
-    public abstract void pushGameState();
-
     public abstract int getDefenders(Country attackingCountry, Country defendingCountry, int attackingArmies);
 
     protected abstract byte[] getSeedComponent();
@@ -88,9 +86,6 @@ public abstract class Client {
     }
 
 
-    public boolean playReady(){
-        return playReady;
-    }
 
     public void markPlayReady(){
         this.playReady = true;

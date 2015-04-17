@@ -18,8 +18,7 @@ public class NetworkClient extends Client {
         this.gameState = gamestate;
     }
 
-    @Override
-    public void pushGameState(){ }
+
 
     @Override
     protected byte[] getSeedComponent(){

@@ -60,6 +60,7 @@ class MessageQueue {
             }
         } catch(IOException | InterruptedException e) {
             //There is nothing to do here, just exit, the protocol has failed.
+            e.printStackTrace();
             System.err.println("Could not get dice rolls, protocol failed");
             System.exit(1);
         }

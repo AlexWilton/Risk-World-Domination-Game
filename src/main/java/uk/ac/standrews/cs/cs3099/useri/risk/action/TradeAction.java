@@ -28,7 +28,11 @@ public class TradeAction extends Action {
     @Override
     public boolean validateAgainstState(State state) {
         if (super.validateAgainstState(state)) {
-            if (calculateArmies(state) != 0) {
+            //no trade made!
+            if (list == null){
+                return true;
+            }
+            if (calculateArmies(state) != 0 ) {
                 return true;
             }
         }
@@ -42,15 +46,17 @@ public class TradeAction extends Action {
      */
     @Override
     public void performOnState(State state) {
-        player.setUnassignedArmies(player.getUnassignedArmies() + calculateArmies(state));
+        if (list != null) {
+            player.setUnassignedArmies(player.getUnassignedArmies() + calculateArmies(state));
 
-        ArrayList<Country> occ;
-        if ((occ = occupied(state)) != null){
-            Country x = player.choose(occ);
-            x.setTroops(x.getTroops() + 2);
+            ArrayList<Country> occ;
+            if ((occ = occupied(state)) != null) {
+                Country x = player.choose(occ);
+                x.setTroops(x.getTroops() + 2);
+            }
+
+            player.removeCards(list);
         }
-
-        player.removeCards(list);
         state.nextStage();
     }
 

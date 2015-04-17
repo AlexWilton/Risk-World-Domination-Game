@@ -394,10 +394,11 @@ public class ClientSocketHandler implements Runnable {
 
     public RandomNumberGenerator popSeed() {
 
-        localClient.newSeedComponent();
+
 
         try {
             while (seed != null) Thread.sleep(10);
+            localClient.newSeedComponent();
             seed = new RandomNumberGenerator();
             seed.addHash(localClient.getPlayerId(), localClient.getHexSeedHash());
 

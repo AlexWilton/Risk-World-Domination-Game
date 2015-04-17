@@ -156,6 +156,17 @@ class HostForwarder {
      * @param comm The command to be processed
      */
     private void processCommand(Command comm) {
+        while (state.getCurrentPlayer().getID() != comm.getPlayer() && !(comm instanceof DefendCommand)){
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //TODO HOTFIX check with bence. This is to prevent that commands are wrongly not verified if the next players
+            //command is trying to execute before the current players command is executed. only an issue if commands are propagated
+            //before they are applied, provoking teh clients to send their next command if its their turn
+            //po26
+        }
         Player currentPlayer = state.getCurrentPlayer();
         ArrayList<Action> playerActions = new ArrayList<>();
         if (comm instanceof AttackCommand){
@@ -224,11 +235,13 @@ class HostForwarder {
     private ArrayList<TradeAction> processPlayCardsCommand(PlayCardsCommand command){
         JSONObject payload = command.getPayload();
         int player = command.getPlayer();
-        JSONArray cards = (JSONArray)(payload.get("cards"));
         if (payload == null){
-            //no action
-            return new ArrayList<>();
+            ArrayList<TradeAction> acts = new ArrayList<>();
+            acts.add(new TradeAction(state.getPlayer(player),null));
+            return acts;
         }
+        JSONArray cards = (JSONArray)(payload.get("cards"));
+
 
         ArrayList<ArrayList<RiskCard>> triplets = new ArrayList<>();
         for (Object tripletObject : cards) {

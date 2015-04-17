@@ -1,24 +1,38 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.action.DeployArmyAction;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.SetupAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
+
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.JettyServer;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
+import java.awt.*;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Created by patrick on 17/04/15.
  */
 public class RandomAIClient extends Client {
 
+
     public RandomAIClient(State gameState){
-        super(gameState);
+        super(gameState,new RandomNumberGenerator());
     }
 
+
+    @Override
+    public Command popCommand() {
+        ArrayList<Command> possible = getAllPossibleCommands();
+        Random r = new Random();
+        return possible.get((int)(r.nextDouble()*possible.size()));
+    }
 
 
     @Override
@@ -27,32 +41,34 @@ public class RandomAIClient extends Client {
         return (defendingCountry.getTroops() > 1 ? 2 : 1);
     }
 
+
+    @Override
+    public boolean isReady(){
+        return true;
+    }
+
+
+    public boolean isLocal(){
+        return true;
+    }
+
+    @Override
+    public DefendCommand popDefendCommand(int origin, int target, int armies) {
+        try {
+            Thread.sleep(1000);
+            //TODO GIVE SERVER A BREAK, shouldnt be necessary
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return new DefendCommand((gameState.getCountryByID(target).getTroops() > 1) ? 2 : 1, playerId);
+    }
+
+
     @Override
     protected byte[] getSeedComponent() {//empty method to just to replace
-        return RNGSeed.makeRandom256BitNumber();
+        return rng.generateNumber();
     }
 
-    @Override
-    public boolean isReady() {
-        return true;
-    }
-
-    @Override
-    public boolean isLocal() {
-        return true;
-    }
-
-    public Command popCommand() {
-        ArrayList<Command> possible = getAllPossibleCommands();
-        Random r = new Random();
-        return possible.get((int)r.nextDouble()*possible.size());
-    }
-
-
-    public DefendCommand popDefendCommand(int origin, int target, int armies) {
-
-        return new DefendCommand((gameState.getCountryByID(target).getTroops() > 1 ? 2 : 1),getPlayerId());
-    }
 
     private ArrayList<Command> getAllPossibleCommands(){
         ArrayList<Command> ret = new ArrayList<>();

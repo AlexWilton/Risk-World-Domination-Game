@@ -193,8 +193,9 @@ public class GameEngine implements Runnable{
         JSONObject payload = command.getPayload();
         int player = command.getPlayer();
         if (payload == null){
-            //no action
-            return new ArrayList<>();
+            ArrayList<TradeAction> acts = new ArrayList<>();
+            acts.add(new TradeAction(state.getPlayer(player),null));
+            return acts;
         }
 
         JSONArray cards = (JSONArray)(payload.get("cards"));
@@ -205,14 +206,14 @@ public class GameEngine implements Runnable{
             ArrayList<RiskCard> triplet = new ArrayList<RiskCard>();
             for (Object aTripletJSON : tripletJSON) {
                 int cardId = Integer.parseInt(aTripletJSON.toString());
-                triplet.add(state.getPlayers().get(player).getRiskCardById(cardId));
+                triplet.add(state.getPlayer(player).getRiskCardById(cardId));
             }
             triplets.add(triplet);
         }
 
         ArrayList<TradeAction> acts = new ArrayList<>();
         for (ArrayList<RiskCard> triplet : triplets){
-            TradeAction act = new TradeAction(state.getPlayers().get(player),triplet);
+            TradeAction act = new TradeAction(state.getPlayer(player),triplet);
 
             System.out.println("Interpreted trade command");
             acts.add(act);
@@ -288,7 +289,7 @@ public class GameEngine implements Runnable{
 
         int armies = Integer.parseInt(fortification.get(2).toString());
 
-        FortifyAction act = new FortifyAction(state.getPlayers().get(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),armies);
+        FortifyAction act = new FortifyAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),armies);
         System.out.println("Interpreted fortify command");
 
 
@@ -306,7 +307,7 @@ public class GameEngine implements Runnable{
         }*/
 
         int player = command.getPlayer();
-        ObtainRiskCardAction act = new ObtainRiskCardAction(state.getPlayers().get(player));
+        ObtainRiskCardAction act = new ObtainRiskCardAction(state.getPlayer(player));
         System.out.println("Interpreted draw command");
         return act;
 

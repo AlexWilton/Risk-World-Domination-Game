@@ -26,6 +26,7 @@ public class State implements JSONAware {
     private int cardSetstradedIn = 0;
     private boolean preGamePlay = true;
 
+    public State(){};
 
     public State(Map map, ArrayList<Player> players){
         setup(map, players);

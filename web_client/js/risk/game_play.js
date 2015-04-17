@@ -70,12 +70,12 @@ function updateTurnPanel(){
                 break;
             case "STAGE_BATTLES":
                 panelHtml += generateAttackPanel();
-
                 break;
             default:
                 break;
         }
         $("#turnPanel").html(panelHtml);
+        setupAttackOnclicks();
     }else{
         $("#turnPanel").html("<h4>Waiting for other players...</h4>");
     }
@@ -107,11 +107,11 @@ function generateTradeInPanel(){
 }
 
 function generateAttackPanel(){
+
+    //see if a country to attack from has been selected:
     if(attackOrigin == null){
         return "<br/><br/><p><strong>Select</strong> your terriory to attack from.</p>";
-    }
-
-    if(attackOrigin.troop_count == 1){
+    }else if(attackOrigin.troop_count == 1){
         attackOrigin = null;
         return '<div class="alert alert-danger alert-dismissible" role="alert">' +
             '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -121,35 +121,45 @@ function generateAttackPanel(){
             '</div>';
     }
 
+    //display attacking country info
     var panelHtml = '<br/><br/><p>Attack from Country: <strong style="color: ' + colors[attackOrigin.player_owner_id] + '">' + attackOrigin.name +
-        '</strong></p><form id="attackForm" class="form-horizontal">' +
+        '</strong><small><a id="removeAttackingCountryBtn" href="#"> (Remove)</a></small></p><form id="attackForm" class="form-horizontal">' +
         '<input type="hidden" name="operation" value="perform_action"/>' +
         '<input type="hidden" name="action" value="attack"/>' +
-        '<input type="hidden" name="attacking_country_id" value="'+ attackOrigin.country_id +'"/>' +
-        '<input type="hidden" name="defending_country_id" value="'+ attackDestination.country_id +'"/>';
+        '<input type="hidden" name="attacking_country_id" value="'+ attackOrigin.country_id +'"/>';
 
     if(attackDestination == null){
-        panelHtml += "<br/><br/><p><strong>Select</strong> a terriory to attack.</p>";
+        panelHtml += "<br/><p><strong>Select</strong> a terriory to attack.</p>";
         return panelHtml;
     }
 
-    panelHtml += '<p>Country to Attack: <strong style="color: ' + colors[attackDestination.player_owner_id] + '">' + attackDestination.name + '</strong></p>';
+    panelHtml += '<input type="hidden" name="defending_country_id" value="'+ attackDestination.country_id +'"/>';
+
+    panelHtml += '<p>Country to Attack: <strong style="color: ' + colors[attackDestination.player_owner_id] + '">' + attackDestination.name + '</strong>' +
+    '<small><a id="removeDefendingCountryBtn" href="#"> (Remove)</a></small></p>';
 
 
     panelHtml += '<div class="form-group">' +
     '<label class="col-sm-5">Attack with:</label> ' +
     '<div class="col-sm-4"> ' +
     '<select name="num_of_armies" class="form-control">';
-    for(var i = 1; i< attackOrigin.troop_count; i++) {
+    for(var i = 1; i< attackOrigin.troop_count && i <= 3; i++) {
         panelHtml += '<option>' + i +'</option>';
     }
     panelHtml += "</select></div></div>";
 
     panelHtml += '<div id="attackOutcome"></div><button type="button" onclick="attempt_attack()" class="btn btn-danger">Attack!</button>' +
-    '  <br/><br/><br/><button type="button" onclick="attempt_attack()" class="btn btn-info">End Attack Phrase</button><div id="attackOutcome"></div></form>';
+    '  <br/><br/><br/><button type="button" onclick="end_attack_phrase()" class="btn btn-info">End Attack Phrase</button><div id="attackOutcome"></div></form>';
     return panelHtml;
 }
 
+function end_attack_phrase(){
+    $.get('/?operation=perform_action&action=attack&end_attack=yes', function(response){
+            $("#turnPanel").html("");
+            $("#attackOutcome").html("<h4>Waiting for Server...</h4>");
+            waitForServer();
+    });
+}
 
 function attempt_attack(){
     $.get('/?' + $('#attackForm').serialize(), function(response){
@@ -166,6 +176,17 @@ function attempt_attack(){
             response +
             '</div>');
         }
+    });
+}
+
+function setupAttackOnclicks(){
+    $("#removeAttackingCountryBtn").click(function(){
+        attackOrigin = null;
+        updateTurnPanel();
+    });
+    $("#removeDefendingCountryBtn").click(function(){
+        attackDestination = null;
+        updateTurnPanel();
     });
 }
 

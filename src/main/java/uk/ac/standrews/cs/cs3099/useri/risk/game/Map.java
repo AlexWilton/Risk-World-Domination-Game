@@ -174,12 +174,18 @@ public class Map implements JSONAware{
 
     public boolean hasUnassignedCountries(){
 
+
+        return getUnassignedCountries().size() > 0;
+    }
+
+    public CountrySet getUnassignedCountries(){
+        CountrySet ret = new CountrySet();
         for (Country c : countries){
             if (c.getOwner() == null){
-                return true;
+                ret.add(c);
             }
         }
-        return false;
+        return ret;
     }
 
     @Override

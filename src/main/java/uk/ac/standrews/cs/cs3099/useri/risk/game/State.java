@@ -117,6 +117,12 @@ public class State implements JSONAware {
         return c;
     }
 
+    public RiskCard peekCard() {
+        RiskCard c = cardsDeck.get(0);
+
+        return c;
+    }
+
     /**
      * Get a country by id from the list of countries.
      * @param id the ID of the country we are looking for
@@ -174,6 +180,10 @@ public class State implements JSONAware {
         preTurnCalculateUnassignedArmies(currentPlayer);
         stage = TurnStage.STAGE_FINISH.next();
         wonBattle = false;
+    }
+
+    public boolean isPreGamePlay(){
+        return preGamePlay;
     }
 
     public void shuffleRiskCards(RNGSeed seed){
@@ -245,6 +255,10 @@ public class State implements JSONAware {
         }
 
         player.setUnassignedArmies(amount);
+    }
+
+    public CountrySet getAllUnassignedCountries(){
+        return map.getUnassignedCountries();
     }
 
 }

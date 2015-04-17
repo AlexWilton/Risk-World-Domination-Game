@@ -193,6 +193,10 @@ public class GameEngine implements Runnable{
 
         JSONObject payload = command.getPayload();
         int player = command.getPlayer();
+        if (payload == null){
+            //no action
+            return new ArrayList<>();
+        }
 
         JSONArray cards = (JSONArray)(payload.get("cards"));
 

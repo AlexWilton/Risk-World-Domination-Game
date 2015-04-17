@@ -12,6 +12,10 @@ public class Command extends JSONObject {
     Command(String command){
         this.put("command", command);
     }
+    Command(String command,int player){
+        this.put("command", command);
+        this.put("player_id", player);
+    }
 
     Command(JSONObject object){
         super(object);

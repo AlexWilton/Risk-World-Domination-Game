@@ -16,4 +16,9 @@ public class DrawCardCommand extends Command {
     public DrawCardCommand(JSONObject object){
         super(object);
     }
+
+    public DrawCardCommand(int cardId, int player) {
+        super(COMMAND_STRING,player);
+        this.put("payload",cardId);
+    }
 }

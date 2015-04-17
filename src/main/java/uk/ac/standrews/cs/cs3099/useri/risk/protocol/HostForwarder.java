@@ -227,6 +227,10 @@ class HostForwarder {
         JSONObject payload = command.getPayload();
         int player = command.getPlayer();
         JSONArray cards = (JSONArray)(payload.get("cards"));
+        if (payload == null){
+            //no action
+            return new ArrayList<>();
+        }
 
         ArrayList<ArrayList<RiskCard>> triplets = new ArrayList<>();
         for (Object tripletObject : cards) {

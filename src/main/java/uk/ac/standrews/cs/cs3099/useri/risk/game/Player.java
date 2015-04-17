@@ -143,4 +143,57 @@ public class Player implements JSONAware{
         return player.toJSONString();
     }
 
+    public ArrayList<ArrayList<Integer>> getAllValidCardCombinations(){
+        ArrayList<ArrayList<RiskCard>> combos = new ArrayList<>();
+
+
+        //get all permutations
+        for (int i = 0; i<cards.size();i++) {
+
+            for (int j = i + 1; j < cards.size(); j++) {
+
+                for (int k = j + 1; k < cards.size(); k++) {
+                    ArrayList<RiskCard> combo = new ArrayList<>();
+                    combo.add(cards.get(i));
+                    combo.add(cards.get(j));
+                    combo.add(cards.get(k));
+                    combos.add(combo);
+                }
+            }
+        }
+
+        //remove all that dont have a wild card, are all the same
+
+        ArrayList<ArrayList<Integer>> ret = new ArrayList<>();
+
+        for (ArrayList<RiskCard> combo : combos){
+
+
+            if (combo.get(0).getType() == combo.get(1).getType() && combo.get(1).getType() == combo.get(2).getType()) {
+                //all the same, add
+            } else if (combo.get(0).getType() != combo.get(1).getType() && combo.get(1).getType() != combo.get(2).getType() && combo.get(0).getType() != combo.get(2).getType()) {
+                //all distinct add
+            } else if (combo.get(0).getType() == RiskCardType.TYPE_WILDCARD || combo.get(1).getType() == RiskCardType.TYPE_WILDCARD || combo.get(2).getType() == RiskCardType.TYPE_WILDCARD){
+                //wildcard add
+            } else {
+                continue;
+            }
+
+            ArrayList<Integer> numberCombo = new ArrayList<>();
+
+            numberCombo.add(combo.get(0).getCardID());
+            numberCombo.add(combo.get(1).getCardID());
+            numberCombo.add(combo.get(2).getCardID());
+
+            ret.add(numberCombo);
+        }
+
+       return ret;
+
+    }
+
+    public Country getCountryWhichMustBeDeployedTo(){
+        return countryWhichMustBeDeployedTo;
+    }
+
 }

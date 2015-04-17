@@ -33,7 +33,7 @@ public abstract class Client {
     private DefendCommand defendCommand;
 
 
-    Client(State gamestate){
+    protected Client(State gamestate){
 
         commandQueue = new ArrayDeque<>();
         hashQueue = new ArrayDeque<>();

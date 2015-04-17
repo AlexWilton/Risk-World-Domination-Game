@@ -50,11 +50,12 @@ function gotoGamePlayWhenReady(){
     $.ajax( "/?operation=move_to_game_play")
         .done(function(response) {
             if(response.indexOf("true") == 0){
-                alert("Game Started!");
-                if(nonPlayingHost)
-                    window.location.href = "/server.html";
-                else
-                    window.location.href = "/play.html";
+                setTimeout(function() {
+                    if (nonPlayingHost)
+                        window.location.href = "/server.html";
+                    else
+                        window.location.href = "/play.html";
+                }, 1700);
             }else{
                 setTimeout(gotoGamePlayWhenReady, 1000);
             }

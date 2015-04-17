@@ -126,7 +126,7 @@ class ParamHandler extends DefaultHandler {
                 return String.valueOf(true);
 
             case "trade_in":
-                    if((params.get("no_trade") != null && params.get("no_trade").equals("yes")) || params.get("card") == null){
+                    if((params.get("no_trade") != null && params.get("no_trade")[0].equals("yes")) || params.get("card") == null){
                         webClient.getState().nextStage();
                         return "true";
                     }
@@ -178,6 +178,10 @@ class ParamHandler extends DefaultHandler {
                     webClient.queueCommand(deployCommand);
                     return String.valueOf(true);
             case "attack":
+                if((params.get("end_attack") != null && params.get("end_attack")[0].equals("yes"))){
+                    webClient.getState().nextStage();
+                    return "true";
+                }
 
                 //Get attacking and defending Country objects
                 String[] attackingCountryArray = params.get("attacking_country_id");

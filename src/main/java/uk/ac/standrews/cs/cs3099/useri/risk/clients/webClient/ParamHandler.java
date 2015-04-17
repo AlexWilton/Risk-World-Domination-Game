@@ -223,8 +223,15 @@ class ParamHandler extends DefaultHandler {
         t.start();
         webClient.setHostAndPlayingBooleans(true, is_host_playing);
 
+        //Get Player's Name
+        String[] nameArray = params.get("player_name");
+        String playerName = "";
+        if(nameArray != null && nameArray.length > 0)
+            playerName = nameArray[0];
+
+
         if(is_host_playing) {
-            if (ClientApp.run("127.0.0.1", port, webClient) != ClientApp.SUCCESS)
+            if (ClientApp.run("127.0.0.1", port, webClient, playerName) != ClientApp.SUCCESS)
                 return "Connect to myself on " + port + "!";
         }
 
@@ -252,8 +259,14 @@ class ParamHandler extends DefaultHandler {
         if(port == -1)
             return "Error! Valid Port Number not provided";
 
+        //Get Player's Name
+        String[] nameArray = params.get("player_name");
+        String playerName = "";
+        if(nameArray != null && nameArray.length > 0)
+            playerName = nameArray[0];
+
         //Attempt Connection
-        if(ClientApp.run(address, port, webClient) != ClientApp.SUCCESS)
+        if(ClientApp.run(address, port, webClient, playerName) != ClientApp.SUCCESS)
             return "Connect to " + address + ":" + port + " failed!";
 
         webClient.setHostAndPlayingBooleans(false, false);

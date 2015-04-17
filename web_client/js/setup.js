@@ -35,6 +35,13 @@ $( document ).ready(function(){
             });
     });
 
+    $("#hostForm").find("input[name=is_host_playing]").change( "click", function(){
+        if($("#hostForm").find("input:checked[name=is_host_playing]").val() == "true"){
+            $('#hostPlayerNameSection').show()
+        }else{
+            $('#hostPlayerNameSection').hide()
+        }
+    })
 
 
 });

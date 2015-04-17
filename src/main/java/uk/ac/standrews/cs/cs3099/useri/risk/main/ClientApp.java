@@ -18,20 +18,21 @@ public class ClientApp {
 
 
     /**
-     * Main Thread of the Executable
+     * Run Client. Attempt make connection to server. Start local game engine for client.
      * @param address of the server
      * @param port of the connecting server
      * @param localClient Client instance
+     * @param playerName Name of Player
      * @return state of initialisation of the game
      */
-    public static int run (String address, int port, Client localClient) {
+    public static int run (String address, int port, Client localClient, String playerName) {
+        if(playerName == null || playerName.equals("")) playerName = "(Nameless)";
         ClientSocketHandler socketHandler = new ClientSocketHandler();
         float[] versions = {1};
         String[] features = {};
-        String name = "Some guy";
 
         //connect and obtain game information
-        int result = socketHandler.initialise(address,port,localClient,versions,features,name);
+        int result = socketHandler.initialise(address,port,localClient,versions,features,playerName);
 
         if(result == SUCCESS) {
             //Run the socket handler
@@ -47,14 +48,5 @@ public class ClientApp {
         return result;
        
     }
-    public static void main(String argv[]){
-        //hardcode port and address for now
-        int port = 1234;
-        String address = "localhost";
 
-        //try to connect to server
-        run(address,port, new WebClient());
-
-
-    }
 }

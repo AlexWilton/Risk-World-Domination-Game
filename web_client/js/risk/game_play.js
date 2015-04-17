@@ -1,4 +1,4 @@
-var game_state, my_player_id, selectedTerriories = [];
+var game_state, my_player_id, selectedTerriories = [], attackOrigin, attackDestination;
 
 //TODO use pre-game in state to add player by player deployment of 1 army to each country and move to real game play after all deployment finished.
 
@@ -60,14 +60,7 @@ function updateTurnPanel(){
                 "</strong> left to deploy.</h5>It is your turn to <strong>Select</strong> a country!<div id='status'></div>";
                 break;
             case "STAGE_TRADING":
-                //if(isTradePossibleForMe())
                     panelHtml += generateTradeInPanel();
-                //else{
-                //
-                //    game_state.turn_stage = "STAGE_DEPLOYING";
-                //    updateTurnPanel();
-                //    return;
-                //}
 
                 break;
             case "STAGE_DEPLOYING":
@@ -75,8 +68,11 @@ function updateTurnPanel(){
                 panelHtml += "<br/><br/><small><strong>Select</strong> countries you wish to deploy to and specify how many armies to send to each.</small>";
                 panelHtml += generateDeployPanel();
                 break;
-            default:
+            case "STAGE_BATTLES":
+                panelHtml += generateAttackPanel();
 
+                break;
+            default:
                 break;
         }
         $("#turnPanel").html(panelHtml);
@@ -102,11 +98,75 @@ function generateTradeInPanel(){
     game_state.currentPlayer.cards.forEach(function(card){
         panelHtml += '<label class="btn btn-default"><input type="checkbox" name="card" value="'+ card.card_id +'" autocomplete="off"> ' + card.type +'</label><br/><br/>';
     });
-    panelHtml += '</div>' +
-    '<br/><button type="button" onclick="make_trade_in_request()" class="btn btn-info">Make Trade</button> ' +
-    '<button type="button" onclick="no_trade_request()" class="btn btn-info">No Trade</button></form>' +
+    panelHtml += '</div><br/>';
+    if(isTradePossibleForMe())
+        panelHtml += '<button type="button" onclick="make_trade_in_request()" class="btn btn-info">Make Trade</button> ';
+    panelHtml += '<button type="button" onclick="no_trade_request()" class="btn btn-info">No Trade</button></form>' +
     '<div id="tradeOutcome"></div>';
     return panelHtml;
+}
+
+function generateAttackPanel(){
+    if(attackOrigin == null){
+        return "<br/><br/><p><strong>Select</strong> your terriory to attack from.</p>";
+    }
+
+    if(attackOrigin.troop_count == 1){
+        attackOrigin = null;
+        return '<div class="alert alert-danger alert-dismissible" role="alert">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>' +
+            '<span class="sr-only">Error:</span>' +
+            'You must attack from a country with at least 2 armies.' +
+            '</div>';
+    }
+
+    var panelHtml = '<br/><br/><p>Attack from Country: <strong style="color: ' + colors[attackOrigin.player_owner_id] + '">' + attackOrigin.name +
+        '</strong></p><form id="attackForm" class="form-horizontal">' +
+        '<input type="hidden" name="operation" value="perform_action"/>' +
+        '<input type="hidden" name="action" value="attack"/>' +
+        '<input type="hidden" name="attacking_country_id" value="'+ attackOrigin.country_id +'"/>' +
+        '<input type="hidden" name="defending_country_id" value="'+ attackDestination.country_id +'"/>';
+
+    if(attackDestination == null){
+        panelHtml += "<br/><br/><p><strong>Select</strong> a terriory to attack.</p>";
+        return panelHtml;
+    }
+
+    panelHtml += '<p>Country to Attack: <strong style="color: ' + colors[attackDestination.player_owner_id] + '">' + attackDestination.name + '</strong></p>';
+
+
+    panelHtml += '<div class="form-group">' +
+    '<label class="col-sm-5">Attack with:</label> ' +
+    '<div class="col-sm-4"> ' +
+    '<select name="num_of_armies" class="form-control">';
+    for(var i = 1; i< attackOrigin.troop_count; i++) {
+        panelHtml += '<option>' + i +'</option>';
+    }
+    panelHtml += "</select></div></div>";
+
+    panelHtml += '<div id="attackOutcome"></div><button type="button" onclick="attempt_attack()" class="btn btn-danger">Attack!</button>' +
+    '  <br/><br/><br/><button type="button" onclick="attempt_attack()" class="btn btn-info">End Attack Phrase</button><div id="attackOutcome"></div></form>';
+    return panelHtml;
+}
+
+
+function attempt_attack(){
+    $.get('/?' + $('#attackForm').serialize(), function(response){
+        console.log(response);
+        if(response.indexOf("true") == 0){
+            $("#turnPanel").html("");
+            $("#attackOutcome").html("<h4>Waiting for Server...</h4>");
+            waitForServer();
+        }else{
+            $("#attackOutcome").html('<div class="alert alert-danger alert-dismissible" role="alert">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>' +
+            '<span class="sr-only">Error:</span>' +
+            response +
+            '</div>');
+        }
+    });
 }
 
 function generateDeployPanel(){
@@ -120,8 +180,6 @@ function generateDeployPanel(){
             '<label class="col-sm-8 control-label">'+name+'</label> ' +
             '<div class="col-sm-4"> ' +
             '<select name="' + selectedTerriories[t].country_id + '" class="form-control">';
-            //'<div class="input-group-addon">'+name+'</div>';
-            //panelHtml += '<select name="' + name + '" class="form-control">';
             for(var i = 0; i<= game_state.currentPlayer.unassignedArmies; i++) {
                 panelHtml += '<option>' + i +'</option>';
             }
@@ -132,7 +190,6 @@ function generateDeployPanel(){
     panelHtml += '<div id="deployOutcome"></div><button type="button" onclick="attempt_deployment()" class="btn btn-info">Deploy Armies</button></form>';
     return panelHtml;
 }
-
 function attempt_deployment(){
     $.get('/?' + $('#deployArmies').serialize(), function(response){
         console.log(response);
@@ -150,7 +207,6 @@ function attempt_deployment(){
         }
     });
 }
-
 
 function make_trade_in_request(){
     $.get('/?' + $('#tradeIn').serialize(), function(response){

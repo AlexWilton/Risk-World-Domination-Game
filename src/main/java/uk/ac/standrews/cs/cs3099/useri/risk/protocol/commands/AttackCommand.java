@@ -4,7 +4,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * Created by po26 on 05/03/15.
+ * Attack Command
  */
 public class AttackCommand extends Command {
 
@@ -19,6 +19,13 @@ public class AttackCommand extends Command {
         super(object);
     }
 
+    /**
+     * Construct an attack command
+     * @param origin Id of country attacking
+     * @param target Id of country being attacked
+     * @param armies Number of Armies (also the number of dice being thrown by attacker)
+     * @param player Attacking Player
+     */
     public AttackCommand(int origin, int target, int armies,int player) {
         super(COMMAND_STRING);
         JSONArray payload = new JSONArray();

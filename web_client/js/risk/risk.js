@@ -226,16 +226,24 @@ var Risk = {
 				group.on('click', function() {
 					console.log(Risk.Territories[path.attrs.id]);
                     if(game_state.currentPlayer.ID == my_player_id){
+                        var selectedCountry = Risk.Territories[path.attrs.id].mapped_game_state_territory;
                         switch (game_state.turn_stage){
                             case "STAGE_SETUP":
-                                claimCountryDuringSetup(Risk.Territories[path.attrs.id].mapped_game_state_territory.country_id);
+                                claimCountryDuringSetup(selectedCountry.country_id);
                                 break;
                             case "STAGE_DEPLOYING":
-                                var selectedCountry = Risk.Territories[path.attrs.id].mapped_game_state_territory;
                                 if($.inArray(selectedCountry,selectedTerriories) == -1)
-                                    selectedTerriories.push(Risk.Territories[path.attrs.id].mapped_game_state_territory);
+                                    selectedTerriories.push(selectedCountry);
                                 updateTurnPanel();
                                 break;
+                            case "STAGE_BATTLES":
+                                if(selectedCountry.player_owner_id == my_player_id){
+                                    attackOrigin = selectedCountry;
+                                    updateTurnPanel();
+                                }else if(selectedCountry.player_owner_id != my_player_id){
+                                    attackDestination = selectedCountry;
+                                    updateTurnPanel();
+                                }
                         }
                     }
 

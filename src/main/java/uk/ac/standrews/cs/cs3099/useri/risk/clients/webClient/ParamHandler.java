@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.DefaultHandler;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.AttackAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.DeployArmyAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.SetupAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
@@ -11,10 +12,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.ServerSocketHandler;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DeployCommand;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DeployTuple;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.PlayCardsCommand;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.SetupCommand;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -179,6 +177,38 @@ class ParamHandler extends DefaultHandler {
                     DeployCommand deployCommand = new DeployCommand(deployTuples, myself.getID());
                     webClient.queueCommand(deployCommand);
                     return String.valueOf(true);
+            case "attack":
+
+                //Get attacking and defending Country objects
+                String[] attackingCountryArray = params.get("attacking_country_id");
+                String[] defendingCountryArray = params.get("defending_country_id");
+                int attacking_country_id, defending_country_id;
+                try{
+                    attacking_country_id = (attackingCountryArray != null) ? (Integer.parseInt(attackingCountryArray[0])) : -1;
+                    defending_country_id = (defendingCountryArray != null) ? (Integer.parseInt(defendingCountryArray[0])) : -1;
+                }catch (NumberFormatException e){
+                    return "Error! Valid Country Id not provided";
+                }
+                Country attackingCountry = webClient.getState().getCountryByID(attacking_country_id);
+                Country defendingCountry = webClient.getState().getCountryByID(defending_country_id);
+                if(attackingCountry == null || attackingCountry.getOwner() != myself)
+                    return "Error! Please attacked from a valid country.";
+                if(defendingCountry == null || defendingCountry.getOwner() == myself)
+                    return "Error! Please chose a valid country to attack";
+
+                //Get number of armies of attack
+                String[] numOfArmiesArray = params.get("num_of_armies");
+                int num_of_armies;
+                try {
+                    num_of_armies = Integer.parseInt(numOfArmiesArray[0]);
+                    if(num_of_armies < 1 || num_of_armies > 3 || num_of_armies >= attackingCountry.getTroops()) throw new NumberFormatException();
+                }catch (NumberFormatException e){
+                    return "Error! Please select a valid number of armies to attack with";
+                }
+
+                AttackCommand attackCommand = new AttackCommand(attacking_country_id, defending_country_id, num_of_armies, myself.getID());
+                webClient.queueCommand(attackCommand);
+                return String.valueOf(true);
             default:
                 return "Unknown Action";
         }

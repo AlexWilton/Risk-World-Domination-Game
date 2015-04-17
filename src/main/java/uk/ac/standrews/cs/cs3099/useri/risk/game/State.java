@@ -10,15 +10,15 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 /**
- * holds the game state inclusive map, players and currently active player.
+ * holds the game state inclusive map, available cards, players and currently active player.
  *
  */
-public class State implements JSONAware{
+public class State implements JSONAware {
 
-	private Map map;
-	private ArrayList<Player> players;
+    private Map map;
+    private ArrayList<Player> players;
     private Stack<RiskCard> cardsDeck;
-	private Player currentPlayer;
+    private Player currentPlayer;
     private Player firstPlayer;
     private Player winner = null;
     private TurnStage stage = TurnStage.STAGE_TRADING;
@@ -26,8 +26,6 @@ public class State implements JSONAware{
     private int cardSetstradedIn = 0;
     private boolean preGamePlay = true;
 
-
-    public State(){}
 
     public State(Map map, ArrayList<Player> players){
         setup(map, players);

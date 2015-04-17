@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Created by patrick on 05/04/15.
+ * Seed to store the random numbers given from all the clients to roll the dice via
+ * the pseudo-random generator given in the protocol specification.
  */
 public class RNGSeed {
     private String[] components;
@@ -27,17 +28,21 @@ public class RNGSeed {
             componentHashes[i] = null;
             components[i] = null;
         }
-
     }
 
 
+    /**
+     * Adds the given hash to the list of hashes.
+     * @param hash
+     * @param player
+     */
     public void addSeedComponentHash(String hash, int player){
         componentHashes[player] = hash;
         gotHash[player] = true;
     }
 
     /**
-     * return false if its wrong
+     * return false if th given hash cannot be obtained from the given component.
      */
     public boolean addSeedComponent(String component, int player){
         if (componentHashes[player].equals(hexHashFromHexNumber(component)) && !gotNumber[player]) {
@@ -66,28 +71,33 @@ public class RNGSeed {
         return true;
     }
 
+    /**
+     * XORs two hexadecimal strings.
+     * @param s1
+     * @param s2
+     * @return s1 XOR s2
+     */
     private String hexXor(String s1, String s2){
         String ret = "";
-
         for (int i = 0; i<s1.length();i++){
             int first = Integer.parseInt(s1.substring(i,i+1),16);
             int second = Integer.parseInt(s2.substring(i,i+1),16);
             int xor = first ^ second;
             ret += Integer.toHexString(xor);
         }
-
         return ret;
     }
 
-
-
+    /**
+     * Gets the hex seed required for the random number generator by XORing all the
+     * given hex strings.
+     * @return
+     */
     public String getHexSeed(){
         String ret = StringUtils.repeat("0",64);
-
         for (String value : components){
             ret = hexXor(ret,value);
         }
-
         return ret;
     }
 
@@ -99,16 +109,24 @@ public class RNGSeed {
         return gotNumber[player];
     }
 
-
+    /**
+     * Converts an array of bytes to hexadecimal string.
+     * @param value
+     * @return
+     */
     public static String toHexString(byte[] value){
         String ret = "";
         for (byte i : value){
             ret += StringUtils.leftPad(Integer.toHexString(i & 0xFF), 2, "0");
         }
-
         return ret;
     }
 
+    /**
+     * Converts string in hexadecimal to byte array.
+     * @param s
+     * @return
+     */
     private static byte[] hexStringToByteArray(String s) {
         int len = s.length();
         byte[] data = new byte[len / 2];
@@ -119,6 +137,11 @@ public class RNGSeed {
         return data;
     }
 
+    /**
+     * Calculates the SHA-256 hash of the given numbers
+     * @param numbers given as byte array.
+     * @return hashed numbers
+     */
     private static byte[] calcHash(byte[] numbers){
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -129,14 +152,22 @@ public class RNGSeed {
             System.out.println("Need sha256 algorithm");
             System.exit(0);
         }
-
         return null;
     }
 
+    /**
+     * Returns the SHA-256 hash of this number. Both shall be in hexadecimal.
+     * @param hexNumber
+     * @return
+     */
     public static String hexHashFromHexNumber(String hexNumber){
         return toHexString(calcHash(hexStringToByteArray(hexNumber)));
     }
 
+    /**
+     * Generates a random 256-bit number and reurns it as a byte array.
+     * @return
+     */
     public static byte[] makeRandom256BitNumber(){
         Random r = new Random(System.currentTimeMillis());
         byte ret[] = new byte[32];

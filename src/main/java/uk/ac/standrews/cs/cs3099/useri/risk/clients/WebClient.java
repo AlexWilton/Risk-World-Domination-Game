@@ -5,6 +5,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.action.SetupAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.JettyServer;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.CountrySet;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.SetupCommand;
@@ -22,7 +23,7 @@ public class WebClient extends Client {
     private ArrayBlockingQueue<Command> commandQueue = new ArrayBlockingQueue<Command>(1); //can only hold one action at a time.
 
     public WebClient(){
-        super(null);
+        super(null, new RandomNumberGenerator());
         //Launch Jetty Web Server
         jettyServer = new JettyServer(this);
         jettyServer.run();
@@ -86,7 +87,7 @@ public class WebClient extends Client {
 
     @Override
     protected byte[] getSeedComponent() {
-        return RNGSeed.makeRandom256BitNumber();
+        return rng.generateNumber();
     }
 
 

@@ -1,7 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.PingCommand;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.PlayersJoinedCommand;
@@ -53,7 +53,7 @@ class MessageQueue {
     }
 
     public void getRolls(int id){
-        HostForwarder.setSeed(new RNGSeed(sockets.size()));
+        HostForwarder.setSeed(new RandomNumberGenerator());
         try {
             for (Map.Entry<Integer, ListenerThread> e : sockets.entrySet()){
                 if (e.getKey() != id){

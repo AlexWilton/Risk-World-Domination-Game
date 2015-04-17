@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 
 
 public class NetworkClient extends Client {
@@ -12,8 +13,8 @@ public class NetworkClient extends Client {
     public void newSeedComponent() {
     }
 
-    public NetworkClient(State gamestate){
-        super(gamestate);
+    public NetworkClient(State gamestate, RandomNumberGenerator rng){
+        super(gamestate, rng);
         ready = false;
         this.gameState = gamestate;
     }

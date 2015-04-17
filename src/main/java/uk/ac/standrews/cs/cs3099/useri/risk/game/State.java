@@ -3,8 +3,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
-import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -185,16 +184,16 @@ public class State implements JSONAware {
     public boolean isPreGamePlay(){
         return preGamePlay;
     }
-
-    public void shuffleRiskCards(RNGSeed seed){
-        RandomNumbers rng = new RandomNumbers(seed.getHexSeed());
+    
+    public void shuffleRiskCards(RandomNumberGenerator seed){
+        RandomNumberGenerator rng = new RandomNumberGenerator();
 
         //cards: Array containing all cards.
 
         int len = cardsDeck.size();
 
         for (int i = 0; i<len;i++){
-            int swapPos = (rng.getRandomByte()+128)%len;
+            int swapPos = (int)(seed.nextInt()%len);
             RiskCard c1 = cardsDeck.get(i);
             cardsDeck.set(i,cardsDeck.get(swapPos));
             cardsDeck.set(swapPos,c1);

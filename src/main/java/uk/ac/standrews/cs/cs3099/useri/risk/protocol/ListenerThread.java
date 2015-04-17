@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.HashMismatchException;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.exceptions.InitialisationException;
 
@@ -143,6 +144,8 @@ class ListenerThread implements Runnable {
                 System.err.println("Error when sending timeout");
             }
         } catch(IOException | InterruptedException e) {
+            e.printStackTrace();
+        } catch (HashMismatchException e) {
             e.printStackTrace();
         }
 

@@ -29,8 +29,8 @@ public class TestGameStateFactory {
         riskCards.add(new RiskCard(RiskCardType.TYPE_INFANTRY,6));
 
         //setup two cliclients
-        CLIClient c0 = new CLIClient(gamestate);
-        CLIClient c1 = new CLIClient(gamestate);
+        CLIClient c0 = new CLIClient(gamestate, null);
+        CLIClient c1 = new CLIClient(gamestate, null);
 
         //setup two players, just assign all the countries alternating with two armies in each
         ArrayList<Player> players = new ArrayList<Player>();
@@ -81,8 +81,8 @@ public class TestGameStateFactory {
         riskCards.add(new RiskCard(RiskCardType.TYPE_INFANTRY,6));
 
         //setup two cliclients
-        CLIClient c0 = new CLIClient(gamestate);
-        CLIClient c1 = new CLIClient(gamestate);
+        CLIClient c0 = new CLIClient(gamestate, null);
+        CLIClient c1 = new CLIClient(gamestate, null);
 
         //setup two players, just assign all the countries alternating with two armies in each
         ArrayList<Player> players = new ArrayList<Player>();
@@ -122,7 +122,7 @@ public class TestGameStateFactory {
         riskCards.add(new RiskCard(RiskCardType.TYPE_INFANTRY,5));
         riskCards.add(new RiskCard(RiskCardType.TYPE_INFANTRY,6));
 
-        CLIClient c1 = new CLIClient(gamestate);
+        CLIClient c1 = new CLIClient(gamestate, null);
 
         //setup two players, just assign all the countries alternating with two armies in each
         ArrayList<Player> players = new ArrayList<Player>();

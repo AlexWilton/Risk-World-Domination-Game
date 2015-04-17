@@ -1,11 +1,11 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import org.json.simple.JSONArray;
-import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Map;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.HashMismatchException;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.InitialiseGameCommand;
 
 import java.io.IOException;
@@ -83,27 +83,30 @@ public class ServerSocketHandler implements Runnable {
             Map map = new Map();
             gameState.setup(map, ListenerThread.getPlayers());
             HostForwarder.setState(gameState);
-            RNGSeed seed = new RNGSeed(ListenerThread.getPlayers().size());
+            RandomNumberGenerator seed = new RandomNumberGenerator();
             HostForwarder.setSeed(seed);
 
             // Elect first player by dice roll and shuffle cards deck.
             while (notAllInitialised(InitState.FIRST_PLAYER_ELECTABLE));
-            RandomNumbers r = new RandomNumbers(seed.getHexSeed());
-            int startingPlayer = (r.getRandomByte()+128)%ListenerThread.getPlayers().size();
+            seed.finalise();
+            int startingPlayer = (int)(seed.nextInt() % ListenerThread.getPlayers().size());
             gameState.setFirstPlayer(gameState.getPlayer(startingPlayer));
             gameState.setCurrentPlayer(startingPlayer);
             HostForwarder.setSeed(null);
             System.err.println("STARTING PLAYER IS " + startingPlayer);
 
-            seed = new RNGSeed(ListenerThread.getPlayers().size());
+            seed = new RandomNumberGenerator();
             HostForwarder.setSeed(seed);
             ListenerThread.shuffleCards();
             while (notAllInitialised(InitState.DECK_SHUFFLED));
+            seed.finalise();
             gameState.shuffleRiskCards(seed);
             System.err.println("SHUFFLED CARD DECK");
 
         } catch (IOException e){
             System.err.println("Error while initialising game");
+        } catch (HashMismatchException e) {
+            e.printStackTrace();
         }
         //TODO ListenerThread remove player if error occurs!
 

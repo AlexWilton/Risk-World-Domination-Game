@@ -1,12 +1,10 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
 
-import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.CountrySet;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
 import java.io.InputStream;
@@ -23,8 +21,8 @@ public class CLIClient extends Client {
 
 
 
-    public CLIClient (State gameState){
-        super(gameState);
+    public CLIClient (State gameState, RandomNumberGenerator rng){
+        super(gameState, rng);
         this.gameState = gameState;
         this.in = System.in;
         this.out = System.out;
@@ -176,7 +174,7 @@ public class CLIClient extends Client {
 
     @Override
     protected byte[] getSeedComponent() {//empty method to just to replace
-        return RNGSeed.makeRandom256BitNumber();
+        return rng.generateNumber();
     }
 
     private int getChoice(int min, int max){

@@ -2,14 +2,12 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -90,6 +88,7 @@ public class GameEngine implements Runnable{
         //Now roll dice to determine first player
         int firstPlayer = csh.determineFirstPlayer();
 
+        System.out.println(firstPlayer);
         System.out.println("Player " + gamestate.getPlayer(firstPlayer).getName() + " goes first!");
         gamestate.setFirstPlayer(gamestate.getPlayer(firstPlayer));
         gamestate.setCurrentPlayer(firstPlayer);
@@ -244,21 +243,19 @@ public class GameEngine implements Runnable{
 
         int defendArmies = def.getPayloadAsInt();
 
-        RNGSeed seed = csh.popSeed();
-
-        RandomNumbers rng = new RandomNumbers(seed.getHexSeed());
+        RandomNumberGenerator rng = csh.popSeed();
 
         int[] attackDice = new int [attackArmies];
 
         for (int i = 0; i<attackArmies; i++){
-            attackDice[i] = (rng.getRandomInt()) % 6 + 1;
+            attackDice[i] = (int)((rng.nextInt()) % 6 + 1);
             System.out.println(attackDice[i]);
         }
 
         int[] defendDice = new int [defendArmies];
 
         for (int i = 0; i<defendArmies; i++){
-            defendDice[i] = (rng.getRandomInt()) % 6 + 1;
+            defendDice[i] = (int)((rng.nextInt()) % 6 + 1);
             System.out.println(defendDice[i]);
         }
 

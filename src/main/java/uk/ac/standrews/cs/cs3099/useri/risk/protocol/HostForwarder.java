@@ -2,12 +2,12 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import uk.ac.standrews.cs.cs3099.risk.game.RandomNumbers;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.RNGSeed;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.HashMismatchException;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.exceptions.RollException;
 
@@ -24,7 +24,7 @@ import java.util.ArrayList;
  */
 class HostForwarder {
     private static State state;
-    private static RNGSeed seed;
+    private static RandomNumberGenerator seed;
 
     private MessageQueue messageQueue;
     private final int MOVE_TIMEOUT;
@@ -58,7 +58,7 @@ class HostForwarder {
      * Adds a Random Generator seed to this Forwarder.
      * @param seed the seed is set to this value.
      */
-    public static void setSeed(RNGSeed seed) {
+    public static void setSeed(RandomNumberGenerator seed) {
         HostForwarder.seed = seed;
     }
 
@@ -69,7 +69,7 @@ class HostForwarder {
      * @throws IOException
      * @throws InterruptedException
      */
-    void getRolls() throws IOException, InterruptedException {
+    void getRolls() throws IOException, InterruptedException, HashMismatchException{
         Command comm = Command.parseCommand(input.readLine());
         messageQueue.sendAll(comm, ID);
         while (!(comm instanceof RollHashCommand)) {
@@ -83,9 +83,7 @@ class HostForwarder {
         RollHashCommand hash = (RollHashCommand) comm;
         System.out.println("Got hash from " + ID);
         String hashStr = hash.get("payload").toString();
-        seed.addSeedComponentHash(hashStr, ID);
-
-        while (!seed.hasAllHashes()) Thread.sleep(10);
+        seed.addHash(ID, hashStr);
 
         comm = Command.parseCommand(input.readLine());
         messageQueue.sendAll(comm, ID);
@@ -94,7 +92,7 @@ class HostForwarder {
         }
         RollNumberCommand roll = (RollNumberCommand) comm;
         String rollStr = roll.get("payload").toString();
-        seed.addSeedComponent(rollStr, ID);
+        seed.addNumber(ID, rollStr);
     }
 
     /**
@@ -106,7 +104,7 @@ class HostForwarder {
             if (getrolls) {
                 try {
                     getRolls();
-                } catch (InterruptedException e) {
+                } catch (InterruptedException | HashMismatchException e) {
                     e.printStackTrace();
                 }
             }
@@ -186,7 +184,7 @@ class HostForwarder {
             return;
         }
 
-        if (playerActions.size() == 0){
+        if (playerActions.size() == 0 && !(comm instanceof DefendCommand)){
             System.out.println("End turn");
             playerActions.add(new FortifyAction(currentPlayer));
         }
@@ -265,29 +263,30 @@ class HostForwarder {
         messageQueue.getRolls(ID);
         try {
             getRolls();
-            while (!seed.hasAllNumbers()) Thread.sleep(1);
-        } catch (InterruptedException | IOException e) {
+            //while (!seed.isFinalised()) Thread.sleep(1);
+            seed.finalise();
+
+            DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId, objectiveId, attackArmies);
+            int defendArmies = def.getPayloadAsInt();
+            System.out.println("Defend armies: " + defendArmies);
+            int[] attackDice = new int [attackArmies];
+            for (int i = 0; i<attackArmies; i++){
+                attackDice[i] = (int)(seed.nextInt() % 6 + 1);
+                System.out.println(attackDice[i]);
+            }
+
+            int[] defendDice = new int [defendArmies];
+            for (int i = 0; i<defendArmies; i++){
+                defendDice[i] = (int)(seed.nextInt() % 6 + 1);
+                System.out.println(defendDice[i]);
+            }
+
+            return new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
+        } catch (InterruptedException | IOException | HashMismatchException e) {
             e.printStackTrace();
         }
+        return null;
 
-        RandomNumbers rng = new RandomNumbers(seed.getHexSeed());
-
-        DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId, objectiveId, attackArmies);
-        int defendArmies = def.getPayloadAsInt();
-        System.out.println("Defend armies: " + defendArmies);
-        int[] attackDice = new int [attackArmies];
-        for (int i = 0; i<attackArmies; i++){
-            attackDice[i] = (rng.getRandomInt()) % 6 + 1;
-            System.out.println(attackDice[i]);
-        }
-
-        int[] defendDice = new int [defendArmies];
-        for (int i = 0; i<defendArmies; i++){
-            defendDice[i] = (rng.getRandomInt()) % 6 + 1;
-            System.out.println(defendDice[i]);
-        }
-
-        return new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
     }
 
     /**

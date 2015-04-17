@@ -3,6 +3,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
 
@@ -23,7 +24,7 @@ public abstract class Client {
 
     private String playerName;
 
-    private String hexSeedComponent;
+    private byte[] hexSeedComponent;
 
     private boolean playReady = false;
     private Queue<Command> commandQueue;
@@ -31,13 +32,15 @@ public abstract class Client {
     private Queue<String> numberQueue;
 
     private DefendCommand defendCommand;
+    protected RandomNumberGenerator rng;
 
 
-    protected Client(State gamestate){
+    protected Client(State gamestate, RandomNumberGenerator rng){
 
         commandQueue = new ArrayDeque<>();
         hashQueue = new ArrayDeque<>();
         numberQueue = new ArrayDeque<>();
+        this.rng = rng;
 
         this.gameState = gamestate;
 
@@ -52,7 +55,7 @@ public abstract class Client {
     protected abstract byte[] getSeedComponent();
 
     public void newSeedComponent(){
-        hexSeedComponent = RNGSeed.toHexString(getSeedComponent());
+        hexSeedComponent = getSeedComponent();
     }
 
     public void setPlayerId(int playerId){
@@ -70,11 +73,11 @@ public abstract class Client {
     public abstract boolean isReady();
 
     public String getHexSeed(){
-        return hexSeedComponent;
+        return RandomNumberGenerator.byteToHex(hexSeedComponent);
     }
 
     public String getHexSeedHash(){
-        return RNGSeed.hexHashFromHexNumber(getHexSeed());
+        return RandomNumberGenerator.byteToHex(rng.hashByteArr(hexSeedComponent));
     }
 
     public String getPlayerName (){

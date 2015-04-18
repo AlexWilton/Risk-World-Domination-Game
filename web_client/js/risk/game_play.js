@@ -1,4 +1,4 @@
-var game_state, my_player_id, selectedTerriories = [], attackOrigin, attackDestination;
+var game_state, my_player_id, selectedTerriories = [], attackOrigin, attackDestination, fortificationOrigin, fortificationDestination;
 
 //TODO use pre-game in state to add player by player deployment of 1 army to each country and move to real game play after all deployment finished.
 
@@ -71,11 +71,15 @@ function updateTurnPanel(){
             case "STAGE_BATTLES":
                 panelHtml += generateAttackPanel();
                 break;
+            case "STAGE_FORTIFY":
+                panelHtml += generateFortifyPanel();
+                break;
             default:
                 break;
         }
         $("#turnPanel").html(panelHtml);
         setupAttackOnclicks();
+        setupFortifyOnClicks();
     }else{
         $("#turnPanel").html("<h4>Waiting for other players...</h4>");
     }
@@ -106,13 +110,15 @@ function generateTradeInPanel(){
     return panelHtml;
 }
 
+
+//*******ATTACKING FUNCTIONS***********
 function generateAttackPanel(){
     if(game_state.attack_capture_needed) return generateAttackCapturePanel();
 
     var panelHtml = "";
     //see if a country to attack from has been selected:
     if(attackOrigin == null){
-        panelHtml += "<br/><br/><p><strong>Select</strong> your terriory to attack from.</p>";
+        panelHtml += "<br/><br/><p><strong>Select</strong> your territory to attack from.</p>";
     }else if(attackOrigin.troop_count == 1){
         attackOrigin = null;
         panelHtml += '<div class="alert alert-danger alert-dismissible" role="alert">' +
@@ -185,7 +191,6 @@ function attempt_attack(){
     });
 }
 
-
 function make_attack_capture(){
     $.get('/?' + $('#attackCaptureForm').serialize(), function(response){
         console.log(response);
@@ -245,7 +250,7 @@ function waitForAttackToBeProcessed(attackingCountryId, defendingCountryId, orig
             attackResultMsg += " <strong>Result:</strong><br/>Your armies lost: <strong>" + attackerArmiesLost + "</strong><br/>" +
             "Defender Armies lost: <strong>" + defenderArmiesLost + "</strong>";
 
-            $("#attackOutcome").html('<div class="alert alert-' + alertType + ' alert-dismissible" role="alert">' +
+            $("#attackOutcome").html('<br/><div class="alert alert-' + alertType + ' alert-dismissible" role="alert">' +
             '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             attackResultMsg +
             '</div>');
@@ -275,16 +280,14 @@ function generateAttackCapturePanel(){
     }
     panelHtml += "</select></div></div>";
 
-    panelHtml += '<button type="button" onclick="make_attack_capture()" class="btn btn-info">Claim Country</button></form><br/><div id="attackOutcome"></div>';
+    panelHtml += '<button type="button" onclick="make_attack_capture()" class="btn btn-info">Claim Country</button></form><br/><br/><br/><div id="attackOutcome"></div>';
     return panelHtml;
 }
-
-
-
 
 function setupAttackOnclicks(){
     $("#removeAttackingCountryBtn").click(function(){
         attackOrigin = null;
+        attackDestination = null;
         updateTurnPanel();
     });
     $("#removeDefendingCountryBtn").click(function(){
@@ -292,6 +295,8 @@ function setupAttackOnclicks(){
         updateTurnPanel();
     });
 }
+//************************************
+
 
 function generateDeployPanel(){
     var panelHtml = '<form id="deployArmies" class="form-horizontal">' +
@@ -369,12 +374,89 @@ function no_trade_request(){
     });
 }
 
+function generateFortifyPanel(){
+    var panelHtml = "";
+    //see if a country to deploy from has been selected:
+    if(fortificationOrigin == null){
+        panelHtml += "<br/><br/><p><strong>No</strong> fortification currently selected.</p>" +
+        "<p>If you would like to make a fortification, please <strong>Select</strong> a terriory, " +
+        "which you would like to deploy from.</p>" +
+        "<p><small>If you do not wish to make a fortification, you can skip this stage.</small>" +
+        '<br/><div id="fortifyStatus"></div><br/><button type="button" onclick="attemptFortification()" class="btn btn-info">Skip Fortification</button>';
+    }
+
+    //display defending country info
+    if(fortificationOrigin != null) {
+        panelHtml += '<br/><br/><p>Fortify from Country: <strong style="color: ' + colors[fortificationOrigin.player_owner_id] + '">' + fortificationOrigin.name +
+        '</strong><small><a id="removeFortifyOriginBtn" href="#"> (Remove)</a></small></p><form id="fortifyForm" class="form-horizontal">' +
+        '<input type="hidden" name="operation" value="perform_action"/>' +
+        '<input type="hidden" name="action" value="fortify"/>' +
+        '<input type="hidden" name="origin_country_id" value="' + fortificationOrigin.country_id + '"/>';
+
+
+        if(fortificationDestination == null){
+            panelHtml += "<br/><p><strong>Select</strong> a territory to fortify.</p>";
+        }else{
+            panelHtml += '<input type="hidden" name="destination_country_id" value="'+ fortificationDestination.country_id +'"/>';
+
+            panelHtml += '<p>Country to Fortify: <strong style="color: ' + colors[fortificationDestination.player_owner_id] + '">' + fortificationDestination.name + '</strong>' +
+            '<small><a id="removeFortifyDestinationBtn" href="#"> (Remove)</a></small></p>';
+
+            panelHtml += '<div class="form-group">' +
+            '<label class="col-sm-5">No. of Troops:</label> ' +
+            '<div class="col-sm-4"> ' +
+            '<select name="num_of_armies" class="form-control">';
+            for(var i = 1; i< fortificationOrigin.troop_count; i++) {
+                panelHtml += '<option>' + i +'</option>';
+            }
+            panelHtml += "</select></div></div>" +
+            '<div id="fortifyStatus"></div><br/><button type="button" onclick="attemptFortification()" class="btn btn-primary">Fortify</button>';
+        }
+    }
+
+    panelHtml += '<br/></form>';
+    return panelHtml;
+}
+
+function attemptFortification(){
+    $.get('/?' + $('#fortifyForm').serialize(), function(response){
+        if(response.indexOf("true") == 0){
+            $("#turnPanel").html("");
+            $("#fortifyStatus").html("<h4>Waiting for Server...</h4>" +
+            '<br/><br/><div class="alert alert-success alert-dismissible" role="alert">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            'Fortification Successful' +
+            '</div>');
+            waitForServer();
+        }else{
+            $("#fortifyStatus").html('<div class="alert alert-danger alert-dismissible" role="alert">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>' +
+            '<span class="sr-only">Error:</span>' +
+            response +
+            '</div>');
+        }
+    });
+}
+
+function setupFortifyOnClicks(){
+    $("#removeFortifyOriginBtn").click(function(){
+        fortificationOrigin = null;
+        fortificationDestination = null;
+        updateTurnPanel();
+    });
+    $("#removeFortifyDestinationBtn").click(function(){
+        fortificationDestination = null;
+        updateTurnPanel();
+    });
+}
+
 function waitForServer(){
     $.get('/?operation=is_server_waiting_for_action', function(response){
         if(response.indexOf("true") == 0){
             getStateFromServer(updateDisplay);
         }else{
-            setTimeout(waitForServer, 1000);
+            setTimeout(waitForServer, 400);
         }
     });
 }
@@ -384,7 +466,7 @@ function waitForMyTurn(){
         if(game_state.currentPlayer.ID == my_player_id){
             updateDisplay();
         }else{
-            setTimeout(waitForMyTurn, 300);
+            setTimeout(waitForMyTurn, 1300);
         }
     })
 }

@@ -264,6 +264,49 @@ var Risk = {
                                         '</div>');
                                     }
                                 }
+                                break;
+                            case "STAGE_FORTIFY":
+                                if(selectedCountry.player_owner_id == my_player_id){
+                                    if(fortificationOrigin == null) {
+                                        if(selectedCountry.troop_count != 1) {
+                                            fortificationOrigin = selectedCountry;
+                                            updateTurnPanel();
+                                        }else{
+                                            $("#fortifyStatus").html('<div class="alert alert-warning alert-dismissible" role="alert">' +
+                                            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                                            "Error! You must fortify from a territory with at least 2 armies</div>");
+                                        }
+                                    }else{
+                                        if(fortificationDestination == null){
+
+                                            //get neighbours of origin
+                                            for(var t in Risk.Territories){
+                                                var territory = Risk.Territories[t];
+                                                if(Risk.Territories[t].mapped_game_state_territory.country_id == fortificationOrigin.country_id)
+                                                    neighboursOfOrigin = Risk.Territories[t].neighbours;
+
+                                                if(Risk.Territories[t].mapped_game_state_territory.name == selectedCountry.name)
+                                                    selectedTerritoryKey = t;
+                                            }
+                                            if($.inArray(selectedTerritoryKey, neighboursOfOrigin) > -1) {
+                                                fortificationDestination = selectedCountry;
+                                                updateTurnPanel();
+                                            }else{
+                                                $("#fortifyStatus").html('<div class="alert alert-warning alert-dismissible" role="alert">' +
+                                                '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                                                "Warning! You can only fortify to a territory neighbouring " + fortificationOrigin.name + "." +
+                                                '</div>');
+                                            }
+
+
+
+
+                                        }
+                                    }
+                                }
+
+
+                                break;//fortificationOrigin
                         }
                     }
 

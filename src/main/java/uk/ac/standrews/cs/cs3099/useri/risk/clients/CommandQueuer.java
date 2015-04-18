@@ -27,7 +27,7 @@ public class CommandQueuer {
 
 
         hashQueue.add(rollHash);
-        
+
     }
 
     public void pushRollNumber(String rollNumber){
@@ -71,7 +71,6 @@ public class CommandQueuer {
 
     public Command popCommand() {
         while (commandQueue.isEmpty()){
-
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {

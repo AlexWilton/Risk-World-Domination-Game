@@ -1,6 +1,5 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.CommandQueuer;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;

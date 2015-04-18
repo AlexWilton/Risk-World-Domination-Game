@@ -1,4 +1,4 @@
-package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI;
+package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
@@ -7,7 +7,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 /**
- *
+ * Ques to hold commands for different types
  */
 public class CommandQueuer {
 
@@ -24,24 +24,18 @@ public class CommandQueuer {
     }
 
     public void pushRollHash(String rollHash){
-
-
         hashQueue.add(rollHash);
-
     }
 
     public void pushRollNumber(String rollNumber){
-
         numberQueue.add(rollNumber);
     }
 
     public void pushCommand(Command command) {
         if (command instanceof DefendCommand){
-
             defendCommand=(DefendCommand)command;
         }
         else{
-
             commandQueue.add(command);
         }
     }
@@ -52,7 +46,6 @@ public class CommandQueuer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         return hashQueue.remove();
     }
 
@@ -62,7 +55,6 @@ public class CommandQueuer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         return numberQueue.remove();
     }
 

@@ -11,15 +11,13 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.*;
 
+/**
+ * Class to run the game over CLI
+ */
 public class CLIClient extends Client {
 
     private InputStream in;
     private PrintStream out;
-
-
-
-
-
 
     public CLIClient (State gameState) {
         super(gameState, new RandomNumberGenerator());

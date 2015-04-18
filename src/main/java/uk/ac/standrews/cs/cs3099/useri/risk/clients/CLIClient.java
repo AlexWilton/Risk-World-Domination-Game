@@ -142,9 +142,9 @@ public class CLIClient extends Client {
 
     /**
      * Asks the player when they have been attacked, how many armies they want to use for defending.
-     * @param attacker
-     * @param objective
-     * @param attackingArmies
+     * @param attacker The attacking country
+     * @param objective The defending country
+     * @param attackingArmies The number of armies used for attacking
      * @return The defending dice.
      */
     public int getDefenders(Country attacker, Country objective, int attackingArmies) {
@@ -178,10 +178,10 @@ public class CLIClient extends Client {
 
     /**
      * Gets the choice from the player for a country from a list of countries available.
-     * @param countries
-     * @param showEnemyNeighbours
-     * @param showCountriesWithoutAttackableNeighbours
-     * @param showOwnNeighbours
+     * @param countries List of countries to chose from
+     * @param showEnemyNeighbours show the neighbours of the list of countries?
+     * @param showCountriesWithoutAttackableNeighbours Show countries without neighbours to be attacked?
+     * @param showOwnNeighbours Show neighbours that we own?
      * @return The country selected.
      */
     private Country selectCountry(CountrySet countries, boolean showEnemyNeighbours, boolean showCountriesWithoutAttackableNeighbours, boolean showOwnNeighbours) {

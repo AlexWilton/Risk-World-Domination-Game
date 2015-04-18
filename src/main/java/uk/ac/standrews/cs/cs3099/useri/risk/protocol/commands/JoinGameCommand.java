@@ -49,7 +49,7 @@ public class JoinGameCommand extends Command {
             return new JoinGameCommand(versions, features, name);
 
         } catch(ParseException e){
-            System.out.println(parseable);
+            System.err.println(parseable);
             return null;
         }
 
@@ -71,7 +71,7 @@ public class JoinGameCommand extends Command {
         ArrayList<String> list = new ArrayList<>();
         for (Object a : features){
             list.add((String) a);
-            System.out.println(a);
+            //System.out.println(a);
 
         }
         return list;

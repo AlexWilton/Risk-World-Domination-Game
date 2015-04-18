@@ -107,13 +107,13 @@ function generateTradeInPanel(){
 }
 
 function generateAttackPanel(){
-
+    var panelHtml = "";
     //see if a country to attack from has been selected:
     if(attackOrigin == null){
-        return "<br/><br/><p><strong>Select</strong> your terriory to attack from.</p>";
+        panelHtml += "<br/><br/><p><strong>Select</strong> your terriory to attack from.</p>";
     }else if(attackOrigin.troop_count == 1){
         attackOrigin = null;
-        return '<div class="alert alert-danger alert-dismissible" role="alert">' +
+        panelHtml += '<div class="alert alert-danger alert-dismissible" role="alert">' +
             '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>' +
             '<span class="sr-only">Error:</span>' +
@@ -122,34 +122,35 @@ function generateAttackPanel(){
     }
 
     //display attacking country info
-    var panelHtml = '<br/><br/><p>Attack from Country: <strong style="color: ' + colors[attackOrigin.player_owner_id] + '">' + attackOrigin.name +
+    if(attackOrigin != null) {
+        panelHtml += '<br/><br/><p>Attack from Country: <strong style="color: ' + colors[attackOrigin.player_owner_id] + '">' + attackOrigin.name +
         '</strong><small><a id="removeAttackingCountryBtn" href="#"> (Remove)</a></small></p><form id="attackForm" class="form-horizontal">' +
         '<input type="hidden" name="operation" value="perform_action"/>' +
         '<input type="hidden" name="action" value="attack"/>' +
-        '<input type="hidden" name="attacking_country_id" value="'+ attackOrigin.country_id +'"/>';
+        '<input type="hidden" name="attacking_country_id" value="' + attackOrigin.country_id + '"/>';
 
-    if(attackDestination == null){
-        panelHtml += "<br/><p><strong>Select</strong> a terriory to attack.</p>";
-        return panelHtml;
+
+        if(attackDestination == null){
+            panelHtml += "<br/><p><strong>Select</strong> a terriory to attack.</p>";
+        }else{
+            panelHtml += '<input type="hidden" name="defending_country_id" value="'+ attackDestination.country_id +'"/>';
+
+            panelHtml += '<p>Country to Attack: <strong style="color: ' + colors[attackDestination.player_owner_id] + '">' + attackDestination.name + '</strong>' +
+            '<small><a id="removeDefendingCountryBtn" href="#"> (Remove)</a></small></p>';
+
+            panelHtml += '<div class="form-group">' +
+            '<label class="col-sm-5">Attack with:</label> ' +
+            '<div class="col-sm-4"> ' +
+            '<select name="num_of_armies" class="form-control">';
+            for(var i = 1; i< attackOrigin.troop_count && i <= 3; i++) {
+                panelHtml += '<option>' + i +'</option>';
+            }
+            panelHtml += "</select></div></div>" +
+            '<button type="button" onclick="attempt_attack()" class="btn btn-danger">Attack!</button>';
+        }
     }
 
-    panelHtml += '<input type="hidden" name="defending_country_id" value="'+ attackDestination.country_id +'"/>';
-
-    panelHtml += '<p>Country to Attack: <strong style="color: ' + colors[attackDestination.player_owner_id] + '">' + attackDestination.name + '</strong>' +
-    '<small><a id="removeDefendingCountryBtn" href="#"> (Remove)</a></small></p>';
-
-
-    panelHtml += '<div class="form-group">' +
-    '<label class="col-sm-5">Attack with:</label> ' +
-    '<div class="col-sm-4"> ' +
-    '<select name="num_of_armies" class="form-control">';
-    for(var i = 1; i< attackOrigin.troop_count && i <= 3; i++) {
-        panelHtml += '<option>' + i +'</option>';
-    }
-    panelHtml += "</select></div></div>";
-
-    panelHtml += '<div id="attackOutcome"></div><button type="button" onclick="attempt_attack()" class="btn btn-danger">Attack!</button>' +
-    '  <br/><br/><br/><button type="button" onclick="end_attack_phrase()" class="btn btn-info">End Attack Phrase</button><div id="attackOutcome"></div></form>';
+    panelHtml += '<br/><br/><div id="attackOutcome"></div><br/><button type="button" onclick="end_attack_phrase()" class="btn btn-info">End Attack Phrase</button></form>';
     return panelHtml;
 }
 
@@ -167,7 +168,11 @@ function attempt_attack(){
         if(response.indexOf("true") == 0){
             $("#turnPanel").html("");
             $("#attackOutcome").html("<h4>Waiting for Server...</h4>");
-            waitForServer();
+            var attackingCountryId = attackOrigin.country_id;
+            var defendingCountryId = attackDestination.country_id;
+            var originCountryArmyCountBeforeAttack = attackOrigin.troop_count;
+            var destinationCountryArmyCountBeforeAttack = attackDestination.troop_count;
+            waitForAttackToBeProcessed(attackingCountryId, defendingCountryId, originCountryArmyCountBeforeAttack, destinationCountryArmyCountBeforeAttack);
         }else{
             $("#attackOutcome").html('<div class="alert alert-danger alert-dismissible" role="alert">' +
             '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -178,6 +183,59 @@ function attempt_attack(){
         }
     });
 }
+
+function waitForAttackToBeProcessed(attackingCountryId, defendingCountryId, originCountryArmyCountBeforeAttack, destinationCountryArmyCountBeforeAttack){
+    console.log(attackingCountryId, defendingCountryId, originCountryArmyCountBeforeAttack, destinationCountryArmyCountBeforeAttack);
+    getStateFromServer(function(){
+        var attackHappened = false, countryCaptured = false, attackerArmiesLost = 0, defenderArmiesLost = 0;
+        game_state.map.countries.forEach(function(c){
+            if(attackingCountryId == c.country_id){
+                if(c.troop_count != originCountryArmyCountBeforeAttack){
+                    attackHappened = true;
+                    attackerArmiesLost = originCountryArmyCountBeforeAttack - c.troop_count;
+                }
+            }
+
+            if(defendingCountryId == c.country_id){
+                if(c.troop_count != destinationCountryArmyCountBeforeAttack){
+                    attackHappened = true;
+                    defenderArmiesLost = destinationCountryArmyCountBeforeAttack - c.troop_count;
+                    if(c.troop_count == 0)
+                        countryCaptured = true;
+                }
+            }
+        });
+        if(attackHappened) {
+            attackOrigin = null;
+            attackDestination = null;
+            updateDisplay();
+
+            //Explain attack outcome to player
+            var attackResultMsg = "";
+            var alertType = "info";
+            if(countryCaptured){
+                alertType = "success";
+                attackResultMsg = "Attack Successful! Territory Taken!";
+            }
+            if(defenderArmiesLost == 0){
+                alertType = "danger";
+                attackResultMsg = "Attack Completely Failed!"
+            }
+
+            attackResultMsg += " <strong>Result:</strong><br/>Your armies lost: <strong>" + attackerArmiesLost + "</strong><br/>" +
+            "Defender Armies lost: <strong>" + defenderArmiesLost + "</strong>";
+
+            $("#attackOutcome").html('<div class="alert alert-' + alertType + ' alert-dismissible" role="alert">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            attackResultMsg +
+            '</div>');
+        }
+        else
+            waitForAttackToBeProcessed(attackingCountryId, defendingCountryId, originCountryArmyCountBeforeAttack, destinationCountryArmyCountBeforeAttack);
+    });
+}
+
+
 
 function setupAttackOnclicks(){
     $("#removeAttackingCountryBtn").click(function(){

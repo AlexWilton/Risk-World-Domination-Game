@@ -239,10 +239,30 @@ var Risk = {
                             case "STAGE_BATTLES":
                                 if(selectedCountry.player_owner_id == my_player_id){
                                     attackOrigin = selectedCountry;
+                                    attackDestination = null;
                                     updateTurnPanel();
-                                }else if(selectedCountry.player_owner_id != my_player_id){
-                                    attackDestination = selectedCountry;
-                                    updateTurnPanel();
+                                }else if(attackOrigin != null){
+                                    //get neighbours of origin
+                                    var neighboursOfOrigin, selectedTerritoryKey;
+                                    for(var t in Risk.Territories){
+                                        var territory = Risk.Territories[t];
+                                        if(Risk.Territories[t].mapped_game_state_territory.country_id == attackOrigin.country_id)
+                                            neighboursOfOrigin = Risk.Territories[t].neighbours;
+
+                                        if(Risk.Territories[t].mapped_game_state_territory.name == selectedCountry.name)
+                                            selectedTerritoryKey = t;
+                                    }
+                                    if($.inArray(selectedTerritoryKey, neighboursOfOrigin) > -1) {
+                                        attackDestination = selectedCountry;
+                                        updateTurnPanel();
+                                    }else{
+                                        attackDestination = null;
+                                        updateTurnPanel();
+                                        $("#attackOutcome").html('<div class="alert alert-warning alert-dismissible" role="alert">' +
+                                        '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                                        "Warning! You can only attack a territory neighbouring " + attackOrigin.name + "." +
+                                        '</div>');
+                                    }
                                 }
                         }
                     }

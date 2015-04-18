@@ -175,6 +175,6 @@ public class Command extends JSONObject {
         return envelope.toJSONString();
     }
 
-    public boolean requiresAcknowledgement() {return this.containsKey("ack_id");}
+    public boolean requiresAcknowledgement() {return containsKey("ack_id");}
 
 }

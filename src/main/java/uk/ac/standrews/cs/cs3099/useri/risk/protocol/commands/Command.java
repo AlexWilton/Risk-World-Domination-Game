@@ -65,7 +65,7 @@ public class Command extends JSONObject {
 
 
     public static Command parseCommand(String envelopeString){
-        if (envelopeString==null){
+        if (envelopeString==null) {
             //TODO throw exception
             System.err.println("received string empty");
             return null;
@@ -73,20 +73,14 @@ public class Command extends JSONObject {
 
         //extract the actual command
         JSONObject envelopeJSON = (JSONObject) JSONValue.parse(envelopeString);
-
         //check if its the envelope or the message
         JSONObject commandJSON;
-
         String unescapedCommandString = "";
-        if (envelopeJSON.containsKey("message")){
+        if (envelopeJSON.containsKey("message")) {
             //TODO maybe verify?
-
             unescapedCommandString = unescape(envelopeJSON.get("message").toString());
             commandJSON = (JSONObject) JSONValue.parse(unescapedCommandString);
-        }
-
-        else
-        {
+        } else {
             unescapedCommandString = envelopeString;
             commandJSON = envelopeJSON;
         }

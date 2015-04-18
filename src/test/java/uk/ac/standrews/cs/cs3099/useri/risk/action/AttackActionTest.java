@@ -69,8 +69,8 @@ public class AttackActionTest{
         assertTrue(westernAustralia.getOwner().equals(playerA));
         assertTrue(playerA.getOccupiedCountries().contains(westernAustralia));
         assertFalse(playerB.getOccupiedCountries().contains(westernAustralia));
-        assertTrue(westernAustralia.getTroops() == 2);
-        assertTrue(indonesia.getTroops() == 1);
+        assertTrue(westernAustralia.getTroops() == 0);
+        assertTrue(indonesia.getTroops() == 3);
     }
 
     @Test

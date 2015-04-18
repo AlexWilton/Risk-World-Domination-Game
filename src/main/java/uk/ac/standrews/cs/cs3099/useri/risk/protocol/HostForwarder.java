@@ -162,6 +162,9 @@ class HostForwarder {
         if (comm instanceof AttackCommand){
             playerActions.add(processAttackCommand((AttackCommand) comm));
         }
+        else if (comm instanceof AttackCaptureCommand) {
+            playerActions.add(processAttackCaptureCommand((AttackCaptureCommand) comm));
+        }
         else if (comm instanceof DeployCommand){
             playerActions.addAll(processDeployCommand((DeployCommand) comm));
         }
@@ -253,6 +256,22 @@ class HostForwarder {
         }
 
         return acts;
+    }
+
+
+    /**
+     * Processes an attack capture command without any sort of validation against the gameState.
+     * @param comm The command to be processed
+     * @return Action corresponding to the command.
+     */
+    private Action processAttackCaptureCommand(AttackCaptureCommand comm) {
+        int origin = comm.getOrigin();
+        int destination = comm.getDestination();
+        int playerID = comm.getPlayer();
+        int armies = comm.getArmies();
+
+        Player player = state.getPlayer(playerID);
+        return new AttackCaptureAction(player, origin, destination, armies);
     }
 
 

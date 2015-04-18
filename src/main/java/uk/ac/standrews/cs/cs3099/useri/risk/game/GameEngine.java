@@ -9,7 +9,6 @@ import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.HashMismatchEx
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -141,6 +140,9 @@ public class GameEngine implements Runnable{
         if (currentCommand instanceof AttackCommand){
             playerActions.add(processAttackCommand((AttackCommand) currentCommand));
         }
+        else if (currentCommand instanceof AttackCaptureCommand) {
+            playerActions.add(processAttackCaptureCommand((AttackCaptureCommand) currentCommand));
+        }
         else if (currentCommand instanceof DeployCommand){
             playerActions.addAll(processDeployCommand((DeployCommand) currentCommand));
         }
@@ -181,6 +183,21 @@ public class GameEngine implements Runnable{
             System.out.println("Winner is " + winner.getID());
             System.exit(0);
         }
+    }
+
+    /**
+     * Processes an attack capture command without any sort of validation against the gameState.
+     * @param comm The command to be processed
+     * @return Action corresponding to the command.
+     */
+    private Action processAttackCaptureCommand(AttackCaptureCommand comm) {
+        int origin = comm.getOrigin();
+        int destination = comm.getDestination();
+        int playerID = comm.getPlayer();
+        int armies = comm.getArmies();
+
+        Player player = state.getPlayer(playerID);
+        return new AttackCaptureAction(player, origin, destination, armies);
     }
 
 

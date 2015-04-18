@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Queue;
 
 /**
@@ -28,6 +29,7 @@ import java.util.Queue;
 class HostForwarder implements Runnable{
     private static State state;
     private static RandomNumberGenerator seed;
+    public static HashMap<Integer,CommandQueuer> queuers = new HashMap();
 
     private MessageQueue messageQueue;
     private final int MOVE_TIMEOUT;
@@ -42,7 +44,7 @@ class HostForwarder implements Runnable{
     private boolean getrolls;
     private boolean running = true;
 
-    private CommandQueuer queuer;
+
     Thread parserThread;
 
     public HostForwarder(MessageQueue q, int move_timeout, int ack_timeout, int id, BufferedReader input) {
@@ -51,7 +53,7 @@ class HostForwarder implements Runnable{
         ACK_TIMEOUT = ack_timeout;
         ID = id;
         this.input = input;
-        this.queuer = new CommandQueuer();
+        queuers.put(id,new CommandQueuer());
         //make the parser thread
         parserThread = new Thread(this);
         parserThread.start();
@@ -81,7 +83,7 @@ class HostForwarder implements Runnable{
      * @throws InterruptedException
      */
     void getRolls() throws IOException, InterruptedException, HashMismatchException{
-        String hashStr = queuer.popRollHash();
+        String hashStr = queuers.get(ID).popRollHash();
         System.out.println("Got hash from " + ID);
 
         while (seed.getNumberSeedSources()>0) {
@@ -89,7 +91,7 @@ class HostForwarder implements Runnable{
         }
         seed.addHash(ID, hashStr);
 
-        String rollStr = queuer.popRollNumber();
+        String rollStr = queuers.get(ID).popRollNumber();
         System.out.println("Got Number from " + ID);
 
         seed.addNumber(ID, rollStr);
@@ -104,7 +106,7 @@ class HostForwarder implements Runnable{
 
         while(true) {
 
-            if (getrolls){
+            if (getrolls && seed.getNumberSeedSources() == 0){
                 try {
                     getRolls();
                 } catch (InterruptedException e) {
@@ -127,7 +129,7 @@ class HostForwarder implements Runnable{
                 timer = System.currentTimeMillis();
             }
 
-            Command reply = queuer.popCommand();
+            Command reply = queuers.get(ID).popCommand();
 
             checkAckCases(reply);
 
@@ -295,7 +297,8 @@ class HostForwarder implements Runnable{
             seed.debug_printnums();
 
 
-            DefendCommand def = queuer.popDefendCommand(0,0,0);
+            DefendCommand def = queuers.get(state.getCountryByID(objectiveId).getOwner().getID()).popDefendCommand(0,0,0);
+
 
             int defendArmies = def.getPayloadAsInt();
             System.out.println("Defend armies: " + defendArmies);
@@ -406,16 +409,16 @@ class HostForwarder implements Runnable{
                 if (input.ready()) {
                     Command reply = Command.parseCommand(input.readLine());
                     if (reply instanceof RollHashCommand){
-                        queuer.pushRollHash(reply.getPayloadAsString().toString());
+                        queuers.get(ID).pushRollHash(reply.getPayloadAsString().toString());
                     }
                     else if (reply instanceof RollNumberCommand){
 
-                        queuer.pushRollNumber(reply.getPayloadAsString().toString());
+                        queuers.get(ID).pushRollNumber(reply.getPayloadAsString().toString());
                     }
 
 
                     else {
-                        queuer.pushCommand(reply);
+                        queuers.get(ID).pushCommand(reply);
                     }
                     System.out.println("in Player " + ID + ": " + reply);
                     messageQueue.sendAll(reply, ID);

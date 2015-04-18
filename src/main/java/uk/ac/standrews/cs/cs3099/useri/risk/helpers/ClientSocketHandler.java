@@ -19,12 +19,20 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 
 /**
  * Created by po26 on 12/02/15.
  */
 public class ClientSocketHandler implements Runnable {
+
+
+    private HashMap<Integer,HashMap<Integer,Boolean>> ackRecieved;
+
+    private int waitingOn = -1;
+
+
 
 
     public enum ProtocolState {
@@ -73,6 +81,7 @@ public class ClientSocketHandler implements Runnable {
     public ClientSocketHandler() {
         this.remoteClients = new ArrayList<>();
         protocolState = ProtocolState.START;
+        ackRecieved = new HashMap<>();
 
     }
 
@@ -250,7 +259,9 @@ public class ClientSocketHandler implements Runnable {
             processPlayersJoinedCommand((PlayersJoinedCommand) command);
         } else if (command instanceof PingCommand) {
             processHostPingCommand((PingCommand) command);
-        } else {
+        } else if (command instanceof AcknowledgementCommand) {
+            processAcknowledgenmentCommand((AcknowledgementCommand) command);
+        }else {
             System.out.println("Command ignored:");
             System.out.println(command.toJSONString());
         }
@@ -261,7 +272,9 @@ public class ClientSocketHandler implements Runnable {
             processReadyCommand((ReadyCommand) command);
         } else if (command instanceof PingCommand) {
             processPingCommand((PingCommand) command);
-        } else {
+        } else if (command instanceof AcknowledgementCommand) {
+            processAcknowledgenmentCommand((AcknowledgementCommand) command);
+        }else {
             System.out.println("Command ignored:");
             System.out.println(command.toJSONString());
         }
@@ -271,6 +284,8 @@ public class ClientSocketHandler implements Runnable {
 
         if (command instanceof InitialiseGameCommand) {
             processInitialiseGameCommand((InitialiseGameCommand) command);
+        } else if (command instanceof AcknowledgementCommand) {
+            processAcknowledgenmentCommand((AcknowledgementCommand) command);
         } else {
             System.out.println("Command ignored:");
             System.out.println(command.toJSONString());
@@ -284,12 +299,27 @@ public class ClientSocketHandler implements Runnable {
             processRollHashCommand((RollHashCommand) command);
         } else if (command instanceof RollNumberCommand) {
             processRollNumberCommand((RollNumberCommand) command);
+        } else if (command instanceof AcknowledgementCommand) {
+            processAcknowledgenmentCommand((AcknowledgementCommand) command);
         } else {
             Client c = getClientById(command.getPlayer());
             if (c != null)
                 c.pushCommand(command);
         }
 
+
+    }
+
+    void processAcknowledgenmentCommand(AcknowledgementCommand command){
+        if (!ackRecieved.keySet().contains(command.getPayloadAsInt())){
+            HashMap <Integer,Boolean> rec = new HashMap<>();
+            for (Client c : getAllClients()){
+                rec.put(c.getPlayerId(),false);
+            }
+            ackRecieved.put(command.getPayloadAsInt(),rec);
+        }
+
+        ackRecieved.get(command.getPayloadAsInt()).put(command.getPlayer(),true);
 
     }
 
@@ -362,9 +392,36 @@ public class ClientSocketHandler implements Runnable {
 
 
     public void sendCommand(Command command) {
+
+        while (waitingOn != -1){
+            if (!ackRecieved.get(waitingOn).containsValue(false)){
+                waitingOn = -1;
+            }
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         out.println(command.toJSONString());
         System.out.println("Sent to server: " + command.toJSONString());
         out.flush();
+
+        //if it needs ack, wait
+        if (command.requiresAcknowledgement()){
+            waitingOn = command.getAck();
+
+            if (!ackRecieved.keySet().contains(command.getAck())){
+                HashMap <Integer,Boolean> rec = new HashMap<>();
+                for (Client c : getAllClients()){
+                    rec.put(c.getPlayerId(),false);
+                }
+                ackRecieved.put(command.getAck(),rec);
+            }
+
+            ackRecieved.get(command.getAck()).put(command.getPlayer(),true);
+
+        }
 
     }
 

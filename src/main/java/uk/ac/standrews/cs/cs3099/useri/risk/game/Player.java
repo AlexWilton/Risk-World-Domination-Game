@@ -196,4 +196,14 @@ public class Player implements JSONAware{
         return countryWhichMustBeDeployedTo;
     }
 
+    public CountrySet getOwnedCountriesWithEnemyBoundaries(){
+        CountrySet ret = new CountrySet();
+        for (Country c : occupiedCountries){
+            if (c.getEnemyNeighbours().size()>0)
+                ret.add(c);
+        }
+
+        return ret;
+    }
+
 }

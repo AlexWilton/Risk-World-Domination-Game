@@ -2,10 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.AttackAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.DeployArmyAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.SetupAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.ClientApp;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
@@ -213,6 +210,40 @@ class ParamHandler extends DefaultHandler {
                 AttackCommand attackCommand = new AttackCommand(attacking_country_id, defending_country_id, num_of_armies, myself.getID());
                 webClient.queueCommand(attackCommand);
                 return String.valueOf(true);
+            case "attack_capture":
+                //Get attacking and defending Country objects
+                attackingCountryArray = params.get("attacking_country_id");
+                defendingCountryArray = params.get("defending_country_id");
+                try{
+                    attacking_country_id = (attackingCountryArray != null) ? (Integer.parseInt(attackingCountryArray[0])) : -1;
+                    defending_country_id = (defendingCountryArray != null) ? (Integer.parseInt(defendingCountryArray[0])) : -1;
+                }catch (NumberFormatException e){
+                    return "Error! Valid Country Id not provided";
+                }
+                attackingCountry = webClient.getState().getCountryByID(attacking_country_id);
+                defendingCountry = webClient.getState().getCountryByID(defending_country_id);
+                if(attackingCountry == null || attackingCountry.getOwner() != myself)
+                    return "Error! Please attacked from a valid country.";
+                if(defendingCountry == null || defendingCountry.getOwner() != myself) //before capture, country is set to new owner when attack action is performed
+                    return "Error! Please chose a valid country to attack";
+
+                //Get number of armies of attack
+                numOfArmiesArray = params.get("num_of_armies");
+                try {
+                    num_of_armies = Integer.parseInt(numOfArmiesArray[0]);
+                    if(num_of_armies < 1) throw new NumberFormatException();
+                }catch (NumberFormatException e){
+                    return "Error! Please select a valid number of armies to attack with";
+                }
+
+                AttackCaptureAction attackCaptureAction = new AttackCaptureAction(myself, attacking_country_id, defending_country_id, num_of_armies);
+                if(!attackCaptureAction.validateAgainstState(webClient.getState())){
+                    return "Error! This movement is not allowed.";
+                }
+
+                AttackCaptureCommand attackCaptureCommand = new AttackCaptureCommand(attacking_country_id, defending_country_id, num_of_armies, myself.getID());
+                webClient.queueCommand(attackCaptureCommand);
+                return String.valueOf("true");
             default:
                 return "Unknown Action";
         }

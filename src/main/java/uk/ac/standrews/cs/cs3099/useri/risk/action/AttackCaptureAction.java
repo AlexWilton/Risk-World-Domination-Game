@@ -4,9 +4,6 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
-/**
- * Created by bs44 on 18/04/15.
- */
 public class AttackCaptureAction  extends Action {
     int origin;
     int destination;
@@ -30,6 +27,9 @@ public class AttackCaptureAction  extends Action {
             return false;
         if (state.getCountryByID(origin).getTroops() <= armies)
             return false;
+        if(!state.isAttackCaptureNeeded())
+            return false;
+
         return true;
     }
 
@@ -40,5 +40,7 @@ public class AttackCaptureAction  extends Action {
 
         originCountry.setTroops(originCountry.getTroops() - armies);
         destinationCountry.setTroops(armies);
+
+        state.markAttackCaptureNotNeeded();
     }
 }

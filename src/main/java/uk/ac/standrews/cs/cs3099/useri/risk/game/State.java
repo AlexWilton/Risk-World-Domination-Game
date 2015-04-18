@@ -25,6 +25,11 @@ public class State implements JSONAware {
     private int cardSetstradedIn = 0;
     private boolean preGamePlay = true;
 
+    private boolean attackCaptureNeeded = false;
+    private Country attackCaptureOrigin = null;
+    private Country attackCaptureDestination = null;
+    private int attackCaptureMinimumArmiesToMove = -1;
+
     public State(){};
 
     public State(Map map, ArrayList<Player> players){
@@ -170,6 +175,10 @@ public class State implements JSONAware {
         }
         state.put("all_countries_claimed", areAllCountriesClaimed);
         state.put("pre_game_play", preGamePlay);
+        state.put("attack_capture_needed", attackCaptureNeeded);
+        state.put("attack_capture_origin", attackCaptureOrigin);
+        state.put("attack_capture_destination", attackCaptureDestination);
+        state.put("attack_capture_min_armies_to_move_in", attackCaptureMinimumArmiesToMove);
         return state.toJSONString();
     }
 
@@ -264,4 +273,21 @@ public class State implements JSONAware {
         this.stage = s;
     }
 
+    public boolean isAttackCaptureNeeded() {
+        return attackCaptureNeeded;
+    }
+
+    public void recordAttackCaptureIsNeeded(Country attackCaptureOrigin, Country attackCaptureDestination, int attackCaptureMinimumArmiesToMove) {
+        attackCaptureNeeded = true;
+        this.attackCaptureOrigin = attackCaptureOrigin;
+        this.attackCaptureDestination = attackCaptureDestination;
+        this.attackCaptureMinimumArmiesToMove = attackCaptureMinimumArmiesToMove;
+    }
+
+    public void markAttackCaptureNotNeeded() {
+        attackCaptureNeeded = false;
+        attackCaptureOrigin = null;
+        attackCaptureDestination = null;
+        attackCaptureMinimumArmiesToMove = -1;
+    }
 }

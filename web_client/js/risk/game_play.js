@@ -107,6 +107,8 @@ function generateTradeInPanel(){
 }
 
 function generateAttackPanel(){
+    if(game_state.attack_capture_needed) return generateAttackCapturePanel();
+
     var panelHtml = "";
     //see if a country to attack from has been selected:
     if(attackOrigin == null){
@@ -164,7 +166,6 @@ function end_attack_phrase(){
 
 function attempt_attack(){
     $.get('/?' + $('#attackForm').serialize(), function(response){
-        console.log(response);
         if(response.indexOf("true") == 0){
             $("#turnPanel").html("");
             $("#attackOutcome").html("<h4>Waiting for Server...</h4>");
@@ -184,8 +185,26 @@ function attempt_attack(){
     });
 }
 
+
+function make_attack_capture(){
+    $.get('/?' + $('#attackCaptureForm').serialize(), function(response){
+        console.log(response);
+        if(response.indexOf("true") == 0){
+            $("#turnPanel").html("");
+            $("#attackOutcome").html("<h4>Waiting for Server...</h4>");
+            waitForServer();
+        }else{
+            $("#attackOutcome").html('<div class="alert alert-danger alert-dismissible" role="alert">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>' +
+            '<span class="sr-only">Error:</span>' +
+            response +
+            '</div>');
+        }
+    });
+}
+
 function waitForAttackToBeProcessed(attackingCountryId, defendingCountryId, originCountryArmyCountBeforeAttack, destinationCountryArmyCountBeforeAttack){
-    console.log(attackingCountryId, defendingCountryId, originCountryArmyCountBeforeAttack, destinationCountryArmyCountBeforeAttack);
     getStateFromServer(function(){
         var attackHappened = false, countryCaptured = false, attackerArmiesLost = 0, defenderArmiesLost = 0;
         game_state.map.countries.forEach(function(c){
@@ -216,6 +235,7 @@ function waitForAttackToBeProcessed(attackingCountryId, defendingCountryId, orig
             if(countryCaptured){
                 alertType = "success";
                 attackResultMsg = "Attack Successful! Territory Taken!";
+                $("#turnPanel").html(generateAttackCapturePanel());
             }
             if(defenderArmiesLost == 0){
                 alertType = "danger";
@@ -234,6 +254,31 @@ function waitForAttackToBeProcessed(attackingCountryId, defendingCountryId, orig
             waitForAttackToBeProcessed(attackingCountryId, defendingCountryId, originCountryArmyCountBeforeAttack, destinationCountryArmyCountBeforeAttack);
     });
 }
+
+function generateAttackCapturePanel(){
+    var panelHtml = '';
+
+    panelHtml += '<form id="attackCaptureForm"><div class="btn-group" data-toggle="buttons">' +
+    '<input type="hidden" name="operation" value="perform_action"/>' +
+    '<input type="hidden" name="action" value="attack_capture"/>' +
+    '<input type="hidden" name="attacking_country_id" value="' + game_state.attack_capture_origin.country_id + '"/>' +
+    '<input type="hidden" name="defending_country_id" value="'+ game_state.attack_capture_destination.country_id +'"/>';
+
+    panelHtml += '<p>You <strong>must</strong> move at least ' + game_state.attack_capture_min_armies_to_move_in + " armies from: ";
+    panelHtml += '<p><strong>' + game_state.attack_capture_origin.name + '</strong></p><p>to:</p>';
+    panelHtml += '<p><strong>' + game_state.attack_capture_destination.name + '</strong></p>'
+    panelHtml += '<p>How many armies do you want to move in?</p><div class="form-group">' +
+    '<div class="col-sm-4"> ' +
+    '<select name="num_of_armies" class="form-control">';
+    for(var i = game_state.attack_capture_min_armies_to_move_in; i<= game_state.attack_capture_origin.troop_count -1; i++) {
+        panelHtml += '<option>' + i +'</option>';
+    }
+    panelHtml += "</select></div></div>";
+
+    panelHtml += '<button type="button" onclick="make_attack_capture()" class="btn btn-info">Claim Country</button></form><br/><div id="attackOutcome"></div>';
+    return panelHtml;
+}
+
 
 
 
@@ -269,6 +314,7 @@ function generateDeployPanel(){
     panelHtml += '<div id="deployOutcome"></div><button type="button" onclick="attempt_deployment()" class="btn btn-info">Deploy Armies</button></form>';
     return panelHtml;
 }
+
 function attempt_deployment(){
     $.get('/?' + $('#deployArmies').serialize(), function(response){
         console.log(response);

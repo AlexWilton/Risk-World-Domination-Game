@@ -8,7 +8,6 @@ import java.util.Arrays;
 
 /**
  * Attacking players. This is optional.
- * Created by bs44 on 30/01/15.
  */
 public class AttackAction extends Action {
     // Minimum and maximum number of armies to attack/defend
@@ -122,6 +121,9 @@ public class AttackAction extends Action {
             //set the number of troops on attacking country.
             attackingCountry.setTroops(attackingCountry.getTroops() - attackerArmiesLost);
             defendingCountry.setTroops(0);
+
+            //tell player it needs to perform an attack capture next
+            state.recordAttackCaptureIsNeeded(attackingCountry, defendingCountry, attackerDice.length - attackerArmiesLost);
         }
         else {
             //decrease number of armies on each country, but don't change owner.

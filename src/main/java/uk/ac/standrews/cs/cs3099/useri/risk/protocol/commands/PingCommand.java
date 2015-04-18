@@ -31,11 +31,11 @@ public class PingCommand extends Command {
             Long payload_str = (Long) obj.get("payload");
             Integer payload = payload_str==null? null: payload_str.intValue();
 
-            System.out.println("PingCommand parsed: id: " + id + ", payload: " + payload);
+            //System.out.println("PingCommand parsed: id: " + id + ", payload: " + payload);
             return new PingCommand(id, payload);
 
         } catch(ParseException e){
-            System.out.println(commandJSON);
+            System.err.println(commandJSON);
             return null;
         }
 

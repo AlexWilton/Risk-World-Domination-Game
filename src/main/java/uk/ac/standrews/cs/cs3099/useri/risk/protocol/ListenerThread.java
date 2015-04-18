@@ -85,7 +85,7 @@ class ListenerThread implements Runnable {
     void reply(Command command) {
         if (command == null)
             return;
-        System.out.println("Player " + ID + ": " + command);
+        //System.out.println("Player " + ID + ": " + command);
         output.println(command);
         output.flush();
     }

@@ -73,7 +73,7 @@ class HostForwarder {
         Command comm = Command.parseCommand(input.readLine());
         messageQueue.sendAll(comm, ID);
         while (!(comm instanceof RollHashCommand)) {
-            System.out.println(comm instanceof RollHashCommand);
+            //System.out.println(comm instanceof RollHashCommand);
             checkAckCases(comm);
             comm = Command.parseCommand(input.readLine());
             messageQueue.sendAll(comm, ID);
@@ -81,7 +81,7 @@ class HostForwarder {
             //throw new RollException();
         }
         RollHashCommand hash = (RollHashCommand) comm;
-        System.out.println("Got hash from " + ID);
+        //System.out.println("Got hash from " + ID);
         String hashStr = hash.get("payload").toString();
         seed.addHash(ID, hashStr);
 
@@ -118,12 +118,12 @@ class HostForwarder {
             }
             if (!move_required && state.getCurrentPlayer().getID() == ID){
                 move_required = true;
-                System.out.println("Player " + ID + "'s turn'");
+                //System.out.println("Player " + ID + "'s turn'");
                 timer = System.currentTimeMillis();
             }
             if (input.ready()) {
                 Command reply = Command.parseCommand(input.readLine());
-                System.out.println("in Player " + ID + ": " + reply);
+                //System.out.println("in Player " + ID + ": " + reply);
                 messageQueue.sendAll(reply, ID);
                 checkAckCases(reply);
             }
@@ -180,12 +180,12 @@ class HostForwarder {
             processDefendCommand((DefendCommand) comm);
         }
         else {
-            System.out.println("Player " + ID + " cant process command " + comm.toJSONString());
+            System.err.println("Player " + ID + " cant process command " + comm.toJSONString());
             return;
         }
 
         if (playerActions.size() == 0 && !(comm instanceof DefendCommand)){
-            System.out.println("End turn");
+            //System.out.println("End turn");
             playerActions.add(new FortifyAction(currentPlayer));
         }
 
@@ -193,7 +193,7 @@ class HostForwarder {
             if (playerAction.validateAgainstState(state)) {
                 playerAction.performOnState(state);
             } else {
-                System.out.println("Error move did not validate: " + comm);
+                System.err.println("Error move did not validate: " + comm);
                 System.exit(1);
             }
         }
@@ -212,7 +212,7 @@ class HostForwarder {
      * @param comm The command to be processed
      */
     private void processDefendCommand(DefendCommand comm) {
-        System.out.println("Processed Defend command by player " + ID);
+        //System.out.println("Processed Defend command by player " + ID);
         state.getPlayer(ID).getClient().pushCommand(comm);
     }
 
@@ -275,17 +275,17 @@ class HostForwarder {
 
             DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId, objectiveId, attackArmies);
             int defendArmies = def.getPayloadAsInt();
-            System.out.println("Defend armies: " + defendArmies);
+            //System.out.println("Defend armies: " + defendArmies);
             int[] attackDice = new int [attackArmies];
             for (int i = 0; i<attackArmies; i++){
                 attackDice[i] = (int)(seed.nextInt() % 6 + 1);
-                System.out.println(attackDice[i]);
+                //System.out.println(attackDice[i]);
             }
 
             int[] defendDice = new int [defendArmies];
             for (int i = 0; i<defendArmies; i++){
                 defendDice[i] = (int)(seed.nextInt() % 6 + 1);
-                System.out.println(defendDice[i]);
+                //System.out.println(defendDice[i]);
             }
 
             return new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
@@ -322,7 +322,7 @@ class HostForwarder {
     private ObtainRiskCardAction processDrawCardCommand(DrawCardCommand command){
         int player = command.getPlayer();
         ObtainRiskCardAction act = new ObtainRiskCardAction(state.getPlayers().get(player));
-        System.out.println("Interpreted draw command");
+        //System.out.println("Interpreted draw command");
         return act;
     }
 

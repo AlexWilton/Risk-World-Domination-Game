@@ -8,35 +8,23 @@ import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGe
 /**
  * represents one client.
  * can take multiple forms, eg local, network or AIClient
- *
  */
 public abstract class Client extends CommandQueuer {
-
-
     protected State gameState;
-
     protected int playerId;
-
-    private String playerName;
-
-    private byte[] hexSeedComponent;
-
-    private boolean playReady = false;
-
     protected RandomNumberGenerator rng;
 
+    private String playerName;
+    private byte[] hexSeedComponent;
+    private boolean playReady = false;
 
-    protected Client(State gamestate, RandomNumberGenerator rng){
-        super();
+    protected Client(State gameState, RandomNumberGenerator rng){
         this.rng = rng;
-
-        this.gameState = gamestate;
-
+        this.gameState = gameState;
     }
 
-
     /**
-     * notify player that game state has changed
+     * notify player that they are under attack.
      */
     public abstract int getDefenders(Country attackingCountry, Country defendingCountry, int attackingArmies);
 
@@ -64,26 +52,21 @@ public abstract class Client extends CommandQueuer {
         return RandomNumberGenerator.byteToHex(hexSeedComponent);
     }
 
-    public String getHexSeedHash(){
+    public String getHexSeedHash() {
         return RandomNumberGenerator.byteToHex(rng.hashByteArr(hexSeedComponent));
     }
 
-    public String getPlayerName (){
+    public String getPlayerName () {
         return playerName;
     }
 
-    public void setPlayerName(String name){
+    public void setPlayerName(String name) {
         this.playerName = name;
     }
 
-
-
-    public void markPlayReady(){
+    public void markPlayReady() {
         this.playReady = true;
     }
-
-
-
 
     public abstract boolean isLocal();
 
@@ -93,7 +76,6 @@ public abstract class Client extends CommandQueuer {
 
     public void setState(State gameState){
         this.gameState = gameState;
-        System.out.println("Got new State!");
     }
 
 

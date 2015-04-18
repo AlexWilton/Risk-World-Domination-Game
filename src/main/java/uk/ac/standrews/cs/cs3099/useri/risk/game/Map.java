@@ -9,10 +9,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Stack;
 
-
+/**
+ * Map that holds a list of all countries and continents.
+ */
 public class Map implements JSONAware{
 
-    private static final String FILEPATH_DEFAULT_MAP = "src/res/defaultMap.json";
+    private static final String DEFAULT_MAP_PATH = "src/res/defaultMap.json";
 
 	private ContinentSet continents;
     private CountrySet countries;
@@ -21,7 +23,7 @@ public class Map implements JSONAware{
 
     //uses default map'
     public Map(){
-        this(FILEPATH_DEFAULT_MAP);
+        this(DEFAULT_MAP_PATH);
     }
 
     //uses given filename
@@ -41,21 +43,19 @@ public class Map implements JSONAware{
             validMap = false;
         }
 
-
         countries = parseCountryNames(mapData);
-
         continents = parseContinentNames(mapData);
-
         makeCountryLinks(mapData,countries);
-
         putCountriesIntoContinent(mapData,countries,continents);
-
         addContinentValues(mapData,continents);
-
     }
 
+    /**
+     * Parse the countries from the Map JSON object.
+     * @param mapData JSONObject to parse
+     * @return Countries in the map.
+     */
     private CountrySet parseCountryNames(JSONObject mapData){
-
         //Parse all Country Data
         CountrySet countries = new CountrySet();
         JSONObject countriesJSON = (JSONObject) mapData.get("country_names");
@@ -69,6 +69,11 @@ public class Map implements JSONAware{
         return countries;
     }
 
+    /**
+     * Parse the continents from the Map JSON Object
+     * @param mapData The JSONObject to parse
+     * @return Continents in the map.
+     */
     private ContinentSet parseContinentNames(JSONObject mapData) {
         //parse all continent data
         ContinentSet continents = new ContinentSet();
@@ -83,6 +88,11 @@ public class Map implements JSONAware{
         return continents;
     }
 
+    /**
+     * Parses the map JSON and sets up the connections between the countries that are adjacent to each other.
+     * @param mapData JSON to be parsed
+     * @param countries Set of countries to apply the links on.
+     */
     private void makeCountryLinks(JSONObject mapData, CountrySet countries){
         //make country links
         JSONArray connectionsJSON = (JSONArray) mapData.get("connections");
@@ -95,6 +105,12 @@ public class Map implements JSONAware{
         }
     }
 
+    /**
+     * Parses the JSON object and puts each country in the continent it belongs to
+     * @param mapData JSON to be parsed
+     * @param countries Set of countries to be put in continents.
+     * @param continents Set of continents to put countries into.
+     */
     private void putCountriesIntoContinent(JSONObject mapData, CountrySet countries, ContinentSet continents){
         //put countries into continents
         JSONObject continentMappingsJSON = (JSONObject) mapData.get("continents");
@@ -113,6 +129,12 @@ public class Map implements JSONAware{
         }
     }
 
+    /**
+     * Adds a value to each continent, ie. the amount of armies a player will obtain for owning all countries in the
+     * continent.
+     * @param mapData The JSON to be parsed
+     * @param continents The set of continents to be given values.
+     */
     private void addContinentValues(JSONObject mapData, ContinentSet continents){
         //add continent values
         JSONObject continentValuesJSON = (JSONObject) mapData.get("continent_values");
@@ -125,9 +147,13 @@ public class Map implements JSONAware{
         }
     }
 
-    //TODO implement method to parse cards
+    /**
+     * Parse the cards of the map. In the default map, each country represents a risk card as well, whose ID should be
+     * the same. Each card has a type, artillery, cavalry or infantry.
+     * @return A stack of Risk cards.
+     */
     private Stack<RiskCard> parseCountryCards(){
-        Stack<RiskCard> cards = new Stack<RiskCard>();
+        Stack<RiskCard> cards = new Stack<>();
         if(mapData==null){
             System.err.println("MapData not initialised;");
             return null;
@@ -136,8 +162,8 @@ public class Map implements JSONAware{
             for(Object key : cardObject.keySet()){
                 RiskCard tempCard = null;
                 int country_id = Integer.parseInt(key.toString());
-                int cardtype_id = Integer.parseInt(cardObject.get(key).toString());
-                switch(cardtype_id){
+                int card_type_id = Integer.parseInt(cardObject.get(key).toString());
+                switch(card_type_id){
                     case 0: tempCard = new RiskCard(RiskCardType.TYPE_INFANTRY, country_id);
                             break;
                     case 1: tempCard = new RiskCard(RiskCardType.TYPE_CAVALRY, country_id);
@@ -154,7 +180,6 @@ public class Map implements JSONAware{
         }
         return cards;
     }
-
 
     public ContinentSet getContinents() {
         return continents;
@@ -173,11 +198,13 @@ public class Map implements JSONAware{
     }
 
     public boolean hasUnassignedCountries(){
-
-
         return getUnassignedCountries().size() > 0;
     }
 
+    /**
+     * Checks all countries and whether they have an owner.
+     * @return The list of countries without an owner.
+     */
     public CountrySet getUnassignedCountries(){
         CountrySet ret = new CountrySet();
         for (Country c : countries){

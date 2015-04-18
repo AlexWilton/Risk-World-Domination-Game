@@ -31,26 +31,16 @@ public class GameEngine implements Runnable{
 
     /**
      * GameEngine constructor which takes clientsockethandler
-     * @param csh
+     * @param csh The ClientSocketHandler that this engine should call.
      */
     public GameEngine(ClientSocketHandler csh){
         this.csh = csh;
-    }
-
-    /**
-     * Empty GameEngine Constructor
-     */
-    public GameEngine() {
     }
 
     @Override
     public void run(){
         initialise();
         gameLoop();
-    }
-
-    public void initialise(State state, ArrayList<Client> clients) {
-        this.state = state;
     }
 
     /**
@@ -65,16 +55,14 @@ public class GameEngine implements Runnable{
      * Constructs a game state and stored in GameEngine object
      */
     void initialise(){
-        //create gamestate
-        State gamestate = new State();
-        state = gamestate;
-
+        //create game state
+        State gameState = new State();
+        state = gameState;
 
         //initialise map
         Map map = new Map();
 
         //wait till we are "playing"
-
         while (csh.getProtocolState() != ClientSocketHandler.ProtocolState.RUNNING){
             try {
                 Thread.sleep(10);
@@ -84,41 +72,35 @@ public class GameEngine implements Runnable{
         }
 
         //setup the players
-        ArrayList<Player> players = new ArrayList<Player>();
+        ArrayList<Player> players = new ArrayList<>();
 
         for (Client c : csh.getAllClients()){
             players.add(new Player(c.getPlayerId(),c, c.getPlayerName()));
         }
-        gamestate.setup(map,players);
-
+        gameState.setup(map,players);
 
         //Now roll dice to determine first player
         int firstPlayer = csh.determineFirstPlayer();
 
         System.out.println(firstPlayer);
-        System.out.println("Player " + gamestate.getPlayer(firstPlayer).getName() + " goes first!");
-        gamestate.setFirstPlayer(gamestate.getPlayer(firstPlayer));
-        gamestate.setCurrentPlayer(firstPlayer);
+        System.out.println("Player " + gameState.getPlayer(firstPlayer).getName() + " goes first!");
+        gameState.setFirstPlayer(gameState.getPlayer(firstPlayer));
+        gameState.setCurrentPlayer(firstPlayer);
 
         //now shuffle cards
-
         System.out.println("shuffling cards");
-
-        gamestate.shuffleRiskCards(csh.popSeed());
-
+        gameState.shuffleRiskCards(csh.popSeed());
         System.out.println("shuffled cards");
 
         //setup the countries in the normal game loop
-
         csh.linkGameState(state);
-
     }
 
     /**
      * Main loops to run game
      */
     void gameLoop(){
-		System.out.println("Game Loop running...");
+        System.out.println("Game Loop running...");
         Player currentPlayer;
         while(true) {
             currentPlayer = state.getCurrentPlayer();
@@ -131,10 +113,14 @@ public class GameEngine implements Runnable{
             processCommand(currentPlayer, currentCommand);
 
             if (state.winConditionsMet()) break;
-
         }
-	}
+    }
 
+    /**
+     * Processes game commands and applies them to game state.
+     * @param currentCommand The command to be processed
+     * @param currentPlayer The player to make the move.
+     */
     private void processCommand(Player currentPlayer, Command currentCommand) {
         ArrayList<Action> playerActions = new ArrayList<>();
         if (currentCommand instanceof AttackCommand){
@@ -200,7 +186,11 @@ public class GameEngine implements Runnable{
         return new AttackCaptureAction(player, origin, destination, armies);
     }
 
-
+    /**
+     * Processes the Play_cards command of the protocol and creates a list of relevant actions.
+     * @param command The command to be parsed
+     * @return List of actions the command implies.
+     */
     private ArrayList<TradeAction> processPlayCardsCommand(PlayCardsCommand command){
         /*{
             "command": "play_cards",
@@ -224,11 +214,10 @@ public class GameEngine implements Runnable{
         }
 
         JSONArray cards = (JSONArray)(payload.get("cards"));
-
-        ArrayList<ArrayList<RiskCard>> triplets = new ArrayList<ArrayList<RiskCard>>();
+        ArrayList<ArrayList<RiskCard>> triplets = new ArrayList<>();
         for (Object tripletObject : cards) {
             JSONArray tripletJSON = (JSONArray) tripletObject;
-            ArrayList<RiskCard> triplet = new ArrayList<RiskCard>();
+            ArrayList<RiskCard> triplet = new ArrayList<>();
             for (Object aTripletJSON : tripletJSON) {
                 int cardId = Integer.parseInt(aTripletJSON.toString());
                 triplet.add(state.getPlayer(player).getRiskCardById(cardId));
@@ -243,13 +232,15 @@ public class GameEngine implements Runnable{
             System.out.println("Interpreted trade command");
             acts.add(act);
         }
-
         return acts;
-
     }
 
-
-    private AttackAction processAttackCommand(AttackCommand command){
+    /**
+     * Processes an Attack Command and retrieves the defend action from the defender as well.
+     * @param command The attack command to be parsed
+     * @return The AttackAction created from this command.
+     */
+    private AttackAction processAttackCommand(AttackCommand command) {
         /*{
             "command": "attack",
             "payload": [1,2,1],
@@ -272,7 +263,7 @@ public class GameEngine implements Runnable{
 
             DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId, objectiveId, attackArmies);
             //if its local, propagate
-            if (csh != null && state.getCountryByID(objectiveId).getOwner().getClient().isLocal()){
+            if (csh != null && state.getCountryByID(objectiveId).getOwner().getClient().isLocal()) {
                 csh.sendCommand(def);
             }
             int defendArmies = def.getPayloadAsInt();
@@ -296,7 +287,12 @@ public class GameEngine implements Runnable{
         return null;
     }
 
-    private FortifyAction processFortifyCommand(FortifyCommand command){
+    /**
+     * Processes a fortification request
+     * @param command the command to be parsed
+     * @return Action to be taken by the player.
+     */
+    private FortifyAction processFortifyCommand(FortifyCommand command) {
         /*
         {
             "command": "fortify",
@@ -311,23 +307,21 @@ public class GameEngine implements Runnable{
         }
         JSONArray fortification = command.getPayloadAsArray();
         int player = command.getPlayer();
-
         int originId = Integer.parseInt(fortification.get(0).toString());
-
         int objectiveId = Integer.parseInt(fortification.get(1).toString());
-
         int armies = Integer.parseInt(fortification.get(2).toString());
 
         FortifyAction act = new FortifyAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),armies);
         System.out.println("Interpreted fortify command");
-
-
         return act;
-
-
     }
 
-    private ObtainRiskCardAction processDrawCardCommand(DrawCardCommand command){
+    /**
+     * Processes the command for drawing a risk card.
+     * @param command the command to be parsed
+     * @return the action corresponding to the command.
+     */
+    private ObtainRiskCardAction processDrawCardCommand(DrawCardCommand command) {
         /*{
             "command": "draw_card",
             "payload": 12,
@@ -339,50 +333,36 @@ public class GameEngine implements Runnable{
         ObtainRiskCardAction act = new ObtainRiskCardAction(state.getPlayer(player));
         System.out.println("Interpreted draw command");
         return act;
-
-
-
-
     }
 
+    /**
+     * Processes an army deploy command
+     * @param command the command to be processed
+     * @return the list of actions corresponding to the command
+     */
     private ArrayList<DeployArmyAction> processDeployCommand(DeployCommand command) {
         ArrayList<DeployArmyAction> deployArmyActions = new ArrayList<>();
         JSONArray territoryNumberPairs = command.getPayloadAsArray();
         int player = command.getPlayer();
         //construct amount of deploy actions
         for (Object pair : territoryNumberPairs) {
-
             //extract parameters
             JSONArray pairArray = (JSONArray) pair;
             int countryId = Integer.parseInt(pairArray.get(0).toString());
             int armies = Integer.parseInt(pairArray.get(1).toString());
-
             //create deploy action
             deployArmyActions.add(new DeployArmyAction(state.getPlayer(player),state.getCountryByID(countryId),armies));
-//
-//            //push to client
-//
-//
-//
-//            //pushed action to client
-//
-//            System.out.println("pushed deploy action to client " + player);
-
-
         }
-
-        //TODO ret multiple
-
         return deployArmyActions;
-
     }
 
-    private SetupAction processSetupCommand(SetupCommand command){
+    /**
+     * Processes setup command at the beginning of the game.
+     * @param command command to be processed
+     * @return Relevant setup action.
+     */
+    private SetupAction processSetupCommand(SetupCommand command) {
         int countryId = command.getPayloadAsInt();
         return  new SetupAction(state.getPlayer(command.getPlayer()),state.getCountryByID(countryId));
     }
-
-
-
-
 }

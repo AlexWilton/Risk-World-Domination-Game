@@ -3,19 +3,16 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
-import java.util.ArrayList;
-
 /**
  * represents a country with borders and keeps track of the troops currently deployed and the player that owns it.
- *
  */
 public class Country implements JSONAware{
 
-	private String countryName = null;
+    private String countryName = null;
     private int countryId;
-	private CountrySet linkedCountries = new CountrySet();
-	private int troops = -1;
-	private Player owner =null;
+    private CountrySet linkedCountries = new CountrySet();
+    private int troops = -1;
+    private Player owner =null;
 
     public Country( int countryId, String countryName){
         this(countryId);
@@ -52,27 +49,31 @@ public class Country implements JSONAware{
 
     public CountrySet getNeighbours() { return linkedCountries;}
 
+    /**
+     * Get the set of countries that are directly connected with this country and are owned by the same player.
+     * @return CountrySet, may be empty.
+     */
     public CountrySet getSamePlayerNeighbours() {
-
         CountrySet ret = new CountrySet();
         for (Country c : linkedCountries){
             if (this.getOwner() == c.getOwner()){
                 ret.add(c);
             }
         }
-
         return ret;
     }
 
+    /**
+     * Get the set of countries that are directly connected with this country and are owned by a different player.
+     * @return CountrySet, may be empty.
+     */
     public CountrySet getEnemyNeighbours() {
-
         CountrySet ret = new CountrySet();
         for (Country c : linkedCountries){
             if (this.getOwner() != c.getOwner()){
                 ret.add(c);
             }
         }
-
         return ret;
     }
 

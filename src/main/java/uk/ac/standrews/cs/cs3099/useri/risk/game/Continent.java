@@ -3,32 +3,31 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 
-import java.util.ArrayList;
-
 /**
- * holds the list of countries contained in a continent and the reward for conquering it
- *
+ * holds the list of countries contained in a continent and the reward for conquering the whole continent.
  */
-public class Continent implements JSONAware{
+public class Continent implements JSONAware {
 	private CountrySet countries = new CountrySet();
 	private int reinforcementValue = 0;
     private String name;
     private int id;
 
-    public Continent(int id,String continentName){
+    public Continent(int id,String continentName) {
         name = continentName;
         this.id = id;
     }
 
-    public void addCountry(Country country){
+    public void addCountry(Country country) {
         countries.add(country);
     }
 
-    public void setReinforcementValue(int reinforcementValue){
+    public void setReinforcementValue(int reinforcementValue) {
         this.reinforcementValue = reinforcementValue;
     }
 
-    public CountrySet getCountries() { return countries;}
+    public CountrySet getCountries() {
+        return countries;
+    }
 
     public int getId() {
         return id;

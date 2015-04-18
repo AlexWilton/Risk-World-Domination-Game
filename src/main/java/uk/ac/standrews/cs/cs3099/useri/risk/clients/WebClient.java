@@ -15,6 +15,9 @@ import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.ArrayBlockingQueue;
 
+/**
+ * Web Client, running in a browser tab. You can be either a host or join to a host somewhere on the public internet.
+ */
 public class WebClient extends Client {
 
     private JettyServer jettyServer;
@@ -77,8 +80,6 @@ public class WebClient extends Client {
         return null;
     }
 
-
-
     @Override
     public int getDefenders(Country attackingCountry, Country defendingCountry, int attackingArmies) {
         //Auto defend with max troops possible
@@ -90,9 +91,6 @@ public class WebClient extends Client {
         return rng.generateNumber();
     }
 
-
-
-
     @Override
     public boolean isReady(){
         return (commandQueue.size() > 0);
@@ -102,9 +100,6 @@ public class WebClient extends Client {
         this.isHost = isHost;
         this.isPlayingHost = isPlayingHost;
     }
-
-
-
 
     public boolean isLocal(){
         return true;
@@ -123,10 +118,8 @@ public class WebClient extends Client {
         return isPlayingHost;
     }
 
-
     @Override
     public void pushRollHash(String rollHash){
-
 
     }
     @Override

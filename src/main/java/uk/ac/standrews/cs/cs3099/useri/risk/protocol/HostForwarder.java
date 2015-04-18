@@ -26,17 +26,17 @@ class HostForwarder {
     private static State state;
     private static RandomNumberGenerator seed;
 
-    private MessageQueue messageQueue;
     private final int MOVE_TIMEOUT;
     private final int ACK_TIMEOUT;
     private final int ID;
+
     private BufferedReader input;
+    private MessageQueue messageQueue;
     private boolean ack_received;
     private boolean move_required;
-
+    private boolean getRolls;
     private double timer = System.currentTimeMillis();
     private int last_ack = 0;
-    private boolean getrolls;
 
     public HostForwarder(MessageQueue q, int move_timeout, int ack_timeout, int id, BufferedReader input) {
         messageQueue = q;
@@ -102,7 +102,7 @@ class HostForwarder {
      */
     protected void playGame() throws IOException {
         while(true) {
-            if (getrolls) {
+            if (getRolls) {
                 try {
                     getRolls();
                 } catch (InterruptedException | HashMismatchException e) {
@@ -131,7 +131,9 @@ class HostForwarder {
             if (state.winConditionsMet()) break;
             try {
                 Thread.sleep(1); // Just sleep a bit to prevent busy looping
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -225,8 +227,6 @@ class HostForwarder {
      * @param command The command to be parsed
      * @return List of actions the command implies.
      */
-
-    private int tradesMade = 0;
     private ArrayList<TradeAction> processPlayCardsCommand(PlayCardsCommand command){
         JSONObject payload = command.getPayload();
         int player = command.getPlayer();
@@ -245,7 +245,6 @@ class HostForwarder {
             for (Object aTripletJSON : tripletJSON) {
                 int cardId = Integer.parseInt(aTripletJSON.toString());
                 triplet.add(state.getPlayers().get(player).getRiskCardById(cardId));
-                System.out.println(tradesMade++);
             }
             triplets.add(triplet);
         }
@@ -344,9 +343,8 @@ class HostForwarder {
      */
     private ObtainRiskCardAction processDrawCardCommand(DrawCardCommand command){
         int player = command.getPlayer();
-        ObtainRiskCardAction act = new ObtainRiskCardAction(state.getPlayers().get(player));
         //System.out.println("Interpreted draw command");
-        return act;
+        return new ObtainRiskCardAction(state.getPlayers().get(player));
     }
 
     /**
@@ -390,11 +388,7 @@ class HostForwarder {
         ack_received = false;
     }
 
-    protected boolean hasSeed() {
-        return seed != null;
-    }
-
     public void getRollsLater(){
-        getrolls = true;
+        getRolls = true;
     }
 }

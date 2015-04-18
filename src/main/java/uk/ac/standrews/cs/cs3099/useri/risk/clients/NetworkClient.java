@@ -4,7 +4,9 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 
-
+/**
+ * Client that communicates over the Network only.
+ */
 public class NetworkClient extends Client {
 
     private boolean ready;
@@ -19,8 +21,6 @@ public class NetworkClient extends Client {
         this.gameState = gamestate;
     }
 
-
-
     @Override
     protected byte[] getSeedComponent(){
         return null;
@@ -34,10 +34,6 @@ public class NetworkClient extends Client {
     @Override
     public boolean isReady(){
         return ready;
-    }
-
-    public void setReady (boolean set){
-        ready = set;
     }
 
     public boolean isLocal(){

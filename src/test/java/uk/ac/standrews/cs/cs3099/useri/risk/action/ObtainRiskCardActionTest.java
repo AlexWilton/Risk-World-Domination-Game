@@ -44,7 +44,7 @@ public class ObtainRiskCardActionTest {
         // has to fail, no battle won.
         assertFalse(action.validateAgainstState(testState));
 
-        testState.winning();
+        testState.territoryCaptured();
         assertTrue(action.validateAgainstState(testState));
 
     }
@@ -53,7 +53,7 @@ public class ObtainRiskCardActionTest {
     public void testPerformOnState() throws Exception {
         ObtainRiskCardAction action = new ObtainRiskCardAction(playerA);
 
-        testState.winning();
+        testState.territoryCaptured();
         assertTrue(action.validateAgainstState(testState));
         action.performOnState(testState);
         assertEquals(1, playerA.getCards().size());

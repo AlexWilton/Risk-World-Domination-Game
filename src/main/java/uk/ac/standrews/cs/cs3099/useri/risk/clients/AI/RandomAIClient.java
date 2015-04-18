@@ -1,21 +1,13 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.action.DeployArmyAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.SetupAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
-
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.JettyServer;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
-import java.awt.*;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Created by patrick on 17/04/15.
@@ -30,10 +22,21 @@ public class RandomAIClient extends Client {
 
     @Override
     public Command popCommand() {
-
+        // This cannot be random, if a country has been captured, move a random number of armies to it (at least 1).
+        if (gameState.isAttackCaptureNeeded()) {
+            Country origin = gameState.getAttackCaptureOrigin();
+            Country destination = gameState.getAttackCaptureDestination();
+            int minArmies =  gameState.getAttackCaptureMinimumArmiesToMove();
+            int maxArmies = origin.getTroops() - 1;
+            Random rn = new Random();
+            int n = maxArmies - minArmies + 1;
+            int i = rn.nextInt() % n;
+            int armies =  minArmies + i;
+            return new AttackCaptureCommand(origin.getCountryId(), destination.getCountryId(), armies, playerId);
+        }
         ArrayList<Command> possible = getAllPossibleCommands();
         Random r = new Random();
-        return possible.get((int)(r.nextDouble()*possible.size()));
+        return possible.get(r.nextInt(possible.size()));
     }
 
 

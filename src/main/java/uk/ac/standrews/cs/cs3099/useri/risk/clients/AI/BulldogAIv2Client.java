@@ -26,10 +26,15 @@ public class BulldogAIv2Client extends Client {
 
     @Override
     public Command popCommand() {
-        //if we attacked before and havent won or havent lost all armies, attack again
+        //if we attacked before and haven't won or haven't lost all armies, attack again
         if (lastAttack != null){
             int lastOrigin = Integer.parseInt(lastAttack.getPayloadAsArray().get(0).toString());
             int lastTarget = Integer.parseInt(lastAttack.getPayloadAsArray().get(1).toString());
+
+            if (gameState.isAttackCaptureNeeded()) {
+                int armies = gameState.getCountryByID(lastOrigin).getTroops() - 1;
+                return new AttackCaptureCommand(lastOrigin, lastTarget, armies, playerId);
+            }
 
             if (gameState.getCountryByID(lastTarget).getOwner().getID() != playerId){
                 if (gameState.getCountryByID(lastOrigin).getTroops() > gameState.getCountryByID(lastTarget).getTroops()){

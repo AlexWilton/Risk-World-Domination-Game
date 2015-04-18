@@ -145,6 +145,7 @@ class ParamHandler extends DefaultHandler {
                     PlayCardsCommand playCardsCommand = new PlayCardsCommand(cardTriplets, ta.calculateArmies(webClient.getState()), myself.getID());
                     webClient.queueCommand(playCardsCommand);
                     return String.valueOf(true);
+
             case "deploy_armies":
                     ArrayList<DeployTuple> deployTuples = new ArrayList<DeployTuple>();
                     for(Country myCountry : myself.getOccupiedCountries()){
@@ -174,9 +175,19 @@ class ParamHandler extends DefaultHandler {
                     DeployCommand deployCommand = new DeployCommand(deployTuples, myself.getID());
                     webClient.queueCommand(deployCommand);
                     return String.valueOf(true);
+
             case "attack":
                 if((params.get("end_attack") != null && params.get("end_attack")[0].equals("yes"))){
                     webClient.getState().nextStage();
+                    //check if a risk card needs to be obtained...
+                    ObtainRiskCardAction obtainRiskCardAction = new ObtainRiskCardAction(myself);
+                    if(obtainRiskCardAction.validateAgainstState(webClient.getState())){
+                        DrawCardCommand drawCardCommand = new DrawCardCommand(webClient.getState().peekCard().getCardID(), myself.getID());
+                        webClient.queueCommand(drawCardCommand);
+                    }else{
+                        webClient.getState().nextStage(); //skip get card stage if there is no card to draw.
+                    }
+
                     return "true";
                 }
 
@@ -210,6 +221,7 @@ class ParamHandler extends DefaultHandler {
                 AttackCommand attackCommand = new AttackCommand(attacking_country_id, defending_country_id, num_of_armies, myself.getID());
                 webClient.queueCommand(attackCommand);
                 return String.valueOf(true);
+
             case "attack_capture":
                 //Get attacking and defending Country objects
                 attackingCountryArray = params.get("attacking_country_id");
@@ -244,6 +256,50 @@ class ParamHandler extends DefaultHandler {
                 AttackCaptureCommand attackCaptureCommand = new AttackCaptureCommand(attacking_country_id, defending_country_id, num_of_armies, myself.getID());
                 webClient.queueCommand(attackCaptureCommand);
                 return String.valueOf("true");
+
+            case "fortify": //skip_fortity
+                if((params.get("skip_fortity") != null && params.get("skip_fortity")[0].equals("yes"))){
+                    FortifyCommand fortifyCommand = new FortifyCommand(myself.getID());
+                    webClient.queueCommand(fortifyCommand);
+                    return String.valueOf("true");
+                }
+
+
+                //Get attacking and defending Country objects
+                String[] originCountryArray = params.get("origin_country_id");
+                String[] destinationCountryArray = params.get("destination_country_id");
+                int origin_country_id, destination_country_id;
+                try{
+                    origin_country_id = (originCountryArray != null) ? (Integer.parseInt(originCountryArray[0])) : -1;
+                    destination_country_id = (destinationCountryArray != null) ? (Integer.parseInt(destinationCountryArray[0])) : -1;
+                }catch (NumberFormatException e){
+                    return "Error! Valid Country Id not provided";
+                }
+                Country originCountry = webClient.getState().getCountryByID(origin_country_id);
+                Country destinationCountry = webClient.getState().getCountryByID(destination_country_id);
+                if(originCountry == null || originCountry.getOwner() != myself)
+                    return "Error! Please fortify from a valid country.";
+                if(destinationCountry == null || destinationCountry.getOwner() != myself) //before capture, country is set to new owner when attack action is performed
+                    return "Error! Please chose a valid country to fortify.";
+
+                //Get number of armies for fortification
+                numOfArmiesArray = params.get("num_of_armies");
+                try {
+                    num_of_armies = Integer.parseInt(numOfArmiesArray[0]);
+                    if(num_of_armies < 1) throw new NumberFormatException();
+                }catch (NumberFormatException e){
+                    return "Error! Please select a valid number of armies to fortify with";
+                }
+
+                FortifyAction fortifyAction = new FortifyAction(myself, originCountry, destinationCountry, num_of_armies);
+                if(!fortifyAction.validateAgainstState(webClient.getState())){
+                    return "Error! This fortify movement is not allowed.";
+                }
+
+                FortifyCommand fortifyCommand = new FortifyCommand(origin_country_id, destination_country_id, num_of_armies, myself.getID());
+                webClient.queueCommand(fortifyCommand);
+                return String.valueOf("true");
+
             default:
                 return "Unknown Action";
         }

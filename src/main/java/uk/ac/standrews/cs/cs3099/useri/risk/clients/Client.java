@@ -15,7 +15,7 @@ import java.util.Queue;
  * can take multiple forms, eg local, network or AIClient
  *
  */
-public abstract class Client {
+public abstract class Client extends CommandQueuer{
 
 
     State gameState;
@@ -27,19 +27,12 @@ public abstract class Client {
     private byte[] hexSeedComponent;
 
     private boolean playReady = false;
-    private Queue<Command> commandQueue;
-    private Queue<String> hashQueue;
-    private Queue<String> numberQueue;
 
-    private DefendCommand defendCommand;
     protected RandomNumberGenerator rng;
 
 
     protected Client(State gamestate, RandomNumberGenerator rng){
-
-        commandQueue = new ArrayDeque<>();
-        hashQueue = new ArrayDeque<>();
-        numberQueue = new ArrayDeque<>();
+        super();
         this.rng = rng;
 
         this.gameState = gamestate;
@@ -95,41 +88,7 @@ public abstract class Client {
     }
 
 
-    public void pushCommand(Command command) {
-        if (command instanceof DefendCommand){
-            defendCommand=(DefendCommand)command;
-        }
-        else{
-            commandQueue.add(command);
-        }
-    }
 
-
-    public Command popCommand() {
-        while (commandQueue.isEmpty()){
-
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        return commandQueue.remove();
-    }
-
-
-    public DefendCommand popDefendCommand(int origin, int target, int armies) {
-        while (defendCommand == null){
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        DefendCommand ret = defendCommand;
-        defendCommand = null;
-        return ret;
-    }
 
     public abstract boolean isLocal();
 
@@ -142,32 +101,6 @@ public abstract class Client {
         System.out.println("Got new State!");
     }
 
-    public void pushRollHash(String rollHash){
-        hashQueue.add(rollHash);
-    }
 
-    public void pushRollNumber(String rollNumber){
-        numberQueue.add(rollNumber);
-    }
-
-    public String popRollHash(){
-        try {
-             while (hashQueue.size() < 1) Thread.sleep(10);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return hashQueue.remove();
-    }
-
-    public String popRollNumber(){
-        try {
-            while (numberQueue.size() < 1) Thread.sleep(10);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return numberQueue.remove();
-    }
 
 }

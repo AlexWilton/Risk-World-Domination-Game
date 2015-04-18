@@ -260,4 +260,8 @@ public class State implements JSONAware {
         return map.getUnassignedCountries();
     }
 
+    public void setTurnStage(TurnStage s){
+        this.stage = s;
+    }
+
 }

@@ -29,6 +29,7 @@ public class RandomAIClient extends Client {
 
     @Override
     public Command popCommand() {
+
         ArrayList<Command> possible = getAllPossibleCommands();
         Random r = new Random();
         return possible.get((int)(r.nextDouble()*possible.size()));
@@ -54,12 +55,7 @@ public class RandomAIClient extends Client {
 
     @Override
     public DefendCommand popDefendCommand(int origin, int target, int armies) {
-        try {
-            Thread.sleep(1000);
-            //TODO GIVE SERVER A BREAK, shouldnt be necessary
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
         return new DefendCommand((gameState.getCountryByID(target).getTroops() > 1) ? 2 : 1, playerId);
     }
 
@@ -78,6 +74,11 @@ public class RandomAIClient extends Client {
             //only setup commands
             ret.addAll(getAllPossibleSetupCommands());
         }else {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             TurnStage stage = gameState.getTurnStage();
             switch (stage) {
                 case STAGE_TRADING: {
@@ -92,7 +93,7 @@ public class RandomAIClient extends Client {
 
                 case STAGE_BATTLES: {
                     ret.addAll(getAllPossibleAttackCommands());
-                } //NO BREAK, we can go straight to the next stage
+                } if (ret.size()!=0) break ;//NO BREAK, we can go straight to the next stage
 
                 case STAGE_GET_CARD: {
                     if (gameState.wonBattle()) {

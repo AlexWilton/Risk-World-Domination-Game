@@ -29,6 +29,10 @@ public class Command extends JSONObject {
         return (JSONObject)this.get("payload");
     }
 
+    public String getPayloadAsString(){
+        return this.get("payload").toString();
+    }
+
     public JSONArray getPayloadAsArray(){
         return (JSONArray)this.get("payload");
     }

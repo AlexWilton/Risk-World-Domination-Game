@@ -127,11 +127,11 @@ class ListenerThread implements Runnable {
 
             // Start forwarding every message as is.
             fw = new HostForwarder(messageQueue, MOVE_TIMEOUT, ACK_TIMEOUT, ID, input);
-            while (!fw.hasSeed()) Thread.sleep(10);
+
             fw.getRolls();
             state = InitState.FIRST_PLAYER_ELECTABLE;
             //HostForwarder.setSeed(null);
-            while (!(fw.hasSeed() && shuffle)) Thread.sleep(10);
+
             fw.getRolls();
             state = InitState.DECK_SHUFFLED;
             fw.playGame();

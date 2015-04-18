@@ -3,6 +3,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.CommandQueuer;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
@@ -15,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Queue;
 
 /**
  * Class for forwarding messages and applying the command from a single client to the GameState.
@@ -22,7 +24,7 @@ import java.util.ArrayList;
  * Diceroll-related commands. Also performs checking for timeouts when an acknowledgement or a
  * move is required.
  */
-class HostForwarder {
+class HostForwarder implements Runnable{
     private static State state;
     private static RandomNumberGenerator seed;
 
@@ -37,6 +39,10 @@ class HostForwarder {
     private double timer = System.currentTimeMillis();
     private int last_ack = 0;
     private boolean getrolls;
+    private boolean running = true;
+
+    private CommandQueuer queuer;
+    Thread parserThread;
 
     public HostForwarder(MessageQueue q, int move_timeout, int ack_timeout, int id, BufferedReader input) {
         messageQueue = q;
@@ -44,6 +50,10 @@ class HostForwarder {
         ACK_TIMEOUT = ack_timeout;
         ID = id;
         this.input = input;
+        this.queuer = new CommandQueuer();
+        //make the parser thread
+        parserThread = new Thread(this);
+        parserThread.start();
     }
 
     /**
@@ -70,29 +80,16 @@ class HostForwarder {
      * @throws InterruptedException
      */
     void getRolls() throws IOException, InterruptedException, HashMismatchException{
-        Command comm = Command.parseCommand(input.readLine());
-        messageQueue.sendAll(comm, ID);
-        while (!(comm instanceof RollHashCommand)) {
-            System.out.println(comm instanceof RollHashCommand);
-            checkAckCases(comm);
-            comm = Command.parseCommand(input.readLine());
-            messageQueue.sendAll(comm, ID);
-            //System.err.println(comm);
-            //throw new RollException();
-        }
-        RollHashCommand hash = (RollHashCommand) comm;
+        String hashStr = queuer.popRollHash();
         System.out.println("Got hash from " + ID);
-        String hashStr = hash.get("payload").toString();
+
         seed.addHash(ID, hashStr);
 
-        comm = Command.parseCommand(input.readLine());
-        messageQueue.sendAll(comm, ID);
-        if (!(comm instanceof RollNumberCommand)) {
-            throw new RollException();
-        }
-        RollNumberCommand roll = (RollNumberCommand) comm;
-        String rollStr = roll.get("payload").toString();
+        String rollStr = queuer.popRollNumber();
+        System.out.println("Got Number from " + ID);
+
         seed.addNumber(ID, rollStr);
+        getrolls = false;
     }
 
     /**
@@ -100,6 +97,7 @@ class HostForwarder {
      * @throws IOException
      */
     protected void playGame() throws IOException {
+
         while(true) {
             if (getrolls) {
                 try {
@@ -121,13 +119,15 @@ class HostForwarder {
                 System.out.println("Player " + ID + "'s turn'");
                 timer = System.currentTimeMillis();
             }
-            if (input.ready()) {
-                Command reply = Command.parseCommand(input.readLine());
-                System.out.println("in Player " + ID + ": " + reply);
-                messageQueue.sendAll(reply, ID);
-                checkAckCases(reply);
+
+            Command reply = queuer.popCommand();
+
+            checkAckCases(reply);
+
+            if (state.winConditionsMet()) {
+                running = false;
+                break;
             }
-            if (state.winConditionsMet()) break;
             try {
                 Thread.sleep(1); // Just sleep a bit to prevent busy looping
             } catch (InterruptedException e) {}
@@ -383,5 +383,33 @@ class HostForwarder {
 
     public void getRollsLater(){
         getrolls = true;
+    }
+
+    @Override
+    public void run() {
+        //TODO potentially dirty hotfix, see commit message
+        while(running){
+            try {
+                if (input.ready()) {
+                    Command reply = Command.parseCommand(input.readLine());
+                    if (reply instanceof RollHashCommand){
+                        queuer.pushRollHash(reply.getPayloadAsString().toString());
+                    }
+                    else if (reply instanceof RollNumberCommand){
+                        queuer.pushRollNumber(reply.getPayloadAsString().toString());
+                    }
+
+
+                    else {
+                        queuer.pushCommand(reply);
+                    }
+                    System.out.println("in Player " + ID + ": " + reply);
+                    messageQueue.sendAll(reply, ID);
+                }
+                Thread.sleep(10);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

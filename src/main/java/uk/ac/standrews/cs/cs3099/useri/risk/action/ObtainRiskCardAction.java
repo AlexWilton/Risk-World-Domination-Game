@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.action;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 
 /**
  * Getting risk cards. This is compulsory. If you won an attack, you get a risk card.
@@ -38,5 +39,6 @@ public class ObtainRiskCardAction extends Action {
     @Override
     public void performOnState(State state) {
         player.addCard(state.getCard());
+        state.setTurnStage(TurnStage.STAGE_FORTIFY);
     }
 }

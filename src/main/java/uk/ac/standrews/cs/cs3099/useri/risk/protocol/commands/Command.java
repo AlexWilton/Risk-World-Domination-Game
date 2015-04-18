@@ -67,7 +67,7 @@ public class Command extends JSONObject {
     public static Command parseCommand(String envelopeString){
         if (envelopeString==null){
             //TODO throw exception
-            System.out.println("received string empty");
+            System.err.println("received string empty");
             return null;
         }
 
@@ -152,7 +152,7 @@ public class Command extends JSONObject {
                 ret = new SetupCommand(commandJSON);
                 break;
             default:
-                System.out.println("Cant parse " + command);
+                System.err.println("Cant parse " + command);
                 ret = null;
         }
 

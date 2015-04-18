@@ -38,7 +38,7 @@ public class AcknowledgementCommand extends Command {
             return new AcknowledgementCommand(ackID, playerId);
 
         } catch(ParseException e){
-            System.out.println(commandJSON);
+            System.err.println(commandJSON);
             return null;
         }
     }

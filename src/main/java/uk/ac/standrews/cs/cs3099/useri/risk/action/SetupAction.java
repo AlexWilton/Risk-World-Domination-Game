@@ -70,12 +70,12 @@ public class SetupAction extends Action {
             player.setUnassignedArmies(player.getUnassignedArmies() - 1);
 
 
-            System.out.println(player.getName() + " took possession of " + country.getCountryName());
+            //System.out.println(player.getName() + " took possession of " + country.getCountryName());
         }else{ //reinforcing already claimed country with a single army
             country.setTroops(country.getTroops() + 1);
             player.setUnassignedArmies( player.getUnassignedArmies() - 1);
 
-            System.out.println(player.getName() + " reinforced " + country.getCountryName());
+            //System.out.println(player.getName() + " reinforced " + country.getCountryName());
         }
 
         //check for end of setup

@@ -14,39 +14,83 @@ public class Country implements JSONAware{
     private int troops = -1;
     private Player owner =null;
 
+    /**
+     * Constructor of the country object
+     * @param countryId integer value representing the id of the country
+     * @param countryName String value to represent the name of the country
+     */
     public Country( int countryId, String countryName){
         this(countryId);
         this.countryName = countryName;
     }
 
+    /**
+     * Constructor of the country object without country name - used in testing
+     * @param countryId integer varialbe representing the id of the country
+     */
     public Country(int countryId){
         this.countryId = countryId;
     }
 
+    /**
+     * Adds link to the country passed in as the variable
+     * @param otherCountry Country object to be linked to
+     */
     public void addOneWayLinkToCountry(Country otherCountry){
         linkedCountries.add(otherCountry);
     }
 
+    /**
+     * Method to retrieve number of troops in the country
+     * @return number of troops in the country as integer
+     */
     public int getTroops() {
         return troops;
     }
-
-    public String getCountryName() {
-        return countryName;
-    }
-
-    public Player getOwner() {
-        return owner;
-    }
-
+    /**
+     * Setter for number of troops in the country
+     * @param troops integer
+     */
     public void setTroops(int troops) {
         this.troops = troops;
     }
 
+    /**
+     * Method to get country name
+     * @return String variable representing the name of the country
+     */
+    public String getCountryName() {
+        return countryName;
+    }
+
+    /**
+     * Getter for country ID
+     * @return Integer country ID variable
+     */
+    public int getCountryId(){
+        return countryId;
+    }
+
+    /**
+     * Getter for the player who owns the country
+     * @return Player object representing the owner
+     */
+    public Player getOwner() {
+        return owner;
+    }
+
+    /**
+     * Setter of the owner of the country
+     * @param owner Player object representing the owner of the country
+     */
     public void setOwner(Player owner) {
         this.owner = owner;
     }
 
+    /**
+     * Returns all of the neighbours connected to this country
+     * @return CountrySet object containing all the countries connected to this country
+     */
     public CountrySet getNeighbours() { return linkedCountries;}
 
     /**
@@ -77,10 +121,10 @@ public class Country implements JSONAware{
         return ret;
     }
 
-    public int getCountryId(){
-        return countryId;
-    }
-
+    /**
+     * Method fo generate JSON string representation of the country
+     * @return String JSON representation
+     */
     @Override
     public String toJSONString() {
         JSONObject country = new JSONObject();

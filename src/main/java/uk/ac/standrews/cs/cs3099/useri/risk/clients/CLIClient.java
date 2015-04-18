@@ -19,6 +19,10 @@ public class CLIClient extends Client {
     private InputStream in;
     private PrintStream out;
 
+    /**
+     * Constructor for this CLI client. Sets the input and output streams to stdin and stdout.
+     * @param gameState The game state to act upon.
+     */
     public CLIClient (State gameState) {
         super(gameState, new RandomNumberGenerator());
         this.gameState = gameState;
@@ -26,17 +30,11 @@ public class CLIClient extends Client {
         this.out = System.out;
     }
 
-
     /**
-     * notify player of the
+     * Prints out the tradeable card sets and asks the player to give their choice.
+     * @return Trade command or null, depending on player's choice.
      */
-    public void pushGameState(){
-        //no need for asynchronous updates (yet)
-    }
-
-    private Command tradeMenu(){
-
-
+    private Command tradeMenu() {
         Command ret = null;
         out.println("TRADE MENU");
         out.println("1 - Trade in Risk Cards");
@@ -51,15 +49,16 @@ public class CLIClient extends Client {
                 gameState.nextStage();
                 ret = deployMenu();break;
         }
-
         return ret;
-
     }
 
-    private Command deployMenu(){
 
+    /**
+     * Asks the player where they want to deploy armies.
+     * @return Deploy command or null.
+     */
+    private Command deployMenu() {
         Command ret;
-
         if (gameState.getPlayer(playerId).getUnassignedArmies() > 0) {
             out.println("You have " + gameState.getPlayer(playerId).getUnassignedArmies() + " unassigned armies. Assign to which country?");
 
@@ -68,10 +67,7 @@ public class CLIClient extends Client {
             out.println("How many armies to deploy to " + target.getCountryName());
 
             int amount = getChoice(0, gameState.getPlayer(playerId).getUnassignedArmies());
-
-
             ArrayList<DeployTuple> tupList = new ArrayList<>();
-
             tupList.add(new DeployTuple(target.getCountryId(),amount));
             ret = new DeployCommand(tupList,gameState.getPlayer(playerId).getID());
         }
@@ -80,93 +76,79 @@ public class CLIClient extends Client {
             gameState.nextStage();
             ret = attackMenu();
         }
-
         return ret;
     }
 
+    /**
+     * Asks the player for attack actions.
+     * @return Attack Command or null.
+     */
     private Command attackMenu(){
 
         Command ret;
         out.println("ATTACK MENU");
         out.println("Select country of origin for attack. In brackets you see (armies,potential targets). select 0 for no attack");
 
-
         //DETERMINE POINT OF ORIGIN
         Country origin = selectCountry(gameState.getPlayer(playerId).getOccupiedCountries(),true,false,false);
 
-
         if (origin != null){
             //DETERMINE TARGET
-
             out.println("Select objective for attack. In brackets you see (armies). select 0 for cancelling attack");
 
             Country objective = selectCountry(origin.getEnemyNeighbours(),false,true,false);
 
             if (objective != null){
-
                 out.println("You have " + origin.getTroops() + " armies in " + origin.getCountryName() + ", there are  " + objective.getTroops() + " armies to defend " + objective.getCountryName() +". How many armies do you attack with?");
-
                 int armies = getChoice(0,origin.getTroops());
-
-
                 ret = new AttackCommand(origin.getCountryId(),objective.getCountryId(),armies,gameState.getPlayer(playerId).getID());
-
-
-
             }
             else {
                 ret = attackMenu();
             }
-
-        }
-
-        else {
-
+        } else {
             gameState.nextStage();
             ret = fortifyMenu();
         }
-
-
         return ret;
     }
 
-    private Command fortifyMenu(){
-
+    /**
+     * Asks the player to fortify their position.
+     * @return Fortify command, containing the specified actions, or empty.
+     */
+    private Command fortifyMenu() {
         Command ret;
         out.println("FORTIFY MENU");
         out.println("If you want to fortify, select the origin country, if you dont, select 0 to end your turn. in brackets you see (available troops, potential targets).");
 
         Country origin = selectCountry(gameState.getPlayer(playerId).getOccupiedCountries(),false,true,true);
 
-        if (origin != null){
+        if (origin != null) {
             out.println("Select the country to fortify, select 0 do choose a different origin. (available troops, potential targets).");
-
             Country target = selectCountry(origin.getNeighbours(),false,true,true);
-
-            if (target != null){
+            if (target != null) {
                 out.println("Select the select the amount of armies to transfer 0 - " + (origin.getTroops()-1) );
-
                 int armies = getChoice(0,origin.getTroops()-1);
-
                 ret = new FortifyCommand(origin.getCountryId(),target.getCountryId(),armies,playerId);
-            }
-            else{
+            } else {
                 ret = fortifyMenu();
             }
-        }
-        else {
-
+        } else {
             ret = new FortifyCommand(playerId);
         }
-
-
         return ret;
     }
 
-    public int getDefenders(Country attacker, Country objective, int attackingArmies){
-
+    /**
+     * Asks the player when they have been attacked, how many armies they want to use for defending.
+     * @param attacker
+     * @param objective
+     * @param attackingArmies
+     * @return The defending dice.
+     */
+    public int getDefenders(Country attacker, Country objective, int attackingArmies) {
         out.println("" + attacker.getCountryName() + " is attacking " + objective.getCountryName() + " with " + attackingArmies + " armies. You have " + objective.getTroops() + " armies to defend with. Choose how many.");
-
         return getChoice(1,objective.getTroops());
     }
 
@@ -175,11 +157,15 @@ public class CLIClient extends Client {
         return rng.generateNumber();
     }
 
-    private int getChoice(int min, int max){
-
+    /**
+     * Gets the choice the player can make and returns it as an int.
+     * @param min minimum number that can be chosen
+     * @param max maximum number that can be chosen
+     * @return The number chosen.
+     */
+    private int getChoice(int min, int max) {
         int choice = min-1;
         Scanner inScanner = new Scanner(in);
-
         while (choice < min || choice > max) {
             out.println("Enter choice:");
             choice = inScanner.nextInt();
@@ -187,22 +173,26 @@ public class CLIClient extends Client {
                 out.println("Enter value between " + min + " and " + max + "please!");
             }
         }
-
         return choice;
     }
 
+    /**
+     * Gets the choice from the player for a country from a list of countries available.
+     * @param countries
+     * @param showEnemyNeighbours
+     * @param showCountriesWithoutAttackableNeighbours
+     * @param showOwnNeighbours
+     * @return The country selected.
+     */
     private Country selectCountry(CountrySet countries, boolean showEnemyNeighbours, boolean showCountriesWithoutAttackableNeighbours, boolean showOwnNeighbours) {
-
         out.println("-1 - none");
         ArrayList<Integer> sortedKeys = countries.getIDList();
         Collections.sort(sortedKeys);
-        for (int key : sortedKeys) {
 
+        for (int key : sortedKeys) {
             String enemyNeighbours = "";
             String ownNeighbours = "";
-
             Country c = countries.get(key);
-
             boolean firstItem = true;
 
             for (Country n : c.getEnemyNeighbours()) {
@@ -227,33 +217,26 @@ public class CLIClient extends Client {
 
             if (showCountriesWithoutAttackableNeighbours || c.getEnemyNeighbours().size() > 0)
                 out.println("" + key + " - " + c.getCountryName() + " (" + c.getTroops() + (showEnemyNeighbours ? ", " + enemyNeighbours : "") + (showOwnNeighbours ? ", " + ownNeighbours : "") + ")");
-
-
         }
 
         int choice = getChoice(-1, 50);
-
         if (choice == -1) {
             return null;
-        }
-        else if (!sortedKeys.contains(choice)){
+        } else if (!sortedKeys.contains(choice)) {
             out.println("Choose from the list!");
             return selectCountry(countries,showEnemyNeighbours,showCountriesWithoutAttackableNeighbours,showOwnNeighbours);
-        }
+        } else {
             return countries.get(choice);
+        }
     }
 
-    public void setStreams(InputStream in, PrintStream out){
-        this.in = in;
-        this.out = out;
-    }
-
-
-
+    /**
+     * Gets the setup command that the player chooses, at the beginning of the game.
+     * @return Setup command chosen by the player.
+     */
     SetupCommand setupMenu(){
         out.println("SETUP MENU: SELECT COUNTRY TO OCCUPY");
         Country target = selectCountry(gameState.unoccupiedCountries(),true,true,true);
-
         return new SetupCommand(target.getCountryId(),playerId);
     }
 
@@ -262,17 +245,12 @@ public class CLIClient extends Client {
         return true;
     }
 
-
-
     @Override
-    public void pushCommand(Command command) {
-
-    }
+    public void pushCommand(Command command) {}
 
     @Override
     public Command popCommand() {
         Command ret = null;
-
         if (gameState.hasUnassignedCountries()){
             ret = setupMenu();
         }
@@ -286,21 +264,16 @@ public class CLIClient extends Client {
             case STAGE_FORTIFY:
                 ret = fortifyMenu();break;
         }
-
         return ret;
     }
 
     @Override
     public DefendCommand popDefendCommand(int origin, int target, int armies) {
         int defArmies = getDefenders(gameState.getCountryByID(origin),gameState.getCountryByID(target),armies);
-
         return new DefendCommand(defArmies,playerId);
-
     }
 
     public boolean isLocal(){
         return true;
     }
-
-
 }

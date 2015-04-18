@@ -23,7 +23,8 @@ public class SetupAction extends Action {
 
 
     /**
-     *
+     * Validates this action against the game state. For validation, the action's owver has to be correct, and the
+     * country has to be empty, plus the player has to hava at least as many armies as they want to place (1).
      *
      * @param state
      * @return true if it is valid
@@ -68,14 +69,9 @@ public class SetupAction extends Action {
             //player must put one army in a country when claiming it
             country.setTroops(1);
             player.setUnassignedArmies(player.getUnassignedArmies() - 1);
-
-
-            //System.out.println(player.getName() + " took possession of " + country.getCountryName());
-        }else{ //reinforcing already claimed country with a single army
+        } else { //reinforcing already claimed country with a single army
             country.setTroops(country.getTroops() + 1);
             player.setUnassignedArmies( player.getUnassignedArmies() - 1);
-
-            //System.out.println(player.getName() + " reinforced " + country.getCountryName());
         }
 
         //check for end of setup

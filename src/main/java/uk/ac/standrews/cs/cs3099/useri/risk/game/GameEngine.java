@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class GameEngine implements Runnable{
     /**
      * This method runs the main game loop
-     *
+     * Simple outline:
      * 1. polls an action from the active client
      * 2. verify the action against the current game state
      * 3. execute action
@@ -29,12 +29,18 @@ public class GameEngine implements Runnable{
     private State state;
     private ClientSocketHandler csh;
 
+    /**
+     * GameEngine constructor which takes clientsockethandler
+     * @param csh
+     */
     public GameEngine(ClientSocketHandler csh){
         this.csh = csh;
     }
 
+    /**
+     * Empty GameEngine Constructor
+     */
     public GameEngine() {
-
     }
 
     @Override

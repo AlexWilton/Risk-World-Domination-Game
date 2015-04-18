@@ -4,6 +4,10 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
+/**
+ * This action is performed when the previous AttackAction has been successful. In this case, the player can decide
+ * how many armies it wants to move to the captured country.
+ */
 public class AttackCaptureAction  extends Action {
     int origin;
     int destination;
@@ -16,6 +20,11 @@ public class AttackCaptureAction  extends Action {
         this.armies = armies;
     }
 
+    /**
+     * Validates this move against the state. For this action to be valid, both the origin and destination countries
+     * have to be owned by the specified player, and the number of armies in the origin country has to be at least 1
+     * greater than the number of armies we want to move to the captured country.
+     */
     public boolean validateAgainstState(State state) {
         if (!super.validateAgainstState(state))
             return false;

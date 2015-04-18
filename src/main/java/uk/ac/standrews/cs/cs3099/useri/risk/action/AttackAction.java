@@ -101,7 +101,7 @@ public class AttackAction extends Action {
     }
 
     /**
-     * Performs the action on the game state, alters it accordingly returning the new state. fields attackerLost and
+     * Performs the action on the game state, alters it accordingly. fields attackerLost and
      * defenderLost have to be set for this to do anything.
      *
      * @param state The state to be changed
@@ -168,6 +168,10 @@ public class AttackAction extends Action {
     }
 
 
+    /**
+     * Sorts an array of ints in descending order by negating, sorting and negating again.
+     * @param array
+     */
     private void sortDescending(int[] array) {
         //negate
         for(int i=0; i<array.length; i++)

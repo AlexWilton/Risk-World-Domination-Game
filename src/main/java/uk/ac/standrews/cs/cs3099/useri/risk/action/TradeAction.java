@@ -47,8 +47,10 @@ public class TradeAction extends Action {
     @Override
     public void performOnState(State state) {
         if (list != null) {
+            state.cardSettradedIn();
+            System.err.println("Player has "+player.getUnassignedArmies() + " armies before");
             player.setUnassignedArmies(player.getUnassignedArmies() + calculateArmies(state));
-
+            System.err.println("Player has "+player.getUnassignedArmies() + " armies after");
             ArrayList<Country> occ;
             if ((occ = occupied(state)) != null) {
                 Country x = player.choose(occ);
@@ -121,8 +123,9 @@ public class TradeAction extends Action {
                 (wild==1 && ((cavalry==2) || (artillery==2) || (infantry==2)))
         ) {
             // Increase number of sets traded in.
-            state.cardSettradedIn();
+
             int sets = state.getCardSetstradedIn();
+            System.out.println(sets);
             if (sets < 6){
                 return (sets + 1) * 2;
             } else {

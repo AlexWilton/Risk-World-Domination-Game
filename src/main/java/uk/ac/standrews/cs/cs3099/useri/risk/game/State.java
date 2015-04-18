@@ -63,11 +63,11 @@ public class State implements JSONAware {
         return false;
     }
 
-    public void nextStage(){
+    public void nextStage() {
         stage = stage.next();
     }
 
-    public void endTurn(){
+    public void endTurn() {
         nextPlayer();
         if(!preGamePlay)
             preTurnCalculateUnassignedArmies(currentPlayer);
@@ -97,9 +97,9 @@ public class State implements JSONAware {
         cardSetstradedIn++;
     }
 
-    public void removePlayer(int playerId){
-        for (int i = 0; i<players.size(); i++){
-            if (players.get(i).getID() == playerId){
+    public void removePlayer(int playerId) {
+        for (int i = 0; i<players.size(); i++) {
+            if (players.get(i).getID() == playerId) {
                 players.remove(i);
                 break;
             }

@@ -119,9 +119,9 @@ public class AttackAction extends Action {
             defendingCountry.setOwner(player);
             player.addCountry(defendingCountry);
 
-            //set the number of troops on each country.
-            attackingCountry.setTroops(attackingCountry.getTroops() - attackerDice.length);
-            defendingCountry.setTroops(attackerDice.length - attackerArmiesLost);
+            //set the number of troops on attacking country.
+            attackingCountry.setTroops(attackingCountry.getTroops() - attackerArmiesLost);
+            defendingCountry.setTroops(0);
         }
         else {
             //decrease number of armies on each country, but don't change owner.

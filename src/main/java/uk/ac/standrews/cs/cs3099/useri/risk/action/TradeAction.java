@@ -48,9 +48,9 @@ public class TradeAction extends Action {
     public void performOnState(State state) {
         if (list != null) {
             state.cardSettradedIn();
-            System.err.println("Player has "+player.getUnassignedArmies() + " armies before");
+            //System.err.println("Player has "+player.getUnassignedArmies() + " armies before");
             player.setUnassignedArmies(player.getUnassignedArmies() + calculateArmies(state));
-            System.err.println("Player has "+player.getUnassignedArmies() + " armies after");
+            //System.err.println("Player has "+player.getUnassignedArmies() + " armies after");
             ArrayList<Country> occ;
             if ((occ = occupied(state)) != null) {
                 Country x = player.choose(occ);
@@ -71,7 +71,7 @@ public class TradeAction extends Action {
      * list of country-card pairs otherwise.
      */
     private ArrayList<Country> occupied(State state) {
-        ArrayList<Country> occupied = new ArrayList<Country>();
+        ArrayList<Country> occupied = new ArrayList<>();
         boolean set = false;
         for (RiskCard card:list) {
             Country country = state.getCountryByID(card.getCardID());
@@ -125,7 +125,7 @@ public class TradeAction extends Action {
             // Increase number of sets traded in.
 
             int sets = state.getCardSetstradedIn();
-            System.out.println(sets);
+            //System.out.println(sets);
             if (sets < 6){
                 return (sets + 1) * 2;
             } else {

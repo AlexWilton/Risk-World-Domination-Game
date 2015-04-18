@@ -1,7 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.main;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.BulldogAIClient;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.BulldogAIv2Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.GameEngine;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
 
@@ -20,7 +19,7 @@ public class AIApp {
         String[] features = {};
 
         //connect and obtain game information
-        int result = socketHandler.initialise("127.0.0.1",8888,new BulldogAIv2Client(null),versions,features,"b2");
+        int result = socketHandler.initialise("127.0.0.1",8888,new BulldogAIClient(null),versions,features,"b1");
 
         if(result == ClientApp.SUCCESS) {
             //Run the socket handler

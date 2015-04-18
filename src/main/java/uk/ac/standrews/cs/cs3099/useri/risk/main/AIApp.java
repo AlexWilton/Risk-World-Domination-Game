@@ -1,7 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.main;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.BulldogAIClient;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.BulldogAIv2Client;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.BulldogAIv2Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.GameEngine;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
 

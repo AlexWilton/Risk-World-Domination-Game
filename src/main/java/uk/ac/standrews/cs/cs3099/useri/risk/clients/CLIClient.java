@@ -21,8 +21,8 @@ public class CLIClient extends Client {
 
 
 
-    public CLIClient (State gameState, RandomNumberGenerator rng){
-        super(gameState, rng);
+    public CLIClient (State gameState) {
+        super(gameState, new RandomNumberGenerator());
         this.gameState = gameState;
         this.in = System.in;
         this.out = System.out;

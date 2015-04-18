@@ -1,27 +1,22 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.CommandQueuer;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.CountrySet;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
-import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
-
-import java.util.ArrayDeque;
-import java.util.Queue;
 
 /**
  * represents one client.
  * can take multiple forms, eg local, network or AIClient
  *
  */
-public abstract class Client extends CommandQueuer{
+public abstract class Client extends CommandQueuer {
 
 
-    State gameState;
+    protected State gameState;
 
-    int playerId;
+    protected int playerId;
 
     private String playerName;
 

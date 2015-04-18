@@ -1,4 +1,4 @@
-package uk.ac.standrews.cs.cs3099.useri.risk.clients;
+package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
@@ -7,7 +7,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 /**
- * Created by patrick on 18/04/15.
+ *
  */
 public class CommandQueuer {
 

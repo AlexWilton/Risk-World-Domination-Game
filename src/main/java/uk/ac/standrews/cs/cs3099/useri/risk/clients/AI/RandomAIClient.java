@@ -1,9 +1,10 @@
-package uk.ac.standrews.cs.cs3099.useri.risk.clients;
+package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.action.DeployArmyAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.SetupAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.JettyServer;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;

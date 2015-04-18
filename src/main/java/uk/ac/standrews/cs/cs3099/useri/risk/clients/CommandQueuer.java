@@ -15,7 +15,7 @@ public class CommandQueuer {
     private Queue<String> hashQueue;
     private Queue<String> numberQueue;
 
-    private DefendCommand defendCommand;
+    protected DefendCommand defendCommand;
 
     public CommandQueuer(){
         commandQueue = new ArrayDeque<>();
@@ -24,11 +24,26 @@ public class CommandQueuer {
     }
 
     public void pushRollHash(String rollHash){
+
+
         hashQueue.add(rollHash);
+        
     }
 
     public void pushRollNumber(String rollNumber){
+
         numberQueue.add(rollNumber);
+    }
+
+    public void pushCommand(Command command) {
+        if (command instanceof DefendCommand){
+
+            defendCommand=(DefendCommand)command;
+        }
+        else{
+
+            commandQueue.add(command);
+        }
     }
 
     public String popRollHash(){
@@ -51,14 +66,7 @@ public class CommandQueuer {
         return numberQueue.remove();
     }
 
-    public void pushCommand(Command command) {
-        if (command instanceof DefendCommand){
-            defendCommand=(DefendCommand)command;
-        }
-        else{
-            commandQueue.add(command);
-        }
-    }
+
 
 
     public Command popCommand() {

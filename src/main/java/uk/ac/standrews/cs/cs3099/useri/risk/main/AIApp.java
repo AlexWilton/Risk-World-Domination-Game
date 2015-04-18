@@ -1,22 +1,30 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.main;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.BulldogAIClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.CLIClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.RandomAIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.GameEngine;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.HashMismatchException;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 
 /**
  * Created by patrick on 17/04/15.
  */
 public class AIApp {
 
+
     public static void main(String argv[]){
+
+
 
         ClientSocketHandler socketHandler = new ClientSocketHandler();
         float[] versions = {1};
         String[] features = {};
 
         //connect and obtain game information
-        int result = socketHandler.initialise("127.0.0.1",8888,new RandomAIClient(null),versions,features,"The stupid AI");
+        int result = socketHandler.initialise("127.0.0.1",8888,new RandomAIClient(null),versions,features,"r");
 
         if(result == ClientApp.SUCCESS) {
             //Run the socket handler

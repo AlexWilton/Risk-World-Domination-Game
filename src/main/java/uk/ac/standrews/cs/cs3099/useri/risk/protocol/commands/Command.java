@@ -41,6 +41,10 @@ public class Command extends JSONObject {
         return Integer.parseInt(this.get("payload").toString());
     }
 
+    public int getAck(){
+        return Integer.parseInt(this.get("ack_id").toString());
+    }
+
     public int getPlayer(){
         Object playerObj = this.get("player_id");
         if(playerObj == null) return -1; //for non-playing host

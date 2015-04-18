@@ -4,6 +4,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.CommandQueuer;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
@@ -83,6 +84,9 @@ class HostForwarder implements Runnable{
         String hashStr = queuer.popRollHash();
         System.out.println("Got hash from " + ID);
 
+        while (seed.getNumberSeedSources()>0) {
+            Thread.sleep(10);
+        }
         seed.addHash(ID, hashStr);
 
         String rollStr = queuer.popRollNumber();
@@ -99,10 +103,13 @@ class HostForwarder implements Runnable{
     protected void playGame() throws IOException {
 
         while(true) {
-            if (getrolls) {
+
+            if (getrolls){
                 try {
                     getRolls();
-                } catch (InterruptedException | HashMismatchException e) {
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (HashMismatchException e) {
                     e.printStackTrace();
                 }
             }
@@ -280,10 +287,16 @@ class HostForwarder implements Runnable{
         messageQueue.getRolls(ID);
         try {
             getRolls();
+            while(seed.getNumberSeedSources()<state.getPlayers().size()) {
+                Thread.sleep(10);
+            }
             //while (!seed.isFinalised()) Thread.sleep(1);
             seed.finalise();
+            seed.debug_printnums();
 
-            DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId, objectiveId, attackArmies);
+
+            DefendCommand def = queuer.popDefendCommand(0,0,0);
+
             int defendArmies = def.getPayloadAsInt();
             System.out.println("Defend armies: " + defendArmies);
             int[] attackDice = new int [attackArmies];
@@ -396,6 +409,7 @@ class HostForwarder implements Runnable{
                         queuer.pushRollHash(reply.getPayloadAsString().toString());
                     }
                     else if (reply instanceof RollNumberCommand){
+
                         queuer.pushRollNumber(reply.getPayloadAsString().toString());
                     }
 

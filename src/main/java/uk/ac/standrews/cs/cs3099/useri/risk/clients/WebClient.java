@@ -122,4 +122,19 @@ public class WebClient extends Client {
     public boolean isPlayingHost() {
         return isPlayingHost;
     }
+
+
+    @Override
+    public void pushRollHash(String rollHash){
+
+
+    }
+    @Override
+    public void pushRollNumber(String rollNumber){
+
+    }
+    @Override
+    public void pushCommand(Command command) {
+
+    }
 }

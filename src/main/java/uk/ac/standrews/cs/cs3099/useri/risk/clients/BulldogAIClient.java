@@ -1,38 +1,49 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.action.DeployArmyAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.SetupAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
-
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.JettyServer;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
-import java.awt.*;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * Created by patrick on 17/04/15.
+ * Always attacks if it can. Will continue attacking one weak country until it is out of armies to do so, or it has conquered the country.
  */
-public class RandomAIClient extends Client {
+public class BulldogAIClient extends Client{
 
 
-    public RandomAIClient(State gameState){
+    private AttackCommand lastAttack;
+
+    public BulldogAIClient(State gameState){
         super(gameState,new RandomNumberGenerator());
     }
 
 
+
+
     @Override
     public Command popCommand() {
+        //if we attacked before and havent won or havent lost all armies, attack again
+        if (lastAttack != null){
+            int lastOrigin = Integer.parseInt(lastAttack.getPayloadAsArray().get(0).toString());
+            int lastTarget = Integer.parseInt(lastAttack.getPayloadAsArray().get(1).toString());
 
+            if (gameState.getCountryByID(lastTarget).getOwner().getID() != playerId){
+                if (gameState.getCountryByID(lastOrigin).getTroops() > gameState.getCountryByID(lastTarget).getTroops()){
+                    int atkArmies = gameState.getCountryByID(lastOrigin).getTroops() > 3 ? 3 : (gameState.getCountryByID(lastOrigin).getTroops()-1);
+                    //go again
+                    return new AttackCommand(lastOrigin,lastTarget,atkArmies,playerId);
+                }
+            }
+        }
         ArrayList<Command> possible = getAllPossibleCommands();
         Random r = new Random();
-        return possible.get((int)(r.nextDouble()*possible.size()));
+        Command ret = possible.get((int)(r.nextDouble()*possible.size()));;
+        if (ret instanceof AttackCommand)
+            lastAttack = (AttackCommand)ret;
+        return ret;
     }
 
 
@@ -93,7 +104,7 @@ public class RandomAIClient extends Client {
 
                 case STAGE_BATTLES: {
                     ret.addAll(getAllPossibleAttackCommands());
-                }
+                } if (ret.size()!=0) break ;//Only break if we cannot attack a weaker country
 
                 case STAGE_GET_CARD: {
                     if (gameState.wonBattle()) {
@@ -163,7 +174,7 @@ public class RandomAIClient extends Client {
 
                 //always attack with as many as possible
                 int atkArmies = c.getTroops() > 3 ? 3 : (c.getTroops()-1);
-                if (atkArmies >= 1)
+                if (atkArmies >= 1 && c.getTroops()>defender.getTroops())
                     ret.add(new AttackCommand(c.getCountryId(),defender.getCountryId(),atkArmies,playerId));
             }
         }

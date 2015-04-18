@@ -5,9 +5,11 @@ import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
+import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.HashMismatchException;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -233,38 +235,42 @@ public class GameEngine implements Runnable{
 
         JSONArray attackPlan = command.getPayloadAsArray();
         int player = command.getPlayer();
-
         int originId = Integer.parseInt(attackPlan.get(0).toString());
-
         int objectiveId = Integer.parseInt(attackPlan.get(1).toString());
-
         int attackArmies = Integer.parseInt(attackPlan.get(2).toString());
 
-        DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId,objectiveId,attackArmies);
-        //if its local, propagate
-        if (state.getCountryByID(objectiveId).getOwner().getClient().isLocal()){
-            csh.sendCommand(def);
+        // Get rolls from all clients...
+        // HostForwarder.setSeed(new RNGSeed(ListenerThread.getPlayers().size()));
+
+        try {
+            RandomNumberGenerator seed = csh.popSeed();
+            //while (!seed.isFinalised()) Thread.sleep(1);
+            seed.finalise();
+
+            DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId, objectiveId, attackArmies);
+            //if its local, propagate
+            if (csh != null && state.getCountryByID(objectiveId).getOwner().getClient().isLocal()){
+                csh.sendCommand(def);
+            }
+            int defendArmies = def.getPayloadAsInt();
+            System.out.println("Defend armies: " + defendArmies);
+            int[] attackDice = new int [attackArmies];
+            for (int i = 0; i<attackArmies; i++){
+                attackDice[i] = (int)(seed.nextInt() % 6 + 1);
+                System.out.println(attackDice[i]);
+            }
+
+            int[] defendDice = new int [defendArmies];
+            for (int i = 0; i<defendArmies; i++){
+                defendDice[i] = (int)(seed.nextInt() % 6 + 1);
+                System.out.println(defendDice[i]);
+            }
+
+            return new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
+        } catch (HashMismatchException e) {
+            e.printStackTrace();
         }
-
-        int defendArmies = def.getPayloadAsInt();
-
-        RandomNumberGenerator rng = csh.popSeed();
-
-        int[] attackDice = new int [attackArmies];
-
-        for (int i = 0; i<attackArmies; i++){
-            attackDice[i] = (int)((rng.nextInt()) % 6 + 1);
-            System.out.println(attackDice[i]);
-        }
-
-        int[] defendDice = new int [defendArmies];
-
-        for (int i = 0; i<defendArmies; i++){
-            defendDice[i] = (int)((rng.nextInt()) % 6 + 1);
-            System.out.println(defendDice[i]);
-        }
-
-        return  new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
+        return null;
     }
 
     private FortifyAction processFortifyCommand(FortifyCommand command){

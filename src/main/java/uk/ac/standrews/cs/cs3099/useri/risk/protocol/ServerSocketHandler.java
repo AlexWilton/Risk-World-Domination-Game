@@ -102,6 +102,7 @@ public class ServerSocketHandler implements Runnable {
             seed.finalise();
             gameState.shuffleRiskCards(seed);
             System.err.println("SHUFFLED CARD DECK");
+            HostForwarder.setSeed(null);
 
         } catch (IOException e){
             System.err.println("Error while initialising game");

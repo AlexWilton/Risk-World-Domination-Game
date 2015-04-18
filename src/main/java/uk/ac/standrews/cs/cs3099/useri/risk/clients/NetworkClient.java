@@ -43,4 +43,6 @@ public class NetworkClient extends Client {
     public boolean isLocal(){
         return false;
     }
+
+
 }

@@ -1,5 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import java.nio.ByteBuffer;
@@ -25,6 +26,12 @@ public class RandomNumberGenerator {
     private SecureRandom sr;
 
     private boolean finalised = false;
+
+    public void debug_printnums(){
+        for (byte[] num : playernum.values()){
+            System.out.println(byteToHex(num));
+        }
+    }
 
     public RandomNumberGenerator() {
         try {
@@ -118,7 +125,7 @@ public class RandomNumberGenerator {
      *
      * @param playerid
      *            The player id sending the number
-     * @param number
+     * @param hash
      *            The number itself
      */
     public synchronized void addHash(int playerid, String hash)

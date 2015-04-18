@@ -277,6 +277,18 @@ public class State implements JSONAware {
         return attackCaptureNeeded;
     }
 
+    public Country getAttackCaptureOrigin() {
+        return attackCaptureOrigin;
+    }
+
+    public Country getAttackCaptureDestination() {
+        return attackCaptureDestination;
+    }
+
+    public int getAttackCaptureMinimumArmiesToMove() {
+        return attackCaptureMinimumArmiesToMove;
+    }
+
     public void recordAttackCaptureIsNeeded(Country attackCaptureOrigin, Country attackCaptureDestination, int attackCaptureMinimumArmiesToMove) {
         attackCaptureNeeded = true;
         this.attackCaptureOrigin = attackCaptureOrigin;

@@ -419,7 +419,10 @@ function generateFortifyPanel(){
 }
 
 function attemptFortification(){
-    $.get('/?' + $('#fortifyForm').serialize(), function(response){
+
+    var queryString = $('#fortifyForm').serialize();
+    if(queryString == "") queryString = "operation=perform_action&action=fortify&skip_fortity=yes";
+    $.get('/?' + queryString, function(response){
         if(response.indexOf("true") == 0){
             $("#turnPanel").html("");
             $("#fortifyStatus").html("<h4>Waiting for Server...</h4>" +

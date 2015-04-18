@@ -179,6 +179,15 @@ class ParamHandler extends DefaultHandler {
             case "attack":
                 if((params.get("end_attack") != null && params.get("end_attack")[0].equals("yes"))){
                     webClient.getState().nextStage();
+                    //check if a risk card needs to be obtained...
+                    ObtainRiskCardAction obtainRiskCardAction = new ObtainRiskCardAction(myself);
+                    if(obtainRiskCardAction.validateAgainstState(webClient.getState())){
+                        DrawCardCommand drawCardCommand = new DrawCardCommand(webClient.getState().peekCard().getCardID(), myself.getID());
+                        webClient.queueCommand(drawCardCommand);
+                    }else{
+                        webClient.getState().nextStage(); //skip get card stage if there is no card to draw.
+                    }
+
                     return "true";
                 }
 
@@ -248,7 +257,14 @@ class ParamHandler extends DefaultHandler {
                 webClient.queueCommand(attackCaptureCommand);
                 return String.valueOf("true");
 
-            case "fortify":
+            case "fortify": //skip_fortity
+                if((params.get("skip_fortity") != null && params.get("skip_fortity")[0].equals("yes"))){
+                    FortifyCommand fortifyCommand = new FortifyCommand(myself.getID());
+                    webClient.queueCommand(fortifyCommand);
+                    return String.valueOf("true");
+                }
+
+
                 //Get attacking and defending Country objects
                 String[] originCountryArray = params.get("origin_country_id");
                 String[] destinationCountryArray = params.get("destination_country_id");

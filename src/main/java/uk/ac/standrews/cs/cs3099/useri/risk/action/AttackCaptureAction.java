@@ -28,8 +28,6 @@ public class AttackCaptureAction  extends Action {
     public boolean validateAgainstState(State state) {
         if (!super.validateAgainstState(state))
             return false;
-        if (!state.wonBattle())
-            return false;
         if (!state.getCountryByID(origin).getOwner().equals(player))
             return false;
         if (!state.getCountryByID(destination).getOwner().equals(player))
@@ -38,7 +36,6 @@ public class AttackCaptureAction  extends Action {
             return false;
         if(!state.isAttackCaptureNeeded())
             return false;
-
         return true;
     }
 

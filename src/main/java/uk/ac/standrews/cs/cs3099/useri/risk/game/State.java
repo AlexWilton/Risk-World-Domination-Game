@@ -3,6 +3,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
+import uk.ac.standrews.cs.cs3099.useri.risk.action.ObtainRiskCardAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 
 import java.util.ArrayList;
@@ -90,7 +91,7 @@ public class State implements JSONAware {
 
     public boolean wonBattle() { return wonBattle; }
 
-    public void winning() {
+    public void territoryCaptured() {
         wonBattle = true;
     }
 

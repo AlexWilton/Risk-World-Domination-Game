@@ -113,7 +113,7 @@ public class AttackAction extends Action {
 
         if (defenderArmiesLost == defendingCountry.getTroops()){ //Attacker won!
             //change owners
-            state.winning();
+            state.territoryCaptured();
             defendingCountry.getOwner().removeCountry(defendingCountry);
             defendingCountry.setOwner(player);
             player.addCountry(defendingCountry);

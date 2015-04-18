@@ -92,6 +92,7 @@ class HostForwarder {
         }
         RollNumberCommand roll = (RollNumberCommand) comm;
         String rollStr = roll.get("payload").toString();
+        while (seed.getNumberHashes() != ListenerThread.getPlayers().size()) Thread.sleep(5);
         seed.addNumber(ID, rollStr);
     }
 
@@ -221,6 +222,8 @@ class HostForwarder {
      * @param command The command to be parsed
      * @return List of actions the command implies.
      */
+
+    private int tradesMade = 0;
     private ArrayList<TradeAction> processPlayCardsCommand(PlayCardsCommand command){
         JSONObject payload = command.getPayload();
         int player = command.getPlayer();
@@ -239,6 +242,7 @@ class HostForwarder {
             for (Object aTripletJSON : tripletJSON) {
                 int cardId = Integer.parseInt(aTripletJSON.toString());
                 triplet.add(state.getPlayers().get(player).getRiskCardById(cardId));
+                System.out.println(tradesMade++);
             }
             triplets.add(triplet);
         }

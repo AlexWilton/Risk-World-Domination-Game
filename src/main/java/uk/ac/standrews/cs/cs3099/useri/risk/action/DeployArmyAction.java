@@ -30,10 +30,13 @@ public class DeployArmyAction extends Action{
     public boolean validateAgainstState(State state) {
         if (super.validateAgainstState(state)) {
             if (country.getOwner().equals(player)) {
+
                 if (player.getUnassignedArmies() >= armies) {
                     return true;
                 }
+                else System.err.println("not enough armies, got " + player.getUnassignedArmies() + ", wanted " + armies);
             }
+            else System.err.println("owner not valid");
         }
         return false;
     }

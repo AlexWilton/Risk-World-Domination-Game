@@ -31,7 +31,13 @@ public class BulldogAIClient extends Client {
             int lastOrigin = Integer.parseInt(lastAttack.getPayloadAsArray().get(0).toString());
             int lastTarget = Integer.parseInt(lastAttack.getPayloadAsArray().get(1).toString());
 
+            if (gameState.isAttackCaptureNeeded()) {
+                int armies = gameState.getCountryByID(lastOrigin).getTroops() - 1;
+                return new AttackCaptureCommand(lastOrigin, lastTarget, armies, playerId);
+            }
+
             if (gameState.getCountryByID(lastTarget).getOwner().getID() != playerId){
+
                 if (gameState.getCountryByID(lastOrigin).getTroops() > gameState.getCountryByID(lastTarget).getTroops()){
                     int atkArmies = gameState.getCountryByID(lastOrigin).getTroops() > 3 ? 3 : (gameState.getCountryByID(lastOrigin).getTroops()-1);
                     //go again

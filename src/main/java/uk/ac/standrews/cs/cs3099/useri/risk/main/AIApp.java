@@ -1,6 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.main;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.RandomAIClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.BulldogAIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.GameEngine;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
 
@@ -16,7 +16,7 @@ public class AIApp {
         String[] features = {};
 
         //connect and obtain game information
-        int result = socketHandler.initialise("127.0.0.1",8888,new RandomAIClient(null),versions,features,"bull");
+        int result = socketHandler.initialise("127.0.0.1",8888,new BulldogAIClient(null),versions,features,"Billy");
 
         if(result == ClientApp.SUCCESS) {
             //Run the socket handler

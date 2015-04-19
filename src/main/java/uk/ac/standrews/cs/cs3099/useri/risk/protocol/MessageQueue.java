@@ -52,7 +52,7 @@ class MessageQueue {
         sendAll(new PlayersJoinedCommand(players), id);
     }
 
-    public void getRolls(int id){
+    public synchronized void getRolls(int id){
         HostForwarder.setSeed(new RandomNumberGenerator());
         try {
             for (Map.Entry<Integer, ListenerThread> e : sockets.entrySet()){
@@ -67,5 +67,10 @@ class MessageQueue {
             System.err.println("Could not get dice rolls, protocol failed");
             System.exit(1);
         }
+    }
+
+    public synchronized void removePlayer(int id) {
+        ListenerThread w = sockets.get(id);
+        w.removePlayer();
     }
 }

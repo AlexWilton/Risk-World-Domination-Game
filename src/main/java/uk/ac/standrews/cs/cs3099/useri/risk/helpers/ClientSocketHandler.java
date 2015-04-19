@@ -6,10 +6,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
-import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.HashMismatchException;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.ClientApp;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
 import java.io.BufferedReader;
@@ -31,9 +30,6 @@ public class ClientSocketHandler implements Runnable {
     private HashMap<Integer,HashMap<Integer,Boolean>> ackRecieved;
 
     private int waitingOn = -1;
-
-
-
 
     public enum ProtocolState {
         START,
@@ -439,7 +435,8 @@ public class ClientSocketHandler implements Runnable {
         if (command.containsKey("ack_id")) {
             int ackId = Integer.parseInt(command.get("ack_id").toString());
             AcknowledgementCommand ack = new AcknowledgementCommand(ackId, localClient.getPlayerId());
-            sendCommand(ack);
+            out.println(ack);
+            out.flush();
         }
 
         System.err.println(command.toJSONString());

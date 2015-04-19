@@ -32,11 +32,13 @@ class HostForwarder {
 
     private BufferedReader input;
     private MessageQueue messageQueue;
+    private Player defender;
     private boolean ack_received;
     private boolean move_required;
     private boolean getRolls;
     private double timer = System.currentTimeMillis();
     private int last_ack = 0;
+    private boolean playing = true;
 
     public HostForwarder(MessageQueue q, int move_timeout, int ack_timeout, int id, BufferedReader input) {
         messageQueue = q;
@@ -82,6 +84,7 @@ class HostForwarder {
         }
         RollHashCommand hash = (RollHashCommand) comm;
         //System.out.println("Got hash from " + ID);
+        while (seed == null) {Thread.sleep(10);}
         String hashStr = hash.get("payload").toString();
         seed.addHash(ID, hashStr);
 
@@ -94,6 +97,8 @@ class HostForwarder {
         String rollStr = roll.get("payload").toString();
         while (seed.getNumberHashes() != ListenerThread.getPlayers().size()) Thread.sleep(5);
         seed.addNumber(ID, rollStr);
+
+        getRolls = false;
     }
 
     /**
@@ -101,7 +106,7 @@ class HostForwarder {
      * @throws IOException
      */
     protected void playGame() throws IOException {
-        while(true) {
+        while(playing) {
             if (getRolls) {
                 try {
                     getRolls();
@@ -150,7 +155,6 @@ class HostForwarder {
             }
         } else {
             processCommand(comm);
-
         }
     }
 
@@ -198,9 +202,26 @@ class HostForwarder {
         for(Action playerAction : playerActions) {
             if (playerAction.validateAgainstState(state)) {
                 playerAction.performOnState(state);
+
+                if (playerAction instanceof AttackCaptureAction) {
+                    System.out.println("Player " + defender.getID() + " has " + defender.getOccupiedCountries().size() + " countries left.");
+                    if (defender.getOccupiedCountries().size() == 0) {
+                        System.out.println("Player " + defender.getID() + " has lost");
+                        System.out.flush();
+                        state.removePlayer(defender.getID());
+                        messageQueue.removePlayer(defender.getID());
+                    }
+                }
             } else {
-                System.err.println("Error move did not validate: " + comm);
-                System.exit(1);
+                try {
+                    System.err.println("Error move did not validate: " + comm);
+                    Thread.sleep(1000);
+                    while (true)
+                        Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //System.exit(1);
             }
         }
 
@@ -291,23 +312,23 @@ class HostForwarder {
         messageQueue.getRolls(ID);
         try {
             getRolls();
-            //while (!seed.isFinalised()) Thread.sleep(1);
             while (seed.getNumberSeedSources() != ListenerThread.getPlayers().size()) Thread.sleep(5);
             seed.finalise();
+            defender = state.getCountryByID(objectiveId).getOwner();
 
-            DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId, objectiveId, attackArmies);
+            // Get defend command
+            DefendCommand def = defender.getClient().popDefendCommand(originId, objectiveId, attackArmies);
             int defendArmies = def.getPayloadAsInt();
-            //System.out.println("Defend armies: " + defendArmies);
+
+            // Roll the dice
             int[] attackDice = new int [attackArmies];
             for (int i = 0; i<attackArmies; i++){
                 attackDice[i] = (int)(seed.nextInt() % 6 + 1);
-                //System.out.println(attackDice[i]);
             }
 
             int[] defendDice = new int [defendArmies];
             for (int i = 0; i<defendArmies; i++){
                 defendDice[i] = (int)(seed.nextInt() % 6 + 1);
-                //System.out.println(defendDice[i]);
             }
 
             return new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
@@ -390,5 +411,9 @@ class HostForwarder {
 
     public void getRollsLater(){
         getRolls = true;
+    }
+
+    public void stop() {
+        playing = false;
     }
 }

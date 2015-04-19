@@ -85,7 +85,7 @@ class ListenerThread implements Runnable {
     void reply(Command command) {
         if (command == null)
             return;
-        //System.out.println("Player " + ID + ": " + command);
+        System.out.println("out Player " + ID + ": " + command);
         output.println(command);
         output.flush();
     }
@@ -197,5 +197,12 @@ class ListenerThread implements Runnable {
 
     public void getRollsLater() throws IOException, InterruptedException {
         fw.getRollsLater();
+    }
+
+    public void removePlayer() {
+        System.out.println("Player " + ID + " removed");
+        players.remove(player);
+        fw.stop();
+        purgeConnection();
     }
 }

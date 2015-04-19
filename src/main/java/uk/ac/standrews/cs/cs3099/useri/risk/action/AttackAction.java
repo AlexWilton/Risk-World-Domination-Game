@@ -32,6 +32,10 @@ public class AttackAction extends Action {
 
     }
 
+    public Country getObjective() {
+        return defendingCountry;
+    }
+
 
     /**
      * Validates whether the action can be made against the current game state.

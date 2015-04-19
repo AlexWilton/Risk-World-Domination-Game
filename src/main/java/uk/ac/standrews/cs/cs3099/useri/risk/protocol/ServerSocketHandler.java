@@ -14,7 +14,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class ServerSocketHandler implements Runnable {
-    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 1, MOVE_TIMEOUT = 30000;
+    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 30, MOVE_TIMEOUT = 30000;
     public static final int MAX_PLAYER_COUNT = 6, MIN_PLAYER_COUNT = 2; //needed for web client to know the range of allowed number of players. (needs to be public)
     private WebClient webClient;
     private ServerSocket server;
@@ -90,9 +90,9 @@ public class ServerSocketHandler implements Runnable {
             while (notAllInitialised(InitState.FIRST_PLAYER_ELECTABLE));
             seed.finalise();
             int startingPlayer = (int)(seed.nextInt() % ListenerThread.getPlayers().size());
+            HostForwarder.setSeed(null);
             gameState.setFirstPlayer(gameState.getPlayer(startingPlayer));
             gameState.setCurrentPlayer(startingPlayer);
-            HostForwarder.setSeed(null);
             System.err.println("STARTING PLAYER IS " + startingPlayer);
 
             seed = new RandomNumberGenerator();

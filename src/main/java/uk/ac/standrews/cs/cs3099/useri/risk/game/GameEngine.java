@@ -260,10 +260,11 @@ public class GameEngine implements Runnable{
             RandomNumberGenerator seed = csh.popSeed();
             //while (!seed.isFinalised()) Thread.sleep(1);
             seed.finalise();
+            Player defender = state.getCountryByID(objectiveId).getOwner();
 
-            DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId, objectiveId, attackArmies);
+            DefendCommand def = defender.getClient().popDefendCommand(originId, objectiveId, attackArmies);
             //if its local, propagate
-            if (csh != null && state.getCountryByID(objectiveId).getOwner().getClient().isLocal()) {
+            if (csh != null && defender.getClient().isLocal()) {
                 csh.sendCommand(def);
             }
             int defendArmies = def.getPayloadAsInt();

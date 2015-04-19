@@ -30,11 +30,16 @@ public class State implements JSONAware {
     private Country attackCaptureDestination = null;
     private int attackCaptureMinimumArmiesToMove = -1;
 
+
+
     public State(){};
 
     public State(Map map, ArrayList<Player> players){
         setup(map, players);
+
     }
+
+
 
     public void setup(Map map, ArrayList<Player> players){
         this.map = map;
@@ -120,12 +125,16 @@ public class State implements JSONAware {
      * @return the top card from the deck.
      */
     public RiskCard getCard() {
+        if (cardsDeck.size() == 0)
+            return null;
         RiskCard c = cardsDeck.get(0);
         cardsDeck.remove(0);
         return c;
     }
 
     public RiskCard peekCard() {
+        if (cardsDeck.size() == 0)
+            return null;
         RiskCard c = cardsDeck.get(0);
 
         return c;
@@ -235,8 +244,13 @@ public class State implements JSONAware {
 
     public void nextPlayer(){
         int i = currentPlayer.getID();
+        int maxPlayerId = -1;
+        for (Player p : players){
+            if (p.getID() > maxPlayerId)
+                maxPlayerId = p.getID();
+        }
         do {
-            currentPlayer = getPlayer((++i) % getPlayerAmount());
+            currentPlayer = getPlayer((++i) % (maxPlayerId+1));
         } while (currentPlayer == null);
     }
 

@@ -120,7 +120,8 @@ public class GreatDaneAIClient extends Client {
 
                 case STAGE_GET_CARD: {
                     if (gameState.wonBattle()) {
-                        ret.add(new DrawCardCommand(gameState.peekCard().getCardID(), playerId));
+                        if (gameState.peekCard() != null)
+                            ret.add(new DrawCardCommand(gameState.peekCard().getCardID(), playerId));
                     }
                 } //NO BREAK, we can go straight to the next stage
 
@@ -194,7 +195,8 @@ public class GreatDaneAIClient extends Client {
                 troopDeploy.put(curr_country,1);
             }
             //remove diff
-            troopDiff.put(curr_country,troopDiff.get(curr_country)+1);
+            if (troopDiff.containsKey(curr_country))
+                troopDiff.put(curr_country,troopDiff.get(curr_country)+1);
 
         }
 
@@ -204,7 +206,16 @@ public class GreatDaneAIClient extends Client {
 
         int i=0;
         for (Map.Entry<Integer,Integer> depTuple : troopDeploy.entrySet()){
-            if (gameState.getCountryByID(depTuple.getKey()).getOwner().getID() != getPlayerId()){
+            if (gameState.getCountryByID(depTuple.getKey()) == null){
+                ArrayList<Command> ret = new ArrayList<>();
+                DeployTuple deptub = new DeployTuple(getPlayer().getOccupiedCountries().get(getPlayer().getOccupiedCountries().getIDList().get(0)).getCountryId(),getPlayer().getUnassignedArmies());
+                depTups = new ArrayList<>();
+                depTups.add(deptub);
+                ret.add(new DeployCommand(depTups,playerId));
+                return ret;
+            }
+
+            else if (gameState.getCountryByID(depTuple.getKey()).getOwner().getID() != getPlayerId()){
                 System.out.println("WRONG");
             }
             depTups.add(new DeployTuple(depTuple.getKey(),((i++)+armies_left)/2));

@@ -34,7 +34,7 @@ public class ClientSocketHandler implements Runnable {
     public void removePlayer(int id) {
         if (id == localClient.getPlayerId()) {
             System.out.println("this player lost");
-            System.exit(0);
+            //System.exit(0);
         } else {
             gameState.removePlayer(id);
             remoteClients.remove(getRemoteClientById(id));
@@ -474,7 +474,9 @@ public class ClientSocketHandler implements Runnable {
                 if (c.getPlayerId() == localClient.getPlayerId()) {
                     continue;
                 }
-                seed.addHash(c.getPlayerId(), c.popRollHash());
+                String hash = c.popRollHash();
+                System.err.println(c.getPlayerId() + " use this roll number " + hash);
+                seed.addHash(c.getPlayerId(), hash);
             }
 
             seed.addNumber(localClient.getPlayerId(), localClient.getHexSeed());
@@ -487,7 +489,10 @@ public class ClientSocketHandler implements Runnable {
                 if (c.getPlayerId() == localClient.getPlayerId()) {
                     continue;
                 }
-                seed.addNumber(c.getPlayerId(), c.popRollNumber());
+                String number = c.popRollNumber();
+                System.err.println(c.getPlayerId() + " use this roll number " + number);
+
+                seed.addNumber(c.getPlayerId(), number);
             }
 
             System.out.println("has all numbers");

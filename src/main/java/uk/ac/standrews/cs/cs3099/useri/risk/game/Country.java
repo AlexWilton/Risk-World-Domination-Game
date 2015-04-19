@@ -40,6 +40,8 @@ public class Country implements JSONAware{
     }
 
     public void setTroops(int troops) {
+        if (troops < 0)
+            System.err.println("stuff");
         this.troops = troops;
     }
 

@@ -3,7 +3,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.ObtainRiskCardAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 
 import java.util.ArrayList;
@@ -231,7 +230,10 @@ public class State implements JSONAware {
     }
 
     public void nextPlayer(){
-        currentPlayer = getPlayer((currentPlayer.getID()+1)%getPlayerAmount());
+        int i = currentPlayer.getID();
+        do {
+            currentPlayer = getPlayer((++i) % getPlayerAmount());
+        } while (currentPlayer == null);
     }
 
     int getPlayerAmount(){
@@ -248,6 +250,8 @@ public class State implements JSONAware {
     }
 
     void preTurnCalculateUnassignedArmies(Player player) {
+        if (player == null)
+            return;
         int territoryCount = player.getOccupiedCountries().size();
         int amount = territoryCount / 3;
         if(amount < 3) amount = 3;

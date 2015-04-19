@@ -30,7 +30,7 @@ public class RandomAIClient extends Client {
             int maxArmies = origin.getTroops() - 1;
             Random rn = new Random();
             int n = maxArmies - minArmies + 1;
-            int i = rn.nextInt() % n;
+            int i = Math.abs(rn.nextInt()) % n;
             int armies =  minArmies + i;
             return new AttackCaptureCommand(origin.getCountryId(), destination.getCountryId(), armies, playerId);
         }

@@ -401,16 +401,16 @@ public class ClientSocketHandler implements Runnable {
 
     public void sendCommand(Command command) {
 
-        while (waitingOn != -1){
-            if (!ackRecieved.get(waitingOn).containsValue(false)){
-                waitingOn = -1;
-            }
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+//        while (waitingOn != -1){
+//            if (!ackRecieved.get(waitingOn).containsValue(false)){
+//                waitingOn = -1;
+//            }
+//            try {
+//                Thread.sleep(10);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
         out.println(command.toJSONString());
         System.out.println("Sent to server: " + command.toJSONString());
         out.flush();

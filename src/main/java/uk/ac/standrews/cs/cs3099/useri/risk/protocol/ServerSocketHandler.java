@@ -93,6 +93,7 @@ public class ServerSocketHandler implements Runnable {
             seed.finalise();
             getFirstPlayer(gameState);
 
+            Thread.sleep(10);
 
             HostForwarder.setSeed(seed);
             ListenerThread.shuffleCards();
@@ -105,6 +106,8 @@ public class ServerSocketHandler implements Runnable {
         } catch (IOException e){
             System.err.println("Error while initialising game");
         } catch (HashMismatchException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
         //TODO ListenerThread remove player if error occurs!

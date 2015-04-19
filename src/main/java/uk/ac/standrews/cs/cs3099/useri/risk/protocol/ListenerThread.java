@@ -199,7 +199,7 @@ class ListenerThread implements Runnable {
         fw.getRollsLater();
     }
 
-    public void removePlayer() {
+    public synchronized void removePlayer() {
         System.out.println("Player " + ID + " removed");
         players.remove(player);
         fw.stop();

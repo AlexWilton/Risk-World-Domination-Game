@@ -179,9 +179,8 @@ public class GameEngine implements Runnable{
             }
         }
 
-        if(state.winConditionsMet()){
+        if(state.winConditionsMet()) {
             Player winner = state.getWinner();
-
             System.out.println("Winner is " + winner.getID());
             System.exit(0);
         }

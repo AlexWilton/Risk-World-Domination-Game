@@ -229,7 +229,13 @@ class HostForwarder {
         }
 
         for(Action playerAction : playerActions) {
-            if (playerAction.validateAgainstState(state)) {
+
+            int waited = 0;
+            while (!playerAction.validateAgainstState(state) && waited < 1000) {
+                Thread.sleep(10);
+                waited += 10;
+            }
+            if (waited < 1000) {
                 playerAction.performOnState(state);
 
                 if (playerAction instanceof AttackCaptureAction) {
@@ -241,7 +247,8 @@ class HostForwarder {
                         messageQueue.removePlayer(defender.getID());
                     }
                 }
-            } else {
+            }
+            else {
                 try {
                     System.err.println("Error move did not validate: " + comm);
                     Thread.sleep(1000);

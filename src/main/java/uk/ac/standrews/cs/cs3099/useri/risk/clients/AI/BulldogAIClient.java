@@ -26,6 +26,7 @@ public class BulldogAIClient extends Client {
 
     @Override
     public Command popCommand() {
+
         //if we attacked before and havent won or havent lost all armies, attack again
         if (lastAttack != null){
             int lastOrigin = Integer.parseInt(lastAttack.getPayloadAsArray().get(0).toString());
@@ -94,11 +95,7 @@ public class BulldogAIClient extends Client {
             //only setup commands
             ret.addAll(getAllPossibleSetupCommands());
         }else {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
             TurnStage stage = gameState.getTurnStage();
             switch (stage) {
                 case STAGE_TRADING: {

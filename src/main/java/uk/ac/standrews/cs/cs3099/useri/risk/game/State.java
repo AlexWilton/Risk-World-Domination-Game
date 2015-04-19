@@ -57,6 +57,10 @@ public class State implements JSONAware {
         return currentPlayer;
     }
 
+    public Continent getContinentById (int id){
+        return getContinents().get(id);
+    }
+
     public boolean winConditionsMet() {
         for(Player p : players){
             if(p.getOccupiedCountries().size()

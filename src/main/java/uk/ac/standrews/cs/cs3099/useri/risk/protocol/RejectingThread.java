@@ -25,11 +25,8 @@ class RejectingThread implements Runnable {
         try {
             while (running) {
                 Socket s = server.accept();
-                BufferedReader input = new BufferedReader(new InputStreamReader(s.getInputStream()));
                 PrintWriter output = new PrintWriter(s.getOutputStream());
                 output.print(new RejectJoinGameCommand("Game already in progress"));
-
-                input.close();
                 output.flush();
                 output.close();
                 s.close();

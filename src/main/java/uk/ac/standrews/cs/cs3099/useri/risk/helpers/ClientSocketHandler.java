@@ -31,6 +31,18 @@ public class ClientSocketHandler implements Runnable {
 
     private int waitingOn = -1;
 
+    public void removePlayer(int id) {
+        if (id == localClient.getPlayerId()) {
+            System.out.println("this player lost");
+            System.exit(0);
+        } else {
+            gameState.removePlayer(id);
+            remoteClients.remove(getRemoteClientById(id));
+            System.out.println("player " + id + "lost");
+
+        }
+    }
+
     public enum ProtocolState {
         START,
         WAITING_FOR_PING,

@@ -1,6 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import org.json.simple.JSONArray;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Map;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
@@ -49,7 +50,7 @@ public class ServerSocketHandler implements Runnable {
                 // Open the gates!
                 Socket temp = server.accept();
                 System.out.println("New client connected");
-                ListenerThread client = new ListenerThread(temp, i, webClient, ACK_TIMEOUT, MOVE_TIMEOUT, s);
+                ListenerThread client = new ListenerThread(temp, i, new NetworkClient(null,null), ACK_TIMEOUT, MOVE_TIMEOUT, s);
                 clientSocketPool.add(i++, client);
                 // Make new Thread for client.
                 Thread t = new Thread(client);

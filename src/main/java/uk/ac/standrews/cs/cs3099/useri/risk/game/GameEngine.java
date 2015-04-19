@@ -112,7 +112,23 @@ public class GameEngine implements Runnable{
             }
             processCommand(currentPlayer, currentCommand);
 
+            checkIfPlayerLost();
             if (state.winConditionsMet()) break;
+        }
+    }
+
+    private void checkIfPlayerLost(){
+
+        int playerRemoved = -1;
+        for (Player p : state.getPlayers()){
+            if (p.getOccupiedCountries().size() == 0 && !state.isPreGamePlay()){
+
+                playerRemoved = p.getID();
+            }
+        }
+
+        if (playerRemoved >= 0){
+            csh.removePlayer(playerRemoved);
         }
     }
 

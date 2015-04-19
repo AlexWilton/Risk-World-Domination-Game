@@ -365,7 +365,7 @@ class HostForwarder {
     private ObtainRiskCardAction processDrawCardCommand(DrawCardCommand command){
         int player = command.getPlayer();
         //System.out.println("Interpreted draw command");
-        return new ObtainRiskCardAction(state.getPlayers().get(player));
+        return new ObtainRiskCardAction(state.getPlayer(player));
     }
 
     /**

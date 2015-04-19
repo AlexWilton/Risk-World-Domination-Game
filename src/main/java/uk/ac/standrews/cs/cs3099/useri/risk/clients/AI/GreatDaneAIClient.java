@@ -81,7 +81,6 @@ public class GreatDaneAIClient extends Client {
 
     @Override
     public DefendCommand popDefendCommand(int origin, int target, int armies) {
-
         return new DefendCommand((gameState.getCountryByID(target).getTroops() > 1) ? 2 : 1, playerId);
     }
 
@@ -102,11 +101,7 @@ public class GreatDaneAIClient extends Client {
             if (bsc != null)
                 ret.add(getBestSetupCommand());
         }else {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
             TurnStage stage = gameState.getTurnStage();
             switch (stage) {
                 case STAGE_TRADING: {

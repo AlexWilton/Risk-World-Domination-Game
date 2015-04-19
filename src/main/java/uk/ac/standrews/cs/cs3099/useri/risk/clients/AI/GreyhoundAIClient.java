@@ -26,6 +26,11 @@ public class GreyhoundAIClient extends Client {
 
     @Override
     public Command popCommand() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         //if we attacked before and haven't won or haven't lost all armies, attack again
         if (lastAttack != null){
             int lastOrigin = Integer.parseInt(lastAttack.getPayloadAsArray().get(0).toString());
@@ -74,6 +79,11 @@ public class GreyhoundAIClient extends Client {
 
     @Override
     public DefendCommand popDefendCommand(int origin, int target, int armies) {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         return new DefendCommand((gameState.getCountryByID(target).getTroops() > 1) ? 2 : 1, playerId);
     }

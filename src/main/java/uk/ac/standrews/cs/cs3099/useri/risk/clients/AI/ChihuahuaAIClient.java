@@ -22,6 +22,7 @@ public class ChihuahuaAIClient extends Client {
 
     @Override
     public Command popCommand() {
+
         // This cannot be random, if a country has been captured, move a random number of armies to it (at least 1).
         if (gameState.isAttackCaptureNeeded()) {
             Country origin = gameState.getAttackCaptureOrigin();
@@ -78,11 +79,7 @@ public class ChihuahuaAIClient extends Client {
             //only setup commands
             ret.addAll(getAllPossibleSetupCommands());
         }else {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
             TurnStage stage = gameState.getTurnStage();
             switch (stage) {
                 case STAGE_TRADING: {

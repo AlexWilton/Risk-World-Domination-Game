@@ -9,7 +9,7 @@ var Risk = {
 	},
 
 	Settings :{
-		colors: {cyan: '#00ffe4', green: '#0f0', blue: '#00f', red: '#f00', purple: '#f0f', pink: '##ffcccc'}
+		colors: {cyan: '#00ffe4', green: '#0f0', blue: '#00f', red: '#f00', purple: '#f0f', pink: '#ffcccc'}
 	},
 
 	Territories: {},

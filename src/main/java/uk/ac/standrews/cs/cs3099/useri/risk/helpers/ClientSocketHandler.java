@@ -415,7 +415,11 @@ public class ClientSocketHandler implements Runnable {
 //                e.printStackTrace();
 //            }
 //        }
-        out.println(command.toJSONString());
+        try {
+            out.println(command.toJSONString());
+        }catch (NullPointerException e){
+            System.err.println("what");
+        }
         System.out.println("Sent to server: " + command.toJSONString());
         out.flush();
 

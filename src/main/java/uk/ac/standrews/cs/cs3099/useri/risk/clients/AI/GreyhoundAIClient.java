@@ -12,12 +12,12 @@ import java.util.Map;
 /**
  * Always attacks if it can. Will continue attacking one weak country until it is out of armies to do so, or it has conquered the country.
  */
-public class BulldogAIv2Client extends Client {
+public class GreyhoundAIClient extends Client {
 
 
     private AttackCommand lastAttack;
 
-    public BulldogAIv2Client(State gameState){
+    public GreyhoundAIClient(State gameState){
         super(gameState,new RandomNumberGenerator());
     }
 
@@ -26,6 +26,11 @@ public class BulldogAIv2Client extends Client {
 
     @Override
     public Command popCommand() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         //if we attacked before and haven't won or haven't lost all armies, attack again
         if (lastAttack != null){
             int lastOrigin = Integer.parseInt(lastAttack.getPayloadAsArray().get(0).toString());
@@ -74,6 +79,11 @@ public class BulldogAIv2Client extends Client {
 
     @Override
     public DefendCommand popDefendCommand(int origin, int target, int armies) {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         return new DefendCommand((gameState.getCountryByID(target).getTroops() > 1) ? 2 : 1, playerId);
     }

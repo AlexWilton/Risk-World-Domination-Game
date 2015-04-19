@@ -32,7 +32,10 @@ public class ServerSocketHandler implements Runnable {
     private boolean gameInProgress = false;
     private RandomNumberGenerator seed;
 
-
+    /**
+     * getter of all the connected player names
+     * @return String ArrayList to return all the player names
+     */
     public ArrayList<String> getConnectedPlayerNames(){
         ArrayList<String> ret = new ArrayList<>();
         for (ListenerThread t : clientSocketPool){
@@ -40,6 +43,14 @@ public class ServerSocketHandler implements Runnable {
         }
         return ret;
     }
+
+    /**
+     * Constructor of server socket handler
+     * @param port number to be connected to (integer)
+     * @param numberOfPlayers integer defining number of playes allowed
+     * @param webClient webclient instance, 
+     * @param isServerPlaying
+     */
     public ServerSocketHandler(int port, int numberOfPlayers, WebClient webClient, boolean isServerPlaying) {
         this.webClient = webClient;
         NUMBER_OF_PLAYERS = numberOfPlayers;

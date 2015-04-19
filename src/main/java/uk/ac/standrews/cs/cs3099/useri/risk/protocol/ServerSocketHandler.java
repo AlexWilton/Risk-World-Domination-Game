@@ -46,6 +46,9 @@ public class ServerSocketHandler implements Runnable {
         }
     }
 
+    /**
+     * Main thread loop
+     */
     public void run() {
         int i = 0;
         clientSocketPool = new ArrayList<>();

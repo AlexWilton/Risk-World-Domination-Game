@@ -5,9 +5,6 @@ import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.GameEngine;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
 
-/**
- * Created by po26 on 19/04/15.
- */
 public class AIRunner implements Runnable {
     private Client client;
     private String name;

@@ -114,6 +114,7 @@ var Risk = {
 	},
 
 	updateMap: function(){
+        Risk.stage.destroy();
 		$("#map").html(""); //clear old displayed map
 		Risk.Territories = {};
 
@@ -134,7 +135,7 @@ var Risk = {
 			scale: Risk.GlobalScale()
 		});
 
-		//Risk.drawBackgroundImg();
+		Risk.drawBackgroundImg();
 		Risk.drawTerritories();
 
 		Risk.stage.add(Risk.backgroundLayer);

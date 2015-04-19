@@ -433,7 +433,7 @@ public class ClientSocketHandler implements Runnable {
 
     }
 
-    Command getNextCommand() throws IOException {
+    synchronized Command getNextCommand() throws IOException {
 
         String currentIn = "";
         while (StringUtils.countMatches(currentIn, "{") != StringUtils.countMatches(currentIn, "}") || StringUtils.countMatches(currentIn, "{") == 0) {

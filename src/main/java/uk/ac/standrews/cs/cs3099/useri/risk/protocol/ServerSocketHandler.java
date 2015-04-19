@@ -25,6 +25,7 @@ public class ServerSocketHandler implements Runnable {
     private RejectingThread reject;
 
     private boolean gameInProgress = false;
+    private RandomNumberGenerator seed;
 
     public ServerSocketHandler(int port, int numberOfPlayers, WebClient webClient, boolean isServerPlaying) {
         this.webClient = webClient;
@@ -84,19 +85,15 @@ public class ServerSocketHandler implements Runnable {
             Map map = new Map();
             gameState.setup(map, ListenerThread.getPlayers());
             HostForwarder.setState(gameState);
-            RandomNumberGenerator seed = new RandomNumberGenerator();
+            seed = new RandomNumberGenerator();
             HostForwarder.setSeed(seed);
 
             // Elect first player by dice roll and shuffle cards deck.
             while (notAllInitialised(InitState.FIRST_PLAYER_ELECTABLE));
             seed.finalise();
-            int startingPlayer = (int)(seed.nextInt() % ListenerThread.getPlayers().size());
-            HostForwarder.setSeed(null);
-            gameState.setFirstPlayer(gameState.getPlayer(startingPlayer));
-            gameState.setCurrentPlayer(startingPlayer);
-            System.err.println("STARTING PLAYER IS " + startingPlayer);
+            getFirstPlayer(gameState);
 
-            seed = new RandomNumberGenerator();
+
             HostForwarder.setSeed(seed);
             ListenerThread.shuffleCards();
             while (notAllInitialised(InitState.DECK_SHUFFLED));
@@ -127,6 +124,15 @@ public class ServerSocketHandler implements Runnable {
             e.printStackTrace();
         }
 
+    }
+
+    private synchronized void getFirstPlayer(State gameState) throws HashMismatchException {
+        int startingPlayer = (int)(seed.nextInt() % ListenerThread.getPlayers().size());
+        HostForwarder.setSeed(null);
+        gameState.setFirstPlayer(gameState.getPlayer(startingPlayer));
+        gameState.setCurrentPlayer(startingPlayer);
+        System.err.println("STARTING PLAYER IS " + startingPlayer);
+        this.seed = new RandomNumberGenerator();
     }
 
     private InitialiseGameCommand generateInitGame() {

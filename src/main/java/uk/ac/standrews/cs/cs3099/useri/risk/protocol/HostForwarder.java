@@ -107,38 +107,42 @@ class HostForwarder {
      */
     protected void playGame() throws IOException {
         while(playing) {
-            if (getRolls) {
-                try {
-                    getRolls();
-                } catch (InterruptedException | HashMismatchException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (move_required && System.currentTimeMillis() > timer + MOVE_TIMEOUT) {
-                System.err.println("Mov from " + ID + " timed out");
-                throw new SocketTimeoutException();
-            }
-            if (!ack_received && System.currentTimeMillis() > timer + ACK_TIMEOUT) {
-                System.err.println("Ack from " + ID + " timed out");
-                throw new SocketTimeoutException();
-            }
-            if (!move_required && state.getCurrentPlayer().getID() == ID){
-                move_required = true;
-                //System.out.println("Player " + ID + "'s turn'");
-                timer = System.currentTimeMillis();
-            }
-            if (input.ready()) {
-                Command reply = Command.parseCommand(input.readLine());
-                //System.out.println("in Player " + ID + ": " + reply);
-                messageQueue.sendAll(reply, ID);
-                checkAckCases(reply);
-            }
-            if (state.winConditionsMet()) break;
+            playGameIteration();
+        }
+    }
+
+    private synchronized void playGameIteration() throws IOException{
+        if (getRolls) {
             try {
-                Thread.sleep(1); // Just sleep a bit to prevent busy looping
-            } catch (InterruptedException e) {
+                getRolls();
+            } catch (InterruptedException | HashMismatchException e) {
                 e.printStackTrace();
             }
+        }
+        if (move_required && System.currentTimeMillis() > timer + MOVE_TIMEOUT) {
+            System.err.println("Mov from " + ID + " timed out");
+            throw new SocketTimeoutException();
+        }
+        if (!ack_received && System.currentTimeMillis() > timer + ACK_TIMEOUT) {
+            System.err.println("Ack from " + ID + " timed out");
+            throw new SocketTimeoutException();
+        }
+        if (!move_required && state.getCurrentPlayer().getID() == ID){
+            move_required = true;
+            //System.out.println("Player " + ID + "'s turn'");
+            timer = System.currentTimeMillis();
+        }
+        if (input.ready()) {
+            Command reply = Command.parseCommand(input.readLine());
+            //System.out.println("in Player " + ID + ": " + reply);
+            messageQueue.sendAll(reply, ID);
+            checkAckCases(reply);
+        }
+        if (state.winConditionsMet()) playing = false;
+        try {
+            Thread.sleep(1); // Just sleep a bit to prevent busy looping
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

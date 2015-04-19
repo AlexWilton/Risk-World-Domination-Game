@@ -199,6 +199,9 @@ public class BulldogAIv2Client extends Client {
         ArrayList<DeployTuple> depTups = new ArrayList<>();
 
         for (Map.Entry<Integer,Integer> depTuple : troopDeploy.entrySet()){
+            if (gameState.getCountryByID(depTuple.getKey()).getOwner().getID() != getPlayerId()){
+                System.out.println("WRONG");
+            }
             depTups.add(new DeployTuple(depTuple.getKey(),depTuple.getValue()));
         }
 

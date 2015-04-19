@@ -39,6 +39,8 @@ class HostForwarder {
     private double timer = System.currentTimeMillis();
     private int last_ack = 0;
     private boolean playing = true;
+    private RollHashCommand hash;
+    private RollNumberCommand number;
 
     public HostForwarder(MessageQueue q, int move_timeout, int ack_timeout, int id, BufferedReader input) {
         messageQueue = q;
@@ -72,7 +74,12 @@ class HostForwarder {
      * @throws InterruptedException
      */
     void getRolls() throws IOException, InterruptedException, HashMismatchException{
-        Command comm = Command.parseCommand(input.readLine());
+        Command comm;
+        if (hash == null)
+            comm = Command.parseCommand(input.readLine());
+        else
+            comm = hash;
+        hash = null;
         messageQueue.sendAll(comm, ID);
         while (!(comm instanceof RollHashCommand)) {
             //System.out.println(comm instanceof RollHashCommand);
@@ -88,7 +95,11 @@ class HostForwarder {
         String hashStr = hash.get("payload").toString();
         seed.addHash(ID, hashStr);
 
-        comm = Command.parseCommand(input.readLine());
+        if (number == null)
+            comm = Command.parseCommand(input.readLine());
+        else
+            comm = number;
+        number = null;
         messageQueue.sendAll(comm, ID);
         if (!(comm instanceof RollNumberCommand)) {
             throw new RollException();
@@ -133,6 +144,7 @@ class HostForwarder {
             timer = System.currentTimeMillis();
         }
         if (input.ready()) {
+            if (getRolls) getRolls();
             Command reply = Command.parseCommand(input.readLine());
             //System.out.println("in Player " + ID + ": " + reply);
             messageQueue.sendAll(reply, ID);
@@ -173,6 +185,12 @@ class HostForwarder {
     private synchronized void processCommand(Command comm) throws HashMismatchException, InterruptedException, IOException{
         if (comm instanceof DefendCommand){
             processDefendCommand((DefendCommand) comm);
+            return;
+        } else if (comm instanceof RollHashCommand) {
+            hash = (RollHashCommand)comm;
+            return;
+        } else if (comm instanceof RollNumberCommand) {
+            number = (RollNumberCommand)comm;
             return;
         }
 

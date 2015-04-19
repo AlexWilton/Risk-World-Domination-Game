@@ -10,6 +10,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGe
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.InitialiseGameCommand;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -31,6 +32,14 @@ public class ServerSocketHandler implements Runnable {
     private boolean gameInProgress = false;
     private RandomNumberGenerator seed;
 
+
+    public ArrayList<String> getConnectedPlayerNames(){
+        ArrayList<String> ret = new ArrayList<>();
+        for (ListenerThread t : clientSocketPool){
+            ret.add(t.getPlayerName());
+        }
+        return ret;
+    }
     public ServerSocketHandler(int port, int numberOfPlayers, WebClient webClient, boolean isServerPlaying) {
         this.webClient = webClient;
         NUMBER_OF_PLAYERS = numberOfPlayers;

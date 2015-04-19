@@ -122,6 +122,13 @@ class HostForwarder {
         }
     }
 
+    /**
+     * Method to handle the game flow, checking timeouts and handles transactions
+     *
+     * @throws IOException
+     * @throws HashMismatchException
+     * @throws InterruptedException
+     */
     private synchronized void playGameIteration() throws IOException, HashMismatchException, InterruptedException {
         if (getRolls) {
             try {

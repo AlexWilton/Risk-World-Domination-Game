@@ -31,6 +31,10 @@ public class ClientSocketHandler implements Runnable {
 
     private int waitingOn = -1;
 
+
+    public int getLocalClientId(){
+        return localClient.getPlayerId();
+    }
     public void removePlayer(int id) {
         if (id == localClient.getPlayerId()) {
             System.out.println("this player lost");

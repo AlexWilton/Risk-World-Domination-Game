@@ -112,12 +112,11 @@ public class GameEngine implements Runnable{
             }
             processCommand(currentPlayer, currentCommand);
 
-            checkIfPlayerLost();
-            if (state.winConditionsMet()) break;
+            if (checkIfPlayerLost() || state.winConditionsMet()) break;
         }
     }
 
-    private void checkIfPlayerLost(){
+    private boolean checkIfPlayerLost(){
 
         int playerRemoved = -1;
         for (Player p : state.getPlayers()){
@@ -129,7 +128,10 @@ public class GameEngine implements Runnable{
 
         if (playerRemoved >= 0){
             csh.removePlayer(playerRemoved);
+            if (playerRemoved == csh.getLocalClientId())
+                return true;
         }
+        return false;
     }
 
     /**

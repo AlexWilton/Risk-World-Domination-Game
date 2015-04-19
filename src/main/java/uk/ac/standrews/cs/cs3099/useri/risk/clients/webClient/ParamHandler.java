@@ -2,8 +2,12 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.json.simple.JSONArray;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.main.AIApp;
+import uk.ac.standrews.cs.cs3099.useri.risk.main.AIRunner;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.ClientApp;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
@@ -16,10 +20,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 class ParamHandler extends DefaultHandler {
     private WebClient webClient;
+    private ServerSocketHandler host;
 
     public ParamHandler(WebClient webClient){
         super();
@@ -51,6 +57,19 @@ class ParamHandler extends DefaultHandler {
                     case "connect":
                         responseString = connectToHost(params);
                         break;
+                    case "get_list_of_players_connected_to_host":
+                        JSONArray playerNames = new JSONArray();
+                        for(String name : host.getConnectedPlayerNames())
+                            playerNames.add(name);
+                        responseString = playerNames.toJSONString();
+                        break;
+                    case "get_list_of_available_ai":
+                        JSONArray aiNames = new JSONArray();
+                        for(String aiName : AIApp.getListOfAvailableAIs()){
+                            aiNames.add(aiName);
+                        }
+                        responseString = aiNames.toJSONString();
+                        break;
                     case "move_to_game_play":
                         if(webClient.getState() != null){
                             responseString = "true";
@@ -79,7 +98,7 @@ class ParamHandler extends DefaultHandler {
                 }
             }
 
-            if(!operation.equals("is_server_waiting_for_action") && !operation.equals("move_to_game_play")  && !operation.equals("get_state"))
+            if(!operation.equals("is_server_waiting_for_action") && !operation.equals("move_to_game_play")  && !operation.equals("get_state") && !operation.equals("get_list_of_players_connected_to_host"))
                 System.out.println("Request for operation: " + operation + " received. (" + params.toString() + ")\nResponse sent: " + responseString + "\n");
             response.getWriter().println(responseString);
             baseRequest.setHandled(true);
@@ -339,7 +358,7 @@ class ParamHandler extends DefaultHandler {
                 return "Error! Valid is Host Playing boolean not provided";
             is_host_playing = Boolean.parseBoolean(is_host_playingArray[0]);
 
-        ServerSocketHandler host = new ServerSocketHandler(port, numOfPlayers, webClient, false);
+        host = new ServerSocketHandler(port, numOfPlayers, webClient, false);
         Thread t = new Thread(host);
         t.start();
         webClient.setHostAndPlayingBooleans(true, is_host_playing);
@@ -356,6 +375,17 @@ class ParamHandler extends DefaultHandler {
                 return "Connect to myself on " + port + "!";
         }
 
+        //check to see if we need to add ai players
+        String[] aiPlayerArray = params.get("ai_player");
+        if(aiPlayerArray != null) {
+            for (int i = 0; i < aiPlayerArray.length; i++) {
+                String[] aiPlayerData = aiPlayerArray[i].split(",");
+                String aiType = aiPlayerData[0];
+                String aiName = aiPlayerData[1];
+                AIRunner aiRunner = new AIRunner(AIApp.createAiClient(aiType), aiName, "127.0.0.1", port);
+                (new Thread(aiRunner)).start();
+            }
+        }
         return "true";
     }
 

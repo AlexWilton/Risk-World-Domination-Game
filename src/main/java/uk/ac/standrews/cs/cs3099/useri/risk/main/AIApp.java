@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.main;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.BulldogAIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.BulldogAIv2Client;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.BulldogAIv3Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.RandomAIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 
@@ -10,21 +11,36 @@ import java.util.HashMap;
 
 public class AIApp {
 
-    public static HashMap<String, Client> getAiClientEntries(){
-        HashMap<String, Client> aiClients = new HashMap<>();
-        aiClients.put("Bulldog v2", new BulldogAIv2Client(null));
-        aiClients.put("Bulldog v1", new BulldogAIClient(null));
-        aiClients.put("Canis Inferior", new RandomAIClient(null));
-        aiClients.put("Random", new RandomAIClient(null));
+    public static ArrayList<String> getListOfAvailableAIs(){
+        ArrayList<String> aiClients = new ArrayList<>();
+        aiClients.add("Bulldog v1");
+        aiClients.add("Random2");
+        aiClients.add("Random1");
+        aiClients.add("Random");
         return aiClients;
     }
 
+    /**
+     * Creates a new AI client for a given AI type
+     * @param name Type of AI
+     * @return AI Client
+     */
+    public static Client createAiClient(String name){
+        switch (name){
+            case "Bulldog v1" : return new BulldogAIClient(null);
+            case "Bulldog v2" : return new BulldogAIv2Client(null);
+            case "Bulldog v3" : return new BulldogAIv3Client(null);
+            case "Random" : return new RandomAIClient(null);
+            default: return null;
+        }
+    }
+
+
     public static void main(String argv[]){
-        HashMap<String, Client> aiClients = getAiClientEntries();
-        String[] names = {"Bulldog v1","Bulldog v2","Canis Inferior","Random"};
+        String[] names = {"Bulldog v1","Random","Random","Random"};
         ArrayList<Thread> threads = new ArrayList<>();
         for (int i = 0; i<names.length; i ++){
-            Thread t = new Thread(new AIRunner(aiClients.get(names[i]),names[i]));
+            Thread t = new Thread(new AIRunner(createAiClient(names[i]),names[i]));
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {

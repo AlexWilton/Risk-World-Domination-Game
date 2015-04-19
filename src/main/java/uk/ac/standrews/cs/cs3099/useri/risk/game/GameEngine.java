@@ -16,16 +16,7 @@ import java.util.ArrayList;
  *
  */
 public class GameEngine implements Runnable{
-    /**
-     * This method runs the main game loop
-     * Simple outline:
-     * 1. polls an action from the active client
-     * 2. verify the action against the current game state
-     * 3. execute action
-     * 4. checks win conditions
-     * 5. sends out update notification to all clients
-     *
-     */
+
     private State state;
     private ClientSocketHandler csh;
 
@@ -54,7 +45,7 @@ public class GameEngine implements Runnable{
     /**
      * Constructs a game state and stored in GameEngine object
      */
-    void initialise(){
+    public void initialise(){
         //create game state
         State gameState = new State();
         state = gameState;
@@ -97,9 +88,15 @@ public class GameEngine implements Runnable{
     }
 
     /**
-     * Main loops to run game
+     * This method runs the main game loop
+     * Simple outline:
+     * 1. polls an action from the active client
+     * 2. verify the action against the current game state
+     * 3. execute action
+     * 4. checks win conditions
+     * 5. sends out update notification to all clients
      */
-    void gameLoop(){
+    public void gameLoop(){
         System.out.println("Game Loop running...");
         Player currentPlayer;
         while(true) {

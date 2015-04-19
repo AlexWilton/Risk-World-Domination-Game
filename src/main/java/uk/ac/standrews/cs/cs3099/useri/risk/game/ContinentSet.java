@@ -6,6 +6,9 @@ import org.json.simple.JSONAware;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+/**
+ * ContinentSet object containing all the continents
+ */
 public class ContinentSet  extends HashSet<Continent> implements JSONAware{
 
     /**
@@ -47,7 +50,7 @@ public class ContinentSet  extends HashSet<Continent> implements JSONAware{
     }
 
     /**
-     *
+     * Getter to return the list of ids representing countries
      * @return list of ids that exists in this set
      */
     public ArrayList<Integer> getIDList(){
@@ -58,6 +61,12 @@ public class ContinentSet  extends HashSet<Continent> implements JSONAware{
         return ids;
     }
 
+    /**
+     * Method to represent the continents in JSON. It
+     * recursivelly calls toJSONString on the inner objects until it reaches the
+     * concrete object with all the attributes in it.
+     * @return String containing JSON representation of the continents
+     */
     @Override
     public String toJSONString() {
         JSONArray continents = new JSONArray();

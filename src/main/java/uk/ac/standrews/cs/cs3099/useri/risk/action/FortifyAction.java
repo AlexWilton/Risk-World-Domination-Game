@@ -6,7 +6,6 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 /**
  * Voluntary
- * Created by bs44 on 30/01/15.
  */
 public class FortifyAction extends Action {
     private Country from;

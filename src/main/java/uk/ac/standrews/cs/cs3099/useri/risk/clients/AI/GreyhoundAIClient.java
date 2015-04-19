@@ -6,20 +6,18 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * Always attacks if it can. Will continue attacking one weak country until it is out of armies to do so, or it has conquered the country.
  */
-public class BulldogAIv3Client extends Client {
+public class GreyhoundAIClient extends Client {
 
 
     private AttackCommand lastAttack;
 
-    public BulldogAIv3Client(State gameState){
+    public GreyhoundAIClient(State gameState){
         super(gameState,new RandomNumberGenerator());
     }
 
@@ -284,6 +282,9 @@ public class BulldogAIv3Client extends Client {
 
             else {
                 ret.add(new FortifyCommand(best_neighbour,curr_country,gameState.getCountryByID(best_neighbour).getTroops()/2,playerId));
+                if (gameState.getCountryByID(best_neighbour).getOwner().getID() != getPlayerId() || gameState.getCountryByID(curr_country).getOwner().getID() != getPlayerId()){
+                    System.out.println("WRONG");
+                }
                 break;
             }
         }

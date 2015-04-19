@@ -12,10 +12,10 @@ import java.util.Random;
 /**
  * Created by patrick on 17/04/15.
  */
-public class RandomAIClient extends Client {
+public class ChihuahuaAIClient extends Client {
 
 
-    public RandomAIClient(State gameState){
+    public ChihuahuaAIClient(State gameState){
         super(gameState,new RandomNumberGenerator());
     }
 

@@ -63,4 +63,23 @@ public class Continent implements JSONAware {
         continent.put("continent_id", id);
         return continent.toJSONString();
     }
+
+    public CountrySet getUnoccupiedCountries(){
+        CountrySet ret = new CountrySet();
+        for (Country c : countries){
+            if (c.getOwner() == null){
+                ret.add(c);
+            }
+        }
+
+        return ret;
+    }
+
+    public boolean isOwnedBy(int id){
+        for (Country c : countries){
+            if (c.getOwner().getID() != id)
+                return false;
+        }
+        return true;
+    }
 }

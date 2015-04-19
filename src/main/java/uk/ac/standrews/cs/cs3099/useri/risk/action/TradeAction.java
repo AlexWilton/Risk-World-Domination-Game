@@ -28,13 +28,17 @@ public class TradeAction extends Action {
     @Override
     public boolean validateAgainstState(State state) {
         if (super.validateAgainstState(state)) {
+
             //no trade made!
-            if (list == null){
+            if (list == null) {
                 return true;
             }
-            if (calculateArmies(state) != 0 ) {
+            if (calculateArmies(state) != 0) {
+
                 return true;
             }
+        } else {
+            System.err.println("out of turn");
         }
         return false;
     }

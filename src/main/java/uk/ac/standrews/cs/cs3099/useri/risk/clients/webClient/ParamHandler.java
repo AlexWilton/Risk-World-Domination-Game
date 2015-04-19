@@ -26,6 +26,7 @@ import java.util.Map;
 class ParamHandler extends DefaultHandler {
     private WebClient webClient;
     private ServerSocketHandler host;
+    private String setup_state = "init";
 
     public ParamHandler(WebClient webClient){
         super();
@@ -57,11 +58,14 @@ class ParamHandler extends DefaultHandler {
                     case "connect":
                         responseString = connectToHost(params);
                         break;
+                    case "get_setup_state":
+                        responseString = setup_state;
+                        break;
                     case "get_list_of_players_connected_to_host":
                         JSONArray playerNames = new JSONArray();
                         for(String name : host.getConnectedPlayerNames())
                             playerNames.add(name);
-                        responseString = playerNames.toJSONString();
+                        responseString = host.getNUMBER_OF_PLAYERS() + playerNames.toJSONString();
                         break;
                     case "get_list_of_available_ai":
                         JSONArray aiNames = new JSONArray();
@@ -386,6 +390,7 @@ class ParamHandler extends DefaultHandler {
                 (new Thread(aiRunner)).start();
             }
         }
+        setup_state = "hosting," + is_host_playing;
         return "true";
     }
 
@@ -421,6 +426,7 @@ class ParamHandler extends DefaultHandler {
             return "Connect to " + address + ":" + port + " failed!";
 
         webClient.setHostAndPlayingBooleans(false, false);
+        setup_state = "connected";
         return "true";
     }
 }

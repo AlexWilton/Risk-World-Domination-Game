@@ -182,5 +182,7 @@ public class ServerSocketHandler implements Runnable {
         return false;
     }
 
-
+    public int getNUMBER_OF_PLAYERS() {
+        return NUMBER_OF_PLAYERS;
+    }
 }

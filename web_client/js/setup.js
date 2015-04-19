@@ -5,9 +5,24 @@ $( document ).ready(function(){
     $("[name=number_of_players]").change(showAddAiPlayerBtnIfMaxPlayersNotReach);
     provideAIoptionsForHostSetupPanel();
 
+    $.ajax( "/?operation=get_setup_state")
+        .done(function(response) {
+            if(response.indexOf("hosting") == 0){
+                nonPlayingHost = (response.indexOf("true") != -1) ? false : true;
+                keepGameLobbyInfoUpdated();
+                gotoGamePlayWhenReady();
+            }
+            if(response.indexOf("connected") == 0){
+                $("#connectButton").html("<h3>Waiting for Host to Start Game</h3>")
+                gotoGamePlayWhenReady();
+            }
+        });
 });
 
 function gotoGamePlayWhenReady(){
+    //disable controls for user
+    $(":input").prop("disabled", true);
+
     $.ajax( "/?operation=move_to_game_play")
         .done(function(response) {
             if(response.indexOf("true") == 0){
@@ -29,6 +44,7 @@ function connect(){
         $.ajax( "/?operation=connect&" + requestParams )
             .done(function(response) {
                 if(response.indexOf("true") == 0) {
+                    $("#connectButton").html("<h3>Waiting for Host to Start Game</h3>");
                     gotoGamePlayWhenReady();
                 }else{
                     alert(response);
@@ -41,18 +57,19 @@ function connect(){
 
 
 
-function keepGameLobbyInfoUpdated(num_of_players) {
+function keepGameLobbyInfoUpdated() {
     $.ajax("/?operation=get_list_of_players_connected_to_host")
         .done(function (response) {
-            var names = JSON.parse(response);
+            var num_of_players = parseInt(response.substr(0,1));
+            var names = JSON.parse(response.substr(1));
             var html = '<div class="well"><h4><strong>Players Currently Connected:</strong></h4><ul>';
             for(i in names){
                 html += '<p>' + names[i] + '</p>';
             }
-            html += '</ul><h4><small>Game will start when ' + (names.length - num_of_players) +
+            html += '</ul><h4><small>Game will start when ' + (num_of_players - names.length) +
             ' more players connect.</small></h4><ul></div>';
             $('#host').html(html);
-            setTimeout(function(){keepGameLobbyInfoUpdated(num_of_players)}, 600);
+            setTimeout(function(){keepGameLobbyInfoUpdated()}, 600);
         });
 }
 
@@ -68,7 +85,7 @@ function host(){
                 //disable controls for user
                 $(":input").prop("disabled", true);
 
-                keepGameLobbyInfoUpdated($("[name=number_of_players]").val());
+                keepGameLobbyInfoUpdated();
                 gotoGamePlayWhenReady();
             }else{
                 alert(response);

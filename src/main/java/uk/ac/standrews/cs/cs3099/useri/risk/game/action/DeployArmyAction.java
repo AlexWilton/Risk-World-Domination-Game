@@ -1,6 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.game.action;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.CountrySet;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
@@ -27,17 +28,31 @@ public class DeployArmyAction extends Action{
      */
     @Override
     public boolean validateAgainstState(State state) {
-        if (super.validateAgainstState(state)) {
-            if (country.getOwner().equals(player)) {
+        if (!super.validateAgainstState(state))
+            return false;
 
-                if (player.getUnassignedArmies() >= armies) {
-                    return true;
+        if(!country.getOwner().equals(player))
+            return false;
+
+        if (player.getUnassignedArmies() < armies)
+            return false;
+
+        // if this is a deployment leaving less than 2 armies,
+        // ensure that there are no countries requiring deployment which haven't been deployed to
+        if(player.getUnassignedArmies() - armies < 2) {
+            CountrySet countryWhereAtLeastOneRequiresTwoArmies = state.getSetOfCountriesWhereAtLeastOneNeedsToBeDeployedTo();
+            if (countryWhereAtLeastOneRequiresTwoArmies != null) {
+                boolean requiredDeploymentTakesPlace = false;
+                for (Country aRequiredCountry : countryWhereAtLeastOneRequiresTwoArmies) {
+                    if (aRequiredCountry.getCountryId() == country.getCountryId())
+                        requiredDeploymentTakesPlace = true;
                 }
-                else System.err.println("not enough armies, got " + player.getUnassignedArmies() + ", wanted " + armies);
+                if(!requiredDeploymentTakesPlace)
+                    return false;
             }
-            else System.err.println("owner not valid");
         }
-        return false;
+
+        return true;
     }
 
     /**
@@ -49,6 +64,17 @@ public class DeployArmyAction extends Action{
     public void performOnState(State state) {
         country.setTroops(country.getTroops() + armies);
         player.setUnassignedArmies(getPlayer().getUnassignedArmies() - armies);
+
+        //if a required deployment is made, remove requirement of all needed deployments
+        CountrySet countryWhereAtLeastOneRequiresTwoArmies = state.getSetOfCountriesWhereAtLeastOneNeedsToBeDeployedTo();
+        if(countryWhereAtLeastOneRequiresTwoArmies != null){
+            if(armies >= 2){
+                for(Country requiredCountry : countryWhereAtLeastOneRequiresTwoArmies){
+                    if(requiredCountry == country)
+                        state.setSetOfCountriesWhereAtLeastOneNeedsToBeDeployedTo(null);
+                }
+            }
+        }
 
         if(state.getCurrentPlayer().getUnassignedArmies() == 0)
             state.nextStage();

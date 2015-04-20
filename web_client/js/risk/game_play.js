@@ -7,7 +7,6 @@ function setup(){
         my_player_id = parseInt(id);
         getStateFromServer(function(){
             Risk.init();
-            console.log(game_state);
             updateDisplay();
 
             //keep requesting state until it is your turn
@@ -100,7 +99,19 @@ function generateTradeInPanel(){
     '<input type="hidden" name="operation" value="perform_action"/>' +
     '<input type="hidden" name="action" value="trade_in"/>';
     game_state.currentPlayer.cards.forEach(function(card){
-        panelHtml += '<label class="btn btn-default"><input type="checkbox" name="card" value="'+ card.card_id +'" autocomplete="off"> ' + card.type +'</label><br/><br/>';
+
+        //find country which corresponds to the card
+        var country;
+        for(countryIndex in game_state.map.countries){
+            country = game_state.map.countries[countryIndex];
+            if(country.country_id == card.card_id)
+                break;
+        }
+
+        panelHtml += '<label class="btn btn-default"><input type="checkbox" name="card" value="'+ card.card_id +'" autocomplete="off"> ' +
+        card.type.substr(5) +
+            "\n(" + country.name + ")" +
+        '</label><br/><br/>';
     });
     panelHtml += '</div><br/>';
     if(isTradePossibleForMe())
@@ -193,7 +204,6 @@ function attempt_attack(){
 
 function make_attack_capture(){
     $.get('/?' + $('#attackCaptureForm').serialize(), function(response){
-        console.log(response);
         if(response.indexOf("true") == 0){
             $("#turnPanel").html("");
             $("#attackOutcome").html("<h4>Waiting for Server...</h4>");
@@ -240,7 +250,9 @@ function waitForAttackToBeProcessed(attackingCountryId, defendingCountryId, orig
             if(countryCaptured){
                 alertType = "success";
                 attackResultMsg = "Attack Successful! Territory Taken!";
-                $("#turnPanel").html(generateAttackCapturePanel());
+                waitForServer();
+                return;
+                //$("#turnPanel").html(generateAttackCapturePanel());
             }
             if(defenderArmiesLost == 0){
                 alertType = "danger";
@@ -302,6 +314,28 @@ function generateDeployPanel(){
     var panelHtml = '<form id="deployArmies" class="form-horizontal">' +
     '<input type="hidden" name="operation" value="perform_action"/>' +
     '<input type="hidden" name="action" value="deploy_armies"/>';
+
+    if(game_state.setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo != null){
+        var multiple = game_state.setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo.length > 1;
+        panelHtml += "<br/><br/>You <strong>must</strong> deploy at least 2 armies to " + ((multiple) ? "one of the following countries:" : "the following country:") + "<br/>";
+        for(countryId in game_state.setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo){
+            var country = game_state.setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo[countryId];
+            panelHtml += "<p><strong>" + country.name + "</strong></p>";
+
+            if(!multiple){
+                panelHtml += '<div class="form-group">' +
+                '<label class="col-sm-8 control-label">'+country.name+'</label> ' +
+                '<div class="col-sm-4"> ' +
+                '<select name="' + country.country_id + '" class="form-control">';
+                for(var i = 2; i<= game_state.currentPlayer.unassignedArmies; i++) {
+                    panelHtml += '<option>' + i +'</option>';
+                }
+                panelHtml += "</select></div></div>";
+            }
+        }
+    }
+
+
     for(t in selectedTerriories){
         if(selectedTerriories[t].player_owner_id == my_player_id) {
             var name = selectedTerriories[t].name;
@@ -322,7 +356,6 @@ function generateDeployPanel(){
 
 function attempt_deployment(){
     $.get('/?' + $('#deployArmies').serialize(), function(response){
-        console.log(response);
         if(response.indexOf("true") == 0){
             $("#turnPanel").html("<h4>Waiting for Server...</h4>");
             selectedTerriories = [];
@@ -340,7 +373,6 @@ function attempt_deployment(){
 
 function make_trade_in_request(){
     $.get('/?' + $('#tradeIn').serialize(), function(response){
-        console.log(response);
         if(response.indexOf("true") == 0){
             $("#turnPanel").html("");
             $("#tradeOutcome").html("<h4>Waiting for Server...</h4>");
@@ -358,7 +390,6 @@ function make_trade_in_request(){
 
 function no_trade_request(){
     $.get('/?operation=perform_action&action=trade_in&no_trade=yes', function(response){
-        console.log(response);
         if(response.indexOf("true") == 0){
             $("#turnPanel").html("");
             $("#tradeOutcome").html("<h4>Waiting for Server...</h4>");

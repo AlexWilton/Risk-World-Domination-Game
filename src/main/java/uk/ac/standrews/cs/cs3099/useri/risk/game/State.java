@@ -26,6 +26,8 @@ public class State implements JSONAware {
     private int cardSetstradedIn = 0;
     private boolean preGamePlay = true;
 
+    private CountrySet setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo = null;
+
     private boolean attackCaptureNeeded = false;
     private Country attackCaptureOrigin = null;
     private Country attackCaptureDestination = null;
@@ -48,8 +50,8 @@ public class State implements JSONAware {
         this.cardsDeck = map.getCardsFromMapData();
         this.currentPlayer = players.get(0);
 
-        //set number of inital troops for each player (based on the total number of players in the game)
-        int armiesForEachPlayer = 20 + (6 - players.size()) * 5;// - 18; //TODO remove -17
+        //set number of initial troops for each player (based on the total number of players in the game)
+        int armiesForEachPlayer = 20 + (6 - players.size()) * 5;
         for(Player p : players){
             p.setUnassignedArmies(armiesForEachPlayer);
         }
@@ -211,6 +213,12 @@ public class State implements JSONAware {
         state.put("attack_capture_origin", attackCaptureOrigin);
         state.put("attack_capture_destination", attackCaptureDestination);
         state.put("attack_capture_min_armies_to_move_in", attackCaptureMinimumArmiesToMove);
+        JSONArray countriesWhereAtLeastOneNeedsToBeDeployedTo = new JSONArray();
+        if(setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo != null){
+            for(Country c : setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo)
+                setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo.add(c);
+        }
+        state.put("setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo", setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo);
         return state.toJSONString();
     }
 
@@ -349,4 +357,11 @@ public class State implements JSONAware {
         return map.getAllCountries();
     }
 
+    public CountrySet getSetOfCountriesWhereAtLeastOneNeedsToBeDeployedTo() {
+        return setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo;
+    }
+
+    public void setSetOfCountriesWhereAtLeastOneNeedsToBeDeployedTo(CountrySet setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo) {
+        this.setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo = setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo;
+    }
 }

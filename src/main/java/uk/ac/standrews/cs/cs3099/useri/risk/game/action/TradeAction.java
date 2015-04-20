@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game.action;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.CountrySet;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.RiskCard;
 
@@ -37,7 +38,6 @@ public class TradeAction extends Action {
                 return true;
             }
             if (calculateArmies(state) != 0) {
-
                 return true;
             }
         } else {
@@ -54,14 +54,11 @@ public class TradeAction extends Action {
     @Override
     public void performOnState(State state) {
         if (list != null) {
-            //System.err.println("Player has "+player.getUnassignedArmies() + " armies before");
             player.setUnassignedArmies(player.getUnassignedArmies() + calculateArmies(state));
-            //System.err.println("Player has "+player.getUnassignedArmies() + " armies after");
-            ArrayList<Country> occ;
-            if ((occ = occupied(state)) != null) {
-                Country x = player.choose(occ);
-                x.setTroops(x.getTroops() + 2);
-            }
+
+            //set countries which require 2 armies to be deployed. (null if not necessary)
+            state.setSetOfCountriesWhereAtLeastOneNeedsToBeDeployedTo(countriesCorrespondingToTradedInRiskCards(state));
+
             state.cardSettradedIn();
             player.removeCards(list);
         }
@@ -76,20 +73,16 @@ public class TradeAction extends Action {
      * null if no card-country pairs are owned by the player
      * list of country-card pairs otherwise.
      */
-    private ArrayList<Country> occupied(State state) {
-        ArrayList<Country> occupied = new ArrayList<>();
-        boolean set = false;
-        for (RiskCard card:list) {
+    private CountrySet countriesCorrespondingToTradedInRiskCards(State state) {
+        CountrySet occupied = null;
+        for (RiskCard card : list) {
             Country country = state.getCountryByID(card.getCardID());
             if (country.getOwner().equals(player)){
+                if(occupied == null) occupied = new CountrySet();
                 occupied.add(country);
-                set = true;
             }
         }
-
-        if (set)
-            return occupied;
-        return null;
+        return occupied;
     }
 
     /**
@@ -99,12 +92,11 @@ public class TradeAction extends Action {
      * @return number of armies to be given to the player or 0 if the move is invalid.
      */
     public int calculateArmies(State state) {
+        int numberOfArmies = 0;
+
         if (list == null || list.size() != 3)
             return 0;
-        int cavalry = 0;
-        int artillery = 0;
-        int infantry = 0;
-        int wild = 0;
+        int cavalry = 0, artillery = 0, infantry = 0, wild = 0;
         for (RiskCard card:list){
             if (card == null)
                 return 0;
@@ -123,23 +115,32 @@ public class TradeAction extends Action {
                     break;
             }
         }
+
+        //check if set is valid
+        boolean validSet = false;
         if (
                 (cavalry == 1 && artillery == 1 && infantry == 1) ||
                 cavalry == 3 ||
                 infantry == 3 ||
                 artillery == 3 ||
                 (wild==1 && ((cavalry==2) || (artillery==2) || (infantry==2)))
-        ) {
-            // Increase number of sets traded in.
+        ) validSet = true;
 
-            int sets = state.getCardSetstradedIn() + 1;
-            //System.out.println(sets);
-            if (sets < 6){
-                return (sets + 1) * 2;
+        if(validSet) {
+            int currentSetNumber = state.getCardSetstradedIn() + 1;
+            if (currentSetNumber < 6) {
+                numberOfArmies += (currentSetNumber + 1) * 2;
             } else {
-                return (sets - 3) * 5;
+                numberOfArmies += (currentSetNumber - 3) * 5;
             }
+
+            //add two extra armies to deploy if one of the risk cards corresponds to an occupied territory
+            if(countriesCorrespondingToTradedInRiskCards(state) != null){
+                numberOfArmies += 2;
+            }
+
         }
-        return 0;
+
+        return numberOfArmies;
     }
 }

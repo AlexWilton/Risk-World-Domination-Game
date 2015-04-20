@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.main;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.BulldogAIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.GreatDaneAIClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.CommandRaterAIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.GameEngineLocal;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
@@ -24,9 +25,10 @@ public class LocalRun {
 
     public static void main (String [] argv){
         ArrayList<Client> c = new ArrayList<>();
-        while(c.size()<6) {
+
             c.add(new GreatDaneAIClient(null));
-        }
+        c.add(new CommandRaterAIClient());
+
 
         for(int i = 0; i< c.size(); i++){
            c.get(i).setPlayerId(i);

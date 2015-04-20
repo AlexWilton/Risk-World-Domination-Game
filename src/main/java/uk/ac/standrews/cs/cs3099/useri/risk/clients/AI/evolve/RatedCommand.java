@@ -18,6 +18,11 @@ public class RatedCommand implements Comparable<RatedCommand>{
 
     @Override
     public int compareTo(RatedCommand ratedCommand) {
-        return 0;
+        if (this.rating - ratedCommand.rating < -0.0001)
+            return 1;
+        else if (this.rating - ratedCommand.rating > 0.0001)
+            return -1;
+        else return 0;
+
     }
 }

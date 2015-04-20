@@ -69,7 +69,9 @@ public class CountryStrategy {
     }
 
     public SetupCommand getBeneficialSetupCommand () {
-        return new SetupCommand(country.getCountryId(),player.getID());
+        if ((!state.hasUnassignedCountries() && country.getOwner().getID() == player.getID()) || country.getOwner() == null)
+            return new SetupCommand(country.getCountryId(),player.getID());
+        return null;
     }
 
     public  FortifyCommand getBeneficialFortifyCommand() {
@@ -87,9 +89,11 @@ public class CountryStrategy {
                     best = c;
                 }
             }
-            return (new FortifyCommand(best.getCountryId(),country.getCountryId(),best.getTroops()-1,player.getID()));
+            if (best != null)
+                return (new FortifyCommand(best.getCountryId(),country.getCountryId(),best.getTroops()-1,player.getID()));
 
-        } else{
+        }
+
             //put them into surrounding country
             ArrayList<DeployTuple> deployTuples = new ArrayList<>();
             CountrySet surr = country.getNeighboursOwnedBy(player.getID());
@@ -146,7 +150,7 @@ public class CountryStrategy {
 
 
 
-        }
+
 
         return null;
     }
@@ -172,8 +176,8 @@ public class CountryStrategy {
 
                     troopsCount += c.getTroops();
                 }
-                if (troopsCount > country.getTroops()){
-                    return (new AttackCommand(best.getCountryId(),country.getCountryId(),best.getTroops() <= 4 ? 3 : (best.getTroops()-1),player.getID()));
+                if (troopsCount > country.getTroops() && best.getTroops() > 1){
+                    return (new AttackCommand(best.getCountryId(),country.getCountryId(),best.getTroops() >= 4 ? 3 : (best.getTroops()-1),player.getID()));
                 }
 
             } else {

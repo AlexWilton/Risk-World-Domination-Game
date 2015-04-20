@@ -65,6 +65,33 @@ public class Country implements JSONAware{
         return ret;
     }
 
+    public CountrySet getNeighboursOwnedBy(int id) {
+        CountrySet ret = new CountrySet();
+        for (Country c : getNeighbours()){
+            if (c.getOwner().getID() == id){
+                ret.add(c);
+            }
+        }
+
+        return ret;
+    }
+
+    public Country getClosestCountryOwnedBy(int id) {
+        CountrySet currConnected = this.getNeighbours();
+        while (true){
+            CountrySet newCurrConnected = new CountrySet();
+            for (Country c : currConnected) {
+                if (c.getOwner().getID() == id) {
+                    return c;
+                }
+                newCurrConnected.addAll(c.getNeighbours());
+            }
+            currConnected = newCurrConnected;
+
+
+        }
+    }
+
     /**
      * Get the set of countries that are directly connected with this country and are owned by a different player.
      * @return CountrySet, may be empty.

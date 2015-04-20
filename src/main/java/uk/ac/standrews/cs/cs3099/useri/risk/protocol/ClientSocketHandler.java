@@ -1,4 +1,4 @@
-package uk.ac.standrews.cs.cs3099.useri.risk.helpers;
+package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 
 import org.apache.commons.lang3.StringUtils;

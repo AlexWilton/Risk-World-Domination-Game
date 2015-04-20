@@ -16,7 +16,14 @@ import java.util.*;
  */
 public class CLIClient extends Client {
 
+    /**
+     * Input Stream for Client
+     */
     private InputStream in;
+
+    /**
+     * Output Stream for Client
+     */
     private PrintStream out;
 
     /**

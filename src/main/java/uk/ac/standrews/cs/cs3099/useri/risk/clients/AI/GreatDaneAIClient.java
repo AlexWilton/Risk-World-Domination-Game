@@ -13,23 +13,26 @@ import java.util.Map;
 import java.util.Random;
 
 /**
+ * Great Dane AI Client
  * Always attacks if it can. Will continue attacking one weak country until it is out of armies to do so, or it has conquered the country.
  */
 public class GreatDaneAIClient extends AI{
 
-
+    /**
+     * Last attack made
+     */
     private AttackCommand lastAttack;
 
+    /**
+     * Create a Great Dane AI Client
+     * @param gameState Game State
+     */
     public GreatDaneAIClient(State gameState){
         super(gameState,new RandomNumberGenerator());
     }
 
-
-
-
     @Override
     public Command popCommand() {
-
         //if we attacked before and haven't won or haven't lost all armies, attack again
         if (lastAttack != null){
             int lastOrigin = Integer.parseInt(lastAttack.getPayloadAsArray().get(0).toString());
@@ -57,11 +60,8 @@ public class GreatDaneAIClient extends AI{
             lastAttack = (AttackCommand)ret;
         else
             lastAttack = null;
-
-
         return ret;
     }
-
 
     @Override
     public int getDefenders(Country attackingCountry, Country defendingCountry, int attackingArmies) {
@@ -69,12 +69,10 @@ public class GreatDaneAIClient extends AI{
         return (defendingCountry.getTroops() > 1 ? 2 : 1);
     }
 
-
     @Override
     public boolean isReady(){
         return true;
     }
-
 
     public boolean isLocal(){
         return true;
@@ -85,36 +83,33 @@ public class GreatDaneAIClient extends AI{
         return new DefendCommand((gameState.getCountryByID(target).getTroops() > 1) ? 2 : 1, playerId);
     }
 
-
     @Override
     protected byte[] getSeedComponent() {//empty method to just to replace
         return rng.generateNumber();
     }
 
-
+    /**
+     * Collects a list of all possible commands the AI can make
+     * @return A list of all possible commands the AI can make
+     */
     private ArrayList<Command> getAllPossibleCommands(){
         ArrayList<Command> ret = new ArrayList<>();
-
-
         if (gameState.isPreGamePlay()){
             //only setup commands
             Command bsc = getBestSetupCommand();
             if (bsc != null)
                 ret.add(getBestSetupCommand());
         }else {
-
             TurnStage stage = gameState.getTurnStage();
             switch (stage) {
                 case STAGE_TRADING: {
                     ret.addAll(getAllPossiblePlayCardsCommands());
                 }
                 break;
-
                 case STAGE_DEPLOYING: {
                     ret.addAll(getAllPossibleDeployCommands());
                 }
                 break;
-
                 case STAGE_BATTLES: {
                     ret.addAll(getAllPossibleAttackCommands());
                 } if (ret.size()!=0) break ;//Only break if we cannot attack a weaker country
@@ -136,30 +131,13 @@ public class GreatDaneAIClient extends AI{
                 }
             }
         }
-
-
         return ret;
     }
-/*
-    private ArrayList<Command> getAllPossiblePlayCardsCommands(){
-        ArrayList<Command> ret = new ArrayList<>();
-        //can always choose not to play a card
-        ret.add(new PlayCardsCommand(playerId));
-        //now get all combinations
-        for (ArrayList<Integer> combo : getPlayer().getAllValidCardCombinations()) {
-            //make Riscard array
-            ArrayList<RiskCard> cCombo = new ArrayList<>();
-            for (int i : combo){
-                cCombo.add(getPlayer().getRiskCardById(i));
-            }
-            int armies = (new TradeAction(getPlayer(),cCombo)).calculateArmies(gameState);
-            ArrayList<ArrayList<Integer>> comboWrapper = new ArrayList<>();
-            comboWrapper.add(combo);
-            ret.add(new PlayCardsCommand(comboWrapper,armies,playerId));
-        }
-        return ret;
-    }
-*/
+
+    /**
+     * Collects a list of all possible deploy commands the AI can make
+     * @return A list of all possible deploy commands the AI can make
+     */
     private ArrayList<Command> getAllPossibleDeployCommands(){
         //deploy to all boundary countries
 
@@ -201,11 +179,7 @@ public class GreatDaneAIClient extends AI{
                 troopDiff.put(curr_country,troopDiff.get(curr_country)+1);
 
         }
-
-
-
         ArrayList<DeployTuple> depTups = new ArrayList<>();
-
         int i=0;
         for (Map.Entry<Integer,Integer> depTuple : troopDeploy.entrySet()){
             if (gameState.getCountryByID(depTuple.getKey()) == null){
@@ -223,18 +197,15 @@ public class GreatDaneAIClient extends AI{
             depTups.add(new DeployTuple(depTuple.getKey(),((i++)+armies_left)/2));
         }
 
-
         ArrayList<Command> ret = new ArrayList<>();
         ret.add(new DeployCommand(depTups,playerId));
         return ret;
-
     }
 
-
-
-
-
-
+    /**
+     * Collects a list of all possible attack commands the AI can make
+     * @return A list of all possible attack commands the AI can make
+     */
     private ArrayList<Command> getAllPossibleAttackCommands(){
         ArrayList<Command> ret = new ArrayList<>();
 
@@ -251,13 +222,16 @@ public class GreatDaneAIClient extends AI{
         return ret;
     }
 
+    /**
+     * Collects a list of all possible fortify commands the AI can make
+     * @return A list of all possible fortify commands the AI can make
+     */
     private ArrayList<Command> getAllPossibleFortifyCommands(){
         ArrayList<Command> ret = new ArrayList<>();
         CountrySet allTargets = getPlayer().getOwnedCountriesWithEnemyBoundaries();
         //Todo improve
         HashMap<Integer,Integer> troopDiff = new HashMap<>();
         HashMap<Integer,Integer> troopDeploy = new HashMap<>();
-
 
         for (Country target : allTargets){
             int diff = target.getTroops();
@@ -267,7 +241,6 @@ public class GreatDaneAIClient extends AI{
 
             troopDiff.put(target.getCountryId(),diff);
         }
-
         while (troopDiff.size() > 0) {
             //find min
             int curr_min = 10000000;
@@ -311,26 +284,13 @@ public class GreatDaneAIClient extends AI{
 
         if (ret.size() < 1)
             ret.add(new FortifyCommand(playerId));
-
         return ret;
     }
-/*
-    private ArrayList<Command> getAllPossibleSetupCommands(){
-        ArrayList<Command> ret = new ArrayList<>();
 
-        CountrySet possibleTargets = null;
-        if (gameState.hasUnassignedCountries()) {
-            possibleTargets = gameState.getAllUnassignedCountries();
-        } else {
-            possibleTargets = getPlayer().getOccupiedCountries();
-        }
-        for (Country c : possibleTargets){
-
-            ret.add(new SetupCommand(c.getCountryId(),playerId));
-        }
-        return ret;
-    }
-*/
+    /**
+     * Determine Best possible setup command
+     * @return Setup Command
+     */
     private Command getBestSetupCommand(){
         /*"continent_names":{
             "0":"North Amercia",
@@ -363,20 +323,21 @@ public class GreatDaneAIClient extends AI{
             if (gameState.getContinentById(5).isOwnedBy(playerId) && gameState.getCountryByID(38).getEnemyNeighbours().size() >0){
                 return new SetupCommand(38, playerId);
             }
-            //reinforce contries with enemy borders
+            //reinforce countries with enemy borders
             Country lowest = getPlayer().getOwnedCountriesWithEnemyBoundaries().get(getPlayer().getOwnedCountriesWithEnemyBoundaries().getIDList().get(0));
             for (Country c : getPlayer().getOwnedCountriesWithEnemyBoundaries()){
                 if (c.getTroops()<lowest.getTroops())
                     lowest = c;
             }
             return new SetupCommand(lowest.getCountryId(), playerId);
-
-
-
-
-
     }
 
+    /**
+     * Determine country from set with lowest number of open connections
+     * (A open connection is a connection to countries with no owner)
+     * @param set Set of Countries
+     * @return Country
+     */
     private Country getLowestOpenConnectionCountry(CountrySet set) {
         Country best = null;
         int lowestConn = 50;
@@ -395,10 +356,13 @@ public class GreatDaneAIClient extends AI{
                 best = c;
             }
         }
-
         return best;
     }
 
+    /**
+     * Set of countries with no owner adjacent to a given country
+     * @return Country
+     */
     private CountrySet getAllFreeAdjacentCountries(){
         CountrySet ret = new CountrySet();
         for (Country c : getPlayer().getOccupiedCountries()){

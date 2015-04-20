@@ -9,6 +9,9 @@ import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGe
  */
 public class NetworkClient extends Client {
 
+    /**
+     * Is Network Client Ready
+     */
     private boolean ready;
 
     @Override

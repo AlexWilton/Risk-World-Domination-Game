@@ -14,15 +14,22 @@ import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.SetupCommand;
 import java.util.ArrayList;
 
 /**
- * Created by ryo_yanagida on 17/04/2015.
+ * Abstract class for representation an AI Client
  */
 public abstract class AI extends Client {
 
+    /**
+     * Abstract Constructor for AI
+     * @param gamestate Game State
+     * @param rnd Random Number Generator
+     */
     public AI(State gamestate, RandomNumberGenerator rnd){
             super(gamestate,rnd);
         }
 
-    //Auxilary method abstracted
+    /**
+     * Auxilary method abstracted for getting all possible play card commands
+     */
     protected ArrayList<Command> getAllPossiblePlayCardsCommands(){
     ArrayList<Command> ret = new ArrayList<>();
         //can always choose not to play a card
@@ -42,6 +49,10 @@ public abstract class AI extends Client {
         return ret;
     }
 
+    /**
+     *  Auxilary method abstracted for getting all possible setup commands
+     * @return Possible setup commands
+     */
     protected ArrayList<Command> getAllPossibleSetupCommands(){
         ArrayList<Command> ret = new ArrayList<>();
 

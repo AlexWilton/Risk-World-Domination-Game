@@ -23,11 +23,29 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class WebClient extends Client {
 
+    /**
+     * Jetty Server for serving Web Client to browser
+     */
     private JettyServer jettyServer;
+
+    /**
+     * Is this a Web Client for a Host
+     */
     private boolean isHost  = false;
+
+    /**
+     * If this Web Client is a Host, is it a playing host
+     */
     private boolean isPlayingHost = false;
+
+    /**
+     * Queue of size one for storing next command to server up to game engine when requested
+     */
     private ArrayBlockingQueue<Command> commandQueue = new ArrayBlockingQueue<Command>(1); //can only hold one action at a time.
 
+    /**
+     * Construct a Web Client
+     */
     public WebClient(){
         super(null, new RandomNumberGenerator());
         //Launch Jetty Web Server
@@ -42,6 +60,10 @@ public class WebClient extends Client {
         openWebpage("http://localhost:" + port + "/");
     }
 
+    /**
+     * Open URL in default web browser
+     * @param urlAsString URL
+     */
     private static void openWebpage(String urlAsString) {
         try {
             URI uri = new URL(urlAsString).toURI();
@@ -58,6 +80,11 @@ public class WebClient extends Client {
         }
     }
 
+    /**
+     * Put Command in command queue.
+     * Waits for queue to be empty. (Blocks)
+     * @param command
+     */
     public void queueCommand(Command command){
         try {
             commandQueue.put(command);
@@ -66,6 +93,10 @@ public class WebClient extends Client {
         }
     }
 
+    /**
+     * Pop Command from Command Queue
+     * @return Command
+     */
     @Override
     public Command popCommand() {
 
@@ -121,6 +152,11 @@ public class WebClient extends Client {
         return (commandQueue.size() > 0);
     }
 
+    /**
+     * Set whether Client is a host and if the host is a playing host
+     * @param isHost is client a host
+     * @param isPlayingHost is client a playing host
+     */
     public void setHostAndPlayingBooleans(boolean isHost, boolean isPlayingHost){
         this.isHost = isHost;
         this.isPlayingHost = isPlayingHost;

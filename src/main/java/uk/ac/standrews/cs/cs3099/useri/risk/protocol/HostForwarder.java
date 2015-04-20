@@ -361,6 +361,7 @@ class HostForwarder {
             DefendCommand def = defender.getClient().popDefendCommand(originId, objectiveId, attackArmies);
             int defendArmies = def.getPayloadAsInt();
             // Roll the dice
+/*
             int[] attackDice = new int [attackArmies];
             for (int i = 0; i<attackArmies; i++){
                 attackDice[i] = (int)(seed.nextInt() % 6 + 1);
@@ -370,6 +371,9 @@ class HostForwarder {
             for (int i = 0; i<defendArmies; i++){
                 defendDice[i] = (int)(seed.nextInt() % 6 + 1);
             }
+            */
+            int[] attackDice = makeDice(seed, attackArmies);
+            int[] defendDice = makeDice(seed, defendArmies);
 
             return new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
         } catch (InterruptedException | HashMismatchException e) {
@@ -377,6 +381,14 @@ class HostForwarder {
         }
         return null;
 
+    }
+    private int[] makeDice(RandomNumberGenerator seed, int size){
+        int[] dice = new int [size];
+        for(int i = 0; i<size; i++){
+            dice[i] = (int)(seed.nextInt() % 6 + 1);
+            //System.out.println(dice[i]);
+        }
+        return dice;
     }
 
     /**

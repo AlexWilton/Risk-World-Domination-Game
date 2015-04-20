@@ -178,13 +178,18 @@ public class AttackAction extends Action {
      */
     private void sortDescending(int[] array) {
         //negate
-        for(int i=0; i<array.length; i++)
-            array[i] = - array[i];
+        array = negation(array);
 
         Arrays.sort(array);
 
         //negate
-        for(int i=0; i<array.length; i++)
-            array[i] = - array[i];
+        array = negation(array);
+    }
+
+    private int[] negation(int[] arr){
+        for(int i : arr) {
+            i = -i;
+        }
+        return arr;
     }
 }

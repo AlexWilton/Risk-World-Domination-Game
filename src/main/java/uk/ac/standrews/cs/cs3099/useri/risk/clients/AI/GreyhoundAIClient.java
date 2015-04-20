@@ -306,7 +306,7 @@ public class GreyhoundAIClient extends AI{
 
         return ret;
     }
-
+/*
     private ArrayList<Command> getAllPossibleSetupCommands(){
         ArrayList<Command> ret = new ArrayList<>();
 
@@ -322,4 +322,5 @@ public class GreyhoundAIClient extends AI{
         }
         return ret;
     }
+    */
 }

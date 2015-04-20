@@ -2,11 +2,14 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.CountrySet;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.PlayCardsCommand;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.SetupCommand;
 
 import java.util.ArrayList;
 
@@ -35,6 +38,22 @@ public abstract class AI extends Client {
             ArrayList<ArrayList<Integer>> comboWrapper = new ArrayList<>();
             comboWrapper.add(combo);
             ret.add(new PlayCardsCommand(comboWrapper,armies,playerId));
+        }
+        return ret;
+    }
+
+    protected ArrayList<Command> getAllPossibleSetupCommands(){
+        ArrayList<Command> ret = new ArrayList<>();
+
+        CountrySet possibleTargets = null;
+        if (gameState.hasUnassignedCountries()) {
+            possibleTargets = gameState.getAllUnassignedCountries();
+        } else {
+            possibleTargets = getPlayer().getOccupiedCountries();
+        }
+        for (Country c : possibleTargets){
+
+            ret.add(new SetupCommand(c.getCountryId(),playerId));
         }
         return ret;
     }

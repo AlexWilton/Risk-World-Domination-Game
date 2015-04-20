@@ -204,7 +204,7 @@ public class BulldogAIClient extends AI{
         }
         return ret;
     }
-
+/*
     private ArrayList<Command> getAllPossibleSetupCommands(){
         ArrayList<Command> ret = new ArrayList<>();
 
@@ -220,4 +220,5 @@ public class BulldogAIClient extends AI{
         }
         return ret;
     }
+    */
 }

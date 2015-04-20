@@ -103,13 +103,23 @@ public class GameEngine implements Runnable{
             currentPlayer = state.getCurrentPlayer();
             System.out.println("Ask player " + currentPlayer.getID() + " (" + currentPlayer.getName() + ")");
             Command currentCommand = currentPlayer.getClient().popCommand();
-            //if its local, propagate
+            //if its local, propagate - sendIfLocal
+            /*
             if (csh != null && currentPlayer.getClient().isLocal()){
                csh.sendCommand(currentCommand);
             }
+            */
+            sendIfLocal(csh, currentPlayer,currentCommand);
+
             processCommand(currentPlayer, currentCommand);
 
             if (checkIfPlayerLost() || state.winConditionsMet()) break;
+        }
+    }
+
+    public void sendIfLocal(ClientSocketHandler csh, Player o, Command currentCommand){
+        if(csh != null && o.getClient().isLocal()){
+            csh.sendCommand(currentCommand);
         }
     }
 
@@ -271,12 +281,18 @@ public class GameEngine implements Runnable{
             Player defender = state.getCountryByID(objectiveId).getOwner();
 
             DefendCommand def = defender.getClient().popDefendCommand(originId, objectiveId, attackArmies);
-            //if its local, propagate
+            //if its local, propagate - sendIfLocal
+            /*
             if (csh != null && defender.getClient().isLocal()) {
                 csh.sendCommand(def);
             }
+            */
+            sendIfLocal(csh, defender, def);
+
             int defendArmies = def.getPayloadAsInt();
             System.out.println("Defend armies: " + defendArmies);
+
+            /*
             int[] attackDice = new int [attackArmies];
             for (int i = 0; i<attackArmies; i++){
                 attackDice[i] = (int)(seed.nextInt() % 6 + 1);
@@ -288,6 +304,9 @@ public class GameEngine implements Runnable{
                 defendDice[i] = (int)(seed.nextInt() % 6 + 1);
                 //System.out.println(defendDice[i]);
             }
+*/
+            int[] attackDice = makeDice(seed, attackArmies);
+            int[] defendDice = makeDice(seed, defendArmies);
 
             return new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
         } catch (HashMismatchException e) {
@@ -296,6 +315,14 @@ public class GameEngine implements Runnable{
         return null;
     }
 
+    private int[] makeDice(RandomNumberGenerator seed, int size){
+        int[] dice = new int [size];
+        for(int i = 0; i<size; i++){
+            dice[i] = (int)(seed.nextInt() % 6 + 1);
+            System.out.println(dice[i]);
+        }
+        return dice;
+    }
     /**
      * Processes a fortification request
      * @param command the command to be parsed

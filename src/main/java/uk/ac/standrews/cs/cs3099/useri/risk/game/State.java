@@ -347,4 +347,9 @@ public class State implements JSONAware {
     public CountrySet getAllCountries() {
         return map.getAllCountries();
     }
+
+    public CountrySet getAllCounttriesInMap(){
+        return map.getAllCountries();
+    }
+
 }

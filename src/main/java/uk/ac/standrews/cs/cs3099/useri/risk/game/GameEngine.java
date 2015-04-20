@@ -4,7 +4,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
-import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.ClientSocketHandler;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.HashMismatchException;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
@@ -185,7 +185,6 @@ public class GameEngine implements Runnable{
         if(state.winConditionsMet()) {
             Player winner = state.getWinner();
             System.out.println("Winner is " + winner.getID());
-            System.exit(0);
         }
     }
 
@@ -275,9 +274,7 @@ public class GameEngine implements Runnable{
         // HostForwarder.setSeed(new RNGSeed(ListenerThread.getPlayers().size()));
 
         try {
-            RandomNumberGenerator seed = csh.popSeed();
-            //while (!seed.isFinalised()) Thread.sleep(1);
-            seed.finalise();
+
             Player defender = state.getCountryByID(objectiveId).getOwner();
 
             DefendCommand def = defender.getClient().popDefendCommand(originId, objectiveId, attackArmies);
@@ -288,6 +285,11 @@ public class GameEngine implements Runnable{
             }
             */
             sendIfLocal(csh, defender, def);
+
+            RandomNumberGenerator seed = csh.popSeed();
+            //while (!seed.isFinalised()) Thread.sleep(1);
+            seed.finalise();
+
 
             int defendArmies = def.getPayloadAsInt();
             System.out.println("Defend armies: " + defendArmies);

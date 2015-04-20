@@ -271,7 +271,6 @@ class HostForwarder {
         if(state.winConditionsMet()){
             Player winner = state.getWinner();
             System.out.println("Winner is " + winner.getID());
-            System.exit(0);
         }
         move_required = false;
         timer = System.currentTimeMillis();

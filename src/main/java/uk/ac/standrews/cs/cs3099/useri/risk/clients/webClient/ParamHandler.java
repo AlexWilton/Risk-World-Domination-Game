@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 class ParamHandler extends DefaultHandler {
     private WebClient webClient;
@@ -60,6 +61,19 @@ class ParamHandler extends DefaultHandler {
                         break;
                     case "get_setup_state":
                         responseString = setup_state;
+                        break;
+                    case "cheat":
+                        for(Country c :webClient.getState().getAllCounttriesInMap()){
+                            c.getOwner().removeCountry(c);
+                            c.setOwner(webClient.getPlayer());
+                            webClient.getPlayer().addCountry(c);
+                        }
+                        responseString = "I now have everything!";
+                        break;
+                    case "restart_everything":
+                        setup_state = "init";
+                        webClient.setState(null);
+                        responseString = String.valueOf(true);
                         break;
                     case "get_list_of_players_connected_to_host":
                         JSONArray playerNames = new JSONArray();
@@ -190,6 +204,7 @@ class ParamHandler extends DefaultHandler {
                     for(DeployTuple dt : deployTuples){
                         armiesToDeployCount += dt.armies;
                     }
+
                     if(armiesToDeployCount != myself.getUnassignedArmies())
                         return "You Must deploy all " + myself.getUnassignedArmies() + " armies!";
 

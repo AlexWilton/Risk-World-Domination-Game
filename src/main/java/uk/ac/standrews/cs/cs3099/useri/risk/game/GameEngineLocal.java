@@ -289,6 +289,8 @@ public class GameEngineLocal implements Runnable{
 
             int defendArmies = def.getPayloadAsInt();
             //System.out.println("Defend armies: " + defendArmies);
+
+            /*
             int[] attackDice = new int [attackArmies];
             for (int i = 0; i<attackArmies; i++){
                 attackDice[i] = (int)(seed.nextInt() % 6 + 1);
@@ -300,6 +302,9 @@ public class GameEngineLocal implements Runnable{
                 defendDice[i] = (int)(seed.nextInt() % 6 + 1);
                 ///System.out.println(defendDice[i]);
             }
+            */
+            int[] attackDice = makeDice(seed, attackArmies);
+            int[] defendDice = makeDice(seed, defendArmies);
 
             return new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
         } catch (HashMismatchException e) {
@@ -308,6 +313,14 @@ public class GameEngineLocal implements Runnable{
         return null;
     }
 
+    private int[] makeDice(RandomNumberGenerator seed, int size){
+        int[] dice = new int [size];
+        for(int i = 0; i<size; i++){
+            dice[i] = (int)(seed.nextInt() % 6 + 1);
+            //System.out.println(dice[i]);
+        }
+        return dice;
+    }
     /**
      * Processes a fortification request
      * @param command the command to be parsed

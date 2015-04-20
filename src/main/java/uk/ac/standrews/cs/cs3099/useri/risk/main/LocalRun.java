@@ -24,18 +24,13 @@ public class LocalRun {
 
     public static void main (String [] argv){
         ArrayList<Client> c = new ArrayList<>();
-        c.add(new GreatDaneAIClient(null));
-        c.add(new GreatDaneAIClient(null));
-        c.add(new GreatDaneAIClient(null));
-        c.add(new GreatDaneAIClient(null));
-        c.add(new GreatDaneAIClient(null));
-        c.add(new GreatDaneAIClient(null));
-        c.get(0).setPlayerId(0);
-        c.get(1).setPlayerId(1);
-        c.get(2).setPlayerId(2);
-        c.get(3).setPlayerId(3);
-        c.get(4).setPlayerId(4);
-        c.get(5).setPlayerId(5);
+        while(c.size()<6) {
+            c.add(new GreatDaneAIClient(null));
+        }
+
+        for(int i = 0; i< c.size(); i++){
+           c.get(i).setPlayerId(i);
+        }
 
         System.out.println(playLocalGame(c));
 

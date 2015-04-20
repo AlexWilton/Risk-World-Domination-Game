@@ -324,10 +324,13 @@ public class ClientSocketHandler implements Runnable {
 
     void processAcknowledgenmentCommand(AcknowledgementCommand command){
         if (!ackRecieved.keySet().contains(command.getPayloadAsInt())){
+            /*
             HashMap <Integer,Boolean> rec = new HashMap<>();
             for (Client c : getAllClients()){
                 rec.put(c.getPlayerId(),false);
             }
+            */
+            HashMap <Integer, Boolean> rec = setReceivedFalse();
             ackRecieved.put(command.getPayloadAsInt(),rec);
         }
 
@@ -335,6 +338,13 @@ public class ClientSocketHandler implements Runnable {
 
     }
 
+    private HashMap <Integer, Boolean> setReceivedFalse(){
+        HashMap <Integer,Boolean> rec = new HashMap<>();
+        for (Client c : getAllClients()){
+            rec.put(c.getPlayerId(),false);
+        }
+        return rec;
+    }
 
     private void processRollHashCommand(RollHashCommand command) {
 
@@ -428,10 +438,13 @@ public class ClientSocketHandler implements Runnable {
             waitingOn = command.getAck();
 
             if (!ackRecieved.keySet().contains(command.getAck())){
+                /*
                 HashMap <Integer,Boolean> rec = new HashMap<>();
                 for (Client c : getAllClients()){
                     rec.put(c.getPlayerId(),false);
                 }
+                */
+                HashMap <Integer, Boolean> rec = setReceivedFalse();
                 ackRecieved.put(command.getAck(),rec);
             }
 

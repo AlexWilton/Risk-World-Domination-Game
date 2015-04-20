@@ -312,7 +312,7 @@ public class GreatDaneAIClient extends AI{
 
         return ret;
     }
-
+/*
     private ArrayList<Command> getAllPossibleSetupCommands(){
         ArrayList<Command> ret = new ArrayList<>();
 
@@ -328,7 +328,7 @@ public class GreatDaneAIClient extends AI{
         }
         return ret;
     }
-
+*/
     private Command getBestSetupCommand(){
         /*"continent_names":{
             "0":"North Amercia",

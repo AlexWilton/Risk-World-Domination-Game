@@ -125,10 +125,11 @@ public class State implements JSONAware {
      * @return the top card from the deck.
      */
     public RiskCard getCard() {
-        if (cardsDeck.size() == 0)
-            return null;
-        RiskCard c = cardsDeck.get(0);
-        cardsDeck.remove(0);
+        RiskCard c = peekCard();
+        if(c != null){
+            cardsDeck.remove(0);
+        }
+
         return c;
     }
 

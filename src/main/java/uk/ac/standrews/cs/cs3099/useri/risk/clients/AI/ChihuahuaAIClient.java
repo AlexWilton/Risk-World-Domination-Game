@@ -187,7 +187,7 @@ public class ChihuahuaAIClient extends AI{
         }
         return ret;
     }
-
+/*
     private ArrayList<Command> getAllPossibleSetupCommands(){
         ArrayList<Command> ret = new ArrayList<>();
 
@@ -203,4 +203,5 @@ public class ChihuahuaAIClient extends AI{
         }
         return ret;
     }
+    */
 }

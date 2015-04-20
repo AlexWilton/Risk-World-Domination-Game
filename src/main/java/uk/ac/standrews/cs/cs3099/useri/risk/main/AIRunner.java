@@ -3,7 +3,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.main;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.GameEngine;
-import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.ClientSocketHandler;
 
 public class AIRunner implements Runnable {
     private Client client;

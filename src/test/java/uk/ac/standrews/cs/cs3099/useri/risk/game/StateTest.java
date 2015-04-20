@@ -2,7 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.standrews.cs.cs3099.useri.risk.helpers.TestGameStateFactory;
+import uk.ac.standrews.cs.cs3099.useri.risk.testHelper.TestGameStateFactory;
 
 import static org.junit.Assert.*;
 

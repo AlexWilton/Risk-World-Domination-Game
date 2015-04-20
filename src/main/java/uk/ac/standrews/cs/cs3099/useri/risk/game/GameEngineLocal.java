@@ -4,7 +4,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
-import uk.ac.standrews.cs.cs3099.useri.risk.helpers.ClientSocketHandler;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.HashMismatchException;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
@@ -126,13 +125,7 @@ public class GameEngineLocal implements Runnable{
 
     private boolean checkIfPlayerLost(){
 
-        int playerRemoved = -1;
-        for (Player p : state.getPlayers()){
-            if (p.getOccupiedCountries().size() == 0 && !state.isPreGamePlay()){
-
-                playerRemoved = p.getID();
-            }
-        }
+        int playerRemoved = state.getRemovedPlayer();
 
         if (playerRemoved >= 0){
             removePlayer(playerRemoved);

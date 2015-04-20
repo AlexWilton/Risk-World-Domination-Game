@@ -242,7 +242,7 @@ class HostForwarder {
                 Thread.sleep(10);
                 waited += 10;
             }
-            if (waited < 1000) {
+            if (waited < 5000) {
                 playerAction.performOnState(state);
 
                 if (playerAction instanceof AttackCaptureAction) {
@@ -308,14 +308,14 @@ class HostForwarder {
             ArrayList<RiskCard> triplet = new ArrayList<>();
             for (Object aTripletJSON : tripletJSON) {
                 int cardId = Integer.parseInt(aTripletJSON.toString());
-                triplet.add(state.getPlayers().get(player).getRiskCardById(cardId));
+                triplet.add(state.getPlayer(player).getRiskCardById(cardId));
             }
             triplets.add(triplet);
         }
 
         ArrayList<TradeAction> acts = new ArrayList<>();
         for (ArrayList<RiskCard> triplet : triplets){
-            acts.add(new TradeAction(state.getPlayers().get(player),triplet));
+            acts.add(new TradeAction(state.getPlayer(player),triplet));
         }
 
         return acts;

@@ -1,7 +1,5 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
@@ -120,8 +118,9 @@ public class GreatDaneAIClient extends AI{
 
                 case STAGE_GET_CARD: {
                     if (gameState.wonBattle()) {
-                        if (gameState.peekCard() != null)
-                            ret.add(new DrawCardCommand(gameState.peekCard().getCardID(), playerId));
+                        RiskCard c = gameState.peekCard();
+                        if (c != null)
+                            ret.add(new DrawCardCommand(c.getCardID(), playerId));
                     }
                 } //NO BREAK, we can go straight to the next stage
 

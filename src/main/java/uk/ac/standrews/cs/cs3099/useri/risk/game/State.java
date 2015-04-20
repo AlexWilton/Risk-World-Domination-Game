@@ -153,8 +153,25 @@ public class State implements JSONAware {
         return map.getContinents();
     }
 
-    public ArrayList<Player> getPlayers (){
+    private ArrayList<Player> getPlayers (){
         return players;
+    }
+
+    public boolean anyoneHasUnassignedArmies() {
+        for (Player p : players) {
+            if (p.getUnassignedArmies() != 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int getRemovedPlayer() {
+        for (Player p : players) {
+            if (p.getOccupiedCountries().size() == 0 && !isPreGamePlay())
+                return p.getID();
+        }
+        return -1;
     }
 
     public Player getPlayer(int playerId) {

@@ -5,7 +5,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by po26 on 05/03/15.
@@ -37,7 +36,7 @@ public class PlayCardsCommand extends Command {
         }
         this.put("payload",payload);
         this.put("player_id", player);
-        this.put("ack_id", "1");
+        this.put("ack_id", ack_id++);
 
     }
 
@@ -45,7 +44,7 @@ public class PlayCardsCommand extends Command {
         super(COMMAND_STRING);
         this.put("payload",null);
         this.put("player_id", player);
-        this.put("ack_id", "1");
+        this.put("ack_id", ack_id++);
     }
 
 }

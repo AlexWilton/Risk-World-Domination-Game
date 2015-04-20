@@ -35,6 +35,7 @@ class ListenerThread implements Runnable {
     private int version;
     private ArrayList<String> customs;
     private HostForwarder fw;
+    private boolean initialised = false;
 
 
 
@@ -48,13 +49,22 @@ class ListenerThread implements Runnable {
         this.sock = sock;
         this.client = client;
         this.messageQueue = q;
+        // Set up the socket i/o and the default timeout
+        try {
+            sock.setSoTimeout(MOVE_TIMEOUT);
+            input = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+            output = new PrintWriter(sock.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
      * Initialises the connection and returns whether it was successful.
      * @throws IOException
      */
-    private synchronized boolean initialiseConnection() throws IOException, InitialisationException{
+    protected synchronized void initialiseConnection() throws IOException, InitialisationException{
         Command command = Command.parseCommand(input.readLine());
         if (command instanceof JoinGameCommand) {
             reply(new AcceptJoinGameCommand(ACK_TIMEOUT, MOVE_TIMEOUT, ID));
@@ -68,7 +78,7 @@ class ListenerThread implements Runnable {
             messageQueue.addPlayer(ID, this, player);
             reply(new PlayersJoinedCommand(players));
             //reply(messageQueue.getMessage(ID));
-            return true;
+            initialised = true;
         } else {
             throw new InitialisationException("Unrecognised command received");
         }
@@ -89,7 +99,7 @@ class ListenerThread implements Runnable {
     void reply(Command command) {
         if (command == null)
             return;
-        System.out.println("out Player " + ID + ": " + command);
+        //System.out.println("out Player " + ID + ": " + command);
         output.println(command);
         output.flush();
     }
@@ -101,14 +111,12 @@ class ListenerThread implements Runnable {
     @Override
     public void run() {
         try {
-            // Set up the socket i/o and the default timeout
-            sock.setSoTimeout(MOVE_TIMEOUT);
-            input = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-            output = new PrintWriter(sock.getOutputStream());
 
             // Initialise the connection
-            if(initialiseConnection()){
+            if(initialised){
                 state = state.next();
+            } else {
+                return;
             }
 
             // Send ping and receive pong.

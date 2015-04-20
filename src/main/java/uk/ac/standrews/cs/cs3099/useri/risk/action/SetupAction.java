@@ -78,13 +78,8 @@ public class SetupAction extends Action {
 
         //check for end of setup
         boolean armyLeftToAssign = false;
-        for(Player p : state.getPlayers()){
-            if(p.getUnassignedArmies() != 0)
-                armyLeftToAssign = true;
-        }
-        if(!armyLeftToAssign) {
+        if (!state.anyoneHasUnassignedArmies()) {
             state.endPreGame();
-
         }else{
             //skip players until player with armies to deploy is left
             do{

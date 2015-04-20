@@ -1,6 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.action;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 
@@ -38,7 +39,9 @@ public class ObtainRiskCardAction extends Action {
      */
     @Override
     public void performOnState(State state) {
-        player.addCard(state.getCard());
+        RiskCard c = state.getCard();
+        if (c != null)
+            player.addCard(state.getCard());
         state.setTurnStage(TurnStage.STAGE_FORTIFY);
     }
 }

@@ -51,6 +51,7 @@ class MessageQueue {
      * @throws IOException
      */
     public synchronized void sendAll(Command comm, Integer id)  throws IOException {
+        System.out.println(comm);
         boolean signal_ack = comm.requiresAcknowledgement();
         int ack_id = -1;
         if (signal_ack)

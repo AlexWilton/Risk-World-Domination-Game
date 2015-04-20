@@ -115,13 +115,7 @@ public class GameEngine implements Runnable{
 
     private boolean checkIfPlayerLost(){
 
-        int playerRemoved = -1;
-        for (Player p : state.getPlayers()){
-            if (p.getOccupiedCountries().size() == 0 && !state.isPreGamePlay()){
-
-                playerRemoved = p.getID();
-            }
-        }
+        int playerRemoved = state.getRemovedPlayer();
 
         if (playerRemoved >= 0){
             csh.removePlayer(playerRemoved);
@@ -165,7 +159,7 @@ public class GameEngine implements Runnable{
         }
 
         if (playerActions.size() == 0){
-            System.out.println("End turn");
+            //System.out.println("End turn");
             playerActions.add(new FortifyAction(currentPlayer));
         }
 
@@ -174,7 +168,7 @@ public class GameEngine implements Runnable{
                 playerAction.performOnState(state);
             } else {
                 System.out.println("Error move did not validate: " + currentCommand);
-                System.exit(1);
+                //System.exit(1);
             }
         }
 
@@ -243,7 +237,7 @@ public class GameEngine implements Runnable{
         for (ArrayList<RiskCard> triplet : triplets){
             TradeAction act = new TradeAction(state.getPlayer(player),triplet);
 
-            System.out.println("Interpreted trade command");
+            //System.out.println("Interpreted trade command");
             acts.add(act);
         }
         return acts;
@@ -286,13 +280,13 @@ public class GameEngine implements Runnable{
             int[] attackDice = new int [attackArmies];
             for (int i = 0; i<attackArmies; i++){
                 attackDice[i] = (int)(seed.nextInt() % 6 + 1);
-                System.out.println(attackDice[i]);
+                //System.out.println(attackDice[i]);
             }
 
             int[] defendDice = new int [defendArmies];
             for (int i = 0; i<defendArmies; i++){
                 defendDice[i] = (int)(seed.nextInt() % 6 + 1);
-                System.out.println(defendDice[i]);
+                //System.out.println(defendDice[i]);
             }
 
             return new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
@@ -327,7 +321,7 @@ public class GameEngine implements Runnable{
         int armies = Integer.parseInt(fortification.get(2).toString());
 
         FortifyAction act = new FortifyAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),armies);
-        System.out.println("Interpreted fortify command");
+        //System.out.println("Interpreted fortify command");
         return act;
     }
 
@@ -346,7 +340,7 @@ public class GameEngine implements Runnable{
 
         int player = command.getPlayer();
         ObtainRiskCardAction act = new ObtainRiskCardAction(state.getPlayer(player));
-        System.out.println("Interpreted draw command");
+        //System.out.println("Interpreted draw command");
         return act;
     }
 

@@ -8,9 +8,9 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.HashMismatchException;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.InitialiseGameCommand;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.exceptions.InitialisationException;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -79,6 +79,7 @@ public class ServerSocketHandler implements Runnable {
                 Socket temp = server.accept();
                 System.out.println("New client connected");
                 ListenerThread client = new ListenerThread(temp, i, new NetworkClient(null,null), ACK_TIMEOUT, MOVE_TIMEOUT, s);
+                client.initialiseConnection();
                 clientSocketPool.add(i++, client);
                 // Make new Thread for client.
                 Thread t = new Thread(client);
@@ -92,7 +93,7 @@ public class ServerSocketHandler implements Runnable {
                     t = new Thread(reject);
                     t.start();
                 }
-            } catch (IOException e) {
+            } catch (IOException | InitialisationException e) {
                 e.printStackTrace();
             }
         }

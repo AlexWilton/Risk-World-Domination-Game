@@ -1,7 +1,5 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
@@ -25,7 +23,7 @@ public class BulldogAIClient extends AI{
 
 
     @Override
-    public Command popCommand() {
+    public synchronized Command popCommand() {
 
         //if we attacked before and havent won or havent lost all armies, attack again
         if (lastAttack != null){
@@ -48,7 +46,7 @@ public class BulldogAIClient extends AI{
         }
         ArrayList<Command> possible = getAllPossibleCommands();
         Random r = new Random();
-        Command ret = possible.get((int)(r.nextDouble()*possible.size()));;
+        Command ret = possible.get((int)(r.nextDouble()*possible.size()));
         if (ret instanceof AttackCommand)
             lastAttack = (AttackCommand)ret;
         else
@@ -114,7 +112,9 @@ public class BulldogAIClient extends AI{
 
                 case STAGE_GET_CARD: {
                     if (gameState.wonBattle()) {
-                        ret.add(new DrawCardCommand(gameState.peekCard().getCardID(), playerId));
+                        RiskCard c = gameState.peekCard();
+                        if (c != null)
+                            ret.add(new DrawCardCommand(c.getCardID(), playerId));
                     }
                 } //NO BREAK, we can go straight to the next stage
 
@@ -156,15 +156,16 @@ public class BulldogAIClient extends AI{
         //for now, deploy everything into one country
         int armies = getPlayer().getUnassignedArmies();
         //TODO
-        if (getPlayer().getCountryWhichMustBeDeployedTo() != null){
+        Country c = getPlayer().getCountryWhichMustBeDeployedTo();
+        if (c != null){
             ArrayList<DeployTuple> tuples = new ArrayList<>();
-            tuples.add(new DeployTuple(getPlayer().getCountryWhichMustBeDeployedTo().getCountryId(),armies));
+            tuples.add(new DeployTuple(c.getCountryId(),armies));
             ret.add(new DeployCommand(tuples,playerId));
             return ret;
         } else {
-            for ( Country c : getPlayer().getOccupiedCountries()){
+            for ( Country c1 : getPlayer().getOccupiedCountries()){
                 ArrayList<DeployTuple> tuples = new ArrayList<>();
-                tuples.add(new DeployTuple(c.getCountryId(),armies));
+                tuples.add(new DeployTuple(c1.getCountryId(),armies));
                 ret.add(new DeployCommand(tuples,playerId));
             }
         }

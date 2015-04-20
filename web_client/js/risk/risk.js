@@ -172,7 +172,7 @@ var Risk = {
 				stroke: '#555',
 				strokeWidth: 1,
 				fill: '#ddd',
-				radius: (armyCount == "") ? 0 : 20,
+				radius: (armyCount === "") ? 0 : 20,
 				shadowColor: 'black',
 				shadowBlur: 1,
 				shadowOffset: [1, 1],

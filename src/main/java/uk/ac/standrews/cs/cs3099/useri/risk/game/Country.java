@@ -52,6 +52,8 @@ public class Country implements JSONAware{
      * @param troops integer
      */
     public void setTroops(int troops) {
+        if (troops < 0)
+            System.err.println("stuff");
         this.troops = troops;
     }
 
@@ -83,12 +85,6 @@ public class Country implements JSONAware{
      * Setter of the owner of the country
      * @param owner Player object representing the owner of the country
      */
-    public void setTroops(int troops) {
-        if (troops < 0)
-            System.err.println("stuff");
-        this.troops = troops;
-    }
-
     public void setOwner(Player owner) {
         this.owner = owner;
     }

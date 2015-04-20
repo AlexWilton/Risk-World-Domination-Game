@@ -6,6 +6,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.ClientApp;
@@ -26,7 +27,7 @@ import java.util.HashMap;
  */
 public class ClientSocketHandler implements Runnable {
 
-
+    private WebClient webClientForWatchOnlyServer = null;
     private HashMap<Integer,HashMap<Integer,Boolean>> ackRecieved;
 
     private int waitingOn = -1;
@@ -45,6 +46,10 @@ public class ClientSocketHandler implements Runnable {
             System.out.println("player " + id + "lost");
 
         }
+    }
+
+    public void setWebClientForWatchOnlyServer(WebClient webClient) {
+        webClientForWatchOnlyServer = webClient;
     }
 
     public enum ProtocolState {
@@ -87,6 +92,8 @@ public class ClientSocketHandler implements Runnable {
     public void linkGameState(State state) {
         gameState = state;
         localClient.setState(state);
+        if(webClientForWatchOnlyServer != null)
+            webClientForWatchOnlyServer.setState(state);
     }
 
 
@@ -325,10 +332,10 @@ public class ClientSocketHandler implements Runnable {
     void processAcknowledgenmentCommand(AcknowledgementCommand command){
         if (!ackRecieved.keySet().contains(command.getPayloadAsInt())){
             HashMap <Integer,Boolean> rec = new HashMap<>();
-            for (Client c : getAllClients()){
+            for (Client c : getAllClients()) {
                 rec.put(c.getPlayerId(),false);
             }
-            ackRecieved.put(command.getPayloadAsInt(),rec);
+            ackRecieved.put(command.getPayloadAsInt(), rec);
         }
 
         ackRecieved.get(command.getPayloadAsInt()).put(command.getPlayer(),true);
@@ -369,7 +376,7 @@ public class ClientSocketHandler implements Runnable {
             NetworkClient remoteClient = new NetworkClient(gameState, seed);
             remoteClient.setPlayerId(playerNr);
             remoteClient.setPlayerName(playerName);
-            System.out.println("Created " + playerName);
+            //System.out.println("Created " + playerName);
             //maybe signature
             remoteClients.add(remoteClient);
         }
@@ -445,9 +452,17 @@ public class ClientSocketHandler implements Runnable {
 
         String currentIn = "";
         while (StringUtils.countMatches(currentIn, "{") != StringUtils.countMatches(currentIn, "}") || StringUtils.countMatches(currentIn, "{") == 0) {
-            String nextPart = in.readLine();
-            if (currentIn.length() > 0 || nextPart.startsWith("{"))
-                currentIn += nextPart;
+            if (in.ready()) {
+                String nextPart = in.readLine();
+                if (currentIn.length() > 0 || nextPart.startsWith("{"))
+                    currentIn += nextPart;
+            } else {
+                try {
+                    Thread.sleep(5);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         Command command = Command.parseCommand(currentIn);
 
@@ -459,7 +474,7 @@ public class ClientSocketHandler implements Runnable {
             out.flush();
         }
 
-        System.err.println(command.toJSONString());
+        //System.err.println(command.toJSONString());
 
 
         return command;
@@ -483,12 +498,12 @@ public class ClientSocketHandler implements Runnable {
                     continue;
                 }
                 String hash = c.popRollHash();
-                System.err.println(c.getPlayerId() + " use this roll number " + hash);
+                //System.err.println(c.getPlayerId() + " use this roll number " + hash);
                 seed.addHash(c.getPlayerId(), hash);
             }
 
             seed.addNumber(localClient.getPlayerId(), localClient.getHexSeed());
-            System.out.println("has all hashes");
+            //System.out.println("has all hashes");
 
             sendCommand(new RollNumberCommand(localClient.getHexSeed(), localClient.getPlayerId()));
 
@@ -498,12 +513,12 @@ public class ClientSocketHandler implements Runnable {
                     continue;
                 }
                 String number = c.popRollNumber();
-                System.err.println(c.getPlayerId() + " use this roll number " + number);
+                //System.err.println(c.getPlayerId() + " use this roll number " + number);
 
                 seed.addNumber(c.getPlayerId(), number);
             }
 
-            System.out.println("has all numbers");
+            //System.out.println("has all numbers");
             seed.finalise();
             RandomNumberGenerator ret = seed;
             seed = null;

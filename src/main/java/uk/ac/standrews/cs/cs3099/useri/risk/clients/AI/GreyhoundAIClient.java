@@ -1,18 +1,18 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Always attacks if it can. Will continue attacking one weak country until it is out of armies to do so, or it has conquered the country.
  */
-public class GreyhoundAIClient extends Client {
+public class GreyhoundAIClient extends AI{
 
 
     private AttackCommand lastAttack;
@@ -126,7 +126,9 @@ public class GreyhoundAIClient extends Client {
 
                 case STAGE_GET_CARD: {
                     if (gameState.wonBattle()) {
-                        ret.add(new DrawCardCommand(gameState.peekCard().getCardID(), playerId));
+                        RiskCard c = gameState.peekCard();
+                        if (c != null)
+                            ret.add(new DrawCardCommand(c.getCardID(), playerId));
                     }
                 } //NO BREAK, we can go straight to the next stage
 
@@ -143,7 +145,7 @@ public class GreyhoundAIClient extends Client {
 
         return ret;
     }
-
+/*
     private ArrayList<Command> getAllPossiblePlayCardsCommands(){
         ArrayList<Command> ret = new ArrayList<>();
         //can always choose not to play a card
@@ -162,7 +164,7 @@ public class GreyhoundAIClient extends Client {
         }
         return ret;
     }
-
+*/
     private ArrayList<Command> getAllPossibleDeployCommands(){
         //deploy to all boundary countries
 
@@ -304,7 +306,7 @@ public class GreyhoundAIClient extends Client {
 
         return ret;
     }
-
+/*
     private ArrayList<Command> getAllPossibleSetupCommands(){
         ArrayList<Command> ret = new ArrayList<>();
 
@@ -320,4 +322,5 @@ public class GreyhoundAIClient extends Client {
         }
         return ret;
     }
+    */
 }

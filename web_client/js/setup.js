@@ -1,13 +1,28 @@
-var nonPlayingHost = false, aiPlayers = [];
+var nonPlayingHost = false, aiPlayers = [], aiForConnecting;
 
 $( document ).ready(function(){
     setOnchangeForIsHostPlayingRadioBtn();
     $("[name=number_of_players]").change(showAddAiPlayerBtnIfMaxPlayersNotReach);
     provideAIoptionsForHostSetupPanel();
 
+    $.ajax( "/?operation=get_setup_state")
+        .done(function(response) {
+            if(response.indexOf("hosting") == 0){
+                nonPlayingHost = (response.indexOf("true") != -1) ? false : true;
+                keepGameLobbyInfoUpdated();
+                gotoGamePlayWhenReady();
+            }
+            if(response.indexOf("connected") == 0){
+                $("#connectButton").html("<h3>Waiting for Host to Start Game</h3>")
+                gotoGamePlayWhenReady();
+            }
+        });
 });
 
 function gotoGamePlayWhenReady(){
+    //disable controls for user
+    $(":input").prop("disabled", true);
+
     $.ajax( "/?operation=move_to_game_play")
         .done(function(response) {
             if(response.indexOf("true") == 0){
@@ -29,6 +44,8 @@ function connect(){
         $.ajax( "/?operation=connect&" + requestParams )
             .done(function(response) {
                 if(response.indexOf("true") == 0) {
+                    $("#connectButton").html("<h3>Waiting for Host to Start Game</h3>");
+                    if(aiForConnecting != null) nonPlayingHost =true;
                     gotoGamePlayWhenReady();
                 }else{
                     alert(response);
@@ -41,18 +58,19 @@ function connect(){
 
 
 
-function keepGameLobbyInfoUpdated(num_of_players) {
+function keepGameLobbyInfoUpdated() {
     $.ajax("/?operation=get_list_of_players_connected_to_host")
         .done(function (response) {
-            var names = JSON.parse(response);
+            var num_of_players = parseInt(response.substr(0,1));
+            var names = JSON.parse(response.substr(1));
             var html = '<div class="well"><h4><strong>Players Currently Connected:</strong></h4><ul>';
             for(i in names){
                 html += '<p>' + names[i] + '</p>';
             }
-            html += '</ul><h4><small>Game will start when ' + (names.length - num_of_players) +
+            html += '</ul><h4><small>Game will start when ' + (num_of_players - names.length) +
             ' more players connect.</small></h4><ul></div>';
             $('#host').html(html);
-            setTimeout(function(){keepGameLobbyInfoUpdated(num_of_players)}, 600);
+            setTimeout(function(){keepGameLobbyInfoUpdated()}, 600);
         });
 }
 
@@ -68,7 +86,7 @@ function host(){
                 //disable controls for user
                 $(":input").prop("disabled", true);
 
-                keepGameLobbyInfoUpdated($("[name=number_of_players]").val());
+                keepGameLobbyInfoUpdated();
                 gotoGamePlayWhenReady();
             }else{
                 alert(response);
@@ -78,10 +96,6 @@ function host(){
         .fail(function(data) {
             alert( "AJAX Failed. Please refresh the page" );
         });
-}
-
-function freezeControls(){
-    $(":input").prop("disabled", true);
 }
 
 function setOnchangeForIsHostPlayingRadioBtn(){
@@ -95,22 +109,48 @@ function setOnchangeForIsHostPlayingRadioBtn(){
         showAddAiPlayerBtnIfMaxPlayersNotReach();
     });
 }
+
 function provideAIoptionsForHostSetupPanel(){
     $.ajax( "/?operation=get_list_of_available_ai")
         .done(function(data) {
+
             var availableAiArray = JSON.parse(data);
             availableAiArray.sort();
-            var optionHtml = "";
-            for(aiNameIndex in availableAiArray){
-                var name = availableAiArray[aiNameIndex];
-                optionHtml += '<li><a href="#" onclick="aiSelected(\'' + name + '\')">' + name + '</a></li>';
-            }
-            $("#aiOptions").html(optionHtml);
+            $("[name=aiOptions]").each(function(index){
+                var optionHtml = "";
+                for(aiNameIndex in availableAiArray){
+                    var name = availableAiArray[aiNameIndex];
+                    optionHtml += '<li><a href="#" onclick="aiSelected(\'' + index + name + '\')">' + name + '</a></li>';
+                }
+               $(this).html(optionHtml);
+            });
         });
     
 }
 
-function aiSelected(aiType){
+function aiSelectedForConnect(aiType){
+    aiForConnecting = aiType;
+    displayAiForConencting();
+}
+
+function displayAiForConencting(){
+    if(aiForConnecting == null){
+        $("#aiSelectorForConnect").show();
+        $("#selectedConnectAI").hide();
+    }else{
+        $("#aiSelectorForConnect").hide();
+        $("#selectedConnectAI").show().html("<p>Connect as AI Player: <strong>" + aiForConnecting +
+        "</strong><small><a href='#' onclick='aiForConnecting = null; displayAiForConencting();'> (Remove)</a> </small></p>" +
+        '<input type="hidden" class="form-control" name="ai_player" value="' + aiForConnecting + "," + aiForConnecting + '">');
+    }
+}
+
+function aiSelected(data){
+    var isHost = data.substr(0,1) == "0";
+    var aiType = data.substr(1);
+
+    if(!isHost) return aiSelectedForConnect(aiType);
+
     var aiPlayer = {};
     aiPlayer.name = "";
     aiPlayer.type = aiType;

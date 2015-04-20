@@ -1,7 +1,5 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
@@ -12,7 +10,7 @@ import java.util.Random;
 /**
  * Always attacks if it can. Will continue attacking one weak country until it is out of armies to do so, or it has conquered the country.
  */
-public class BulldogAIClient extends Client {
+public class BulldogAIClient extends AI{
 
 
     private AttackCommand lastAttack;
@@ -25,7 +23,7 @@ public class BulldogAIClient extends Client {
 
 
     @Override
-    public Command popCommand() {
+    public synchronized Command popCommand() {
 
         //if we attacked before and havent won or havent lost all armies, attack again
         if (lastAttack != null){
@@ -48,7 +46,7 @@ public class BulldogAIClient extends Client {
         }
         ArrayList<Command> possible = getAllPossibleCommands();
         Random r = new Random();
-        Command ret = possible.get((int)(r.nextDouble()*possible.size()));;
+        Command ret = possible.get((int)(r.nextDouble()*possible.size()));
         if (ret instanceof AttackCommand)
             lastAttack = (AttackCommand)ret;
         else
@@ -114,7 +112,9 @@ public class BulldogAIClient extends Client {
 
                 case STAGE_GET_CARD: {
                     if (gameState.wonBattle()) {
-                        ret.add(new DrawCardCommand(gameState.peekCard().getCardID(), playerId));
+                        RiskCard c = gameState.peekCard();
+                        if (c != null)
+                            ret.add(new DrawCardCommand(c.getCardID(), playerId));
                     }
                 } //NO BREAK, we can go straight to the next stage
 
@@ -131,7 +131,7 @@ public class BulldogAIClient extends Client {
 
         return ret;
     }
-
+/*
     private ArrayList<Command> getAllPossiblePlayCardsCommands(){
         ArrayList<Command> ret = new ArrayList<>();
         //can always choose not to play a card
@@ -150,21 +150,22 @@ public class BulldogAIClient extends Client {
         }
         return ret;
     }
-
+*/
     private ArrayList<Command> getAllPossibleDeployCommands(){
         ArrayList<Command> ret = new ArrayList<>();
         //for now, deploy everything into one country
         int armies = getPlayer().getUnassignedArmies();
         //TODO
-        if (getPlayer().getCountryWhichMustBeDeployedTo() != null){
+        Country c = getPlayer().getCountryWhichMustBeDeployedTo();
+        if (c != null){
             ArrayList<DeployTuple> tuples = new ArrayList<>();
-            tuples.add(new DeployTuple(getPlayer().getCountryWhichMustBeDeployedTo().getCountryId(),armies));
+            tuples.add(new DeployTuple(c.getCountryId(),armies));
             ret.add(new DeployCommand(tuples,playerId));
             return ret;
         } else {
-            for ( Country c : getPlayer().getOccupiedCountries()){
+            for ( Country c1 : getPlayer().getOccupiedCountries()){
                 ArrayList<DeployTuple> tuples = new ArrayList<>();
-                tuples.add(new DeployTuple(c.getCountryId(),armies));
+                tuples.add(new DeployTuple(c1.getCountryId(),armies));
                 ret.add(new DeployCommand(tuples,playerId));
             }
         }
@@ -203,7 +204,7 @@ public class BulldogAIClient extends Client {
         }
         return ret;
     }
-
+/*
     private ArrayList<Command> getAllPossibleSetupCommands(){
         ArrayList<Command> ret = new ArrayList<>();
 
@@ -219,4 +220,5 @@ public class BulldogAIClient extends Client {
         }
         return ret;
     }
+    */
 }

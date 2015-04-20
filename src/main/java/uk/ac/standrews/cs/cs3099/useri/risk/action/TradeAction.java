@@ -96,13 +96,15 @@ public class TradeAction extends Action {
      * @return number of armies to be given to the player or 0 if the move is invalid.
      */
     public int calculateArmies(State state) {
-        if (list.size() != 3)
+        if (list == null || list.size() != 3)
             return 0;
         int cavalry = 0;
         int artillery = 0;
         int infantry = 0;
         int wild = 0;
         for (RiskCard card:list){
+            if (card == null)
+                return 0;
             switch (card.getType()){
                 case TYPE_CAVALRY:
                     cavalry++;

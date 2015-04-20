@@ -193,7 +193,9 @@ public class Player implements JSONAware{
     }
 
     public Country getCountryWhichMustBeDeployedTo(){
-        return countryWhichMustBeDeployedTo;
+        Country c = countryWhichMustBeDeployedTo;
+        countryWhichMustBeDeployedTo = null;
+        return c;
     }
 
     public CountrySet getOwnedCountriesWithEnemyBoundaries(){

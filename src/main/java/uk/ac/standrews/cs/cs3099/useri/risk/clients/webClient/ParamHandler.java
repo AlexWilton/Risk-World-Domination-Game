@@ -26,6 +26,7 @@ import java.util.Map;
 class ParamHandler extends DefaultHandler {
     private WebClient webClient;
     private ServerSocketHandler host;
+    private String setup_state = "init";
 
     public ParamHandler(WebClient webClient){
         super();
@@ -57,11 +58,14 @@ class ParamHandler extends DefaultHandler {
                     case "connect":
                         responseString = connectToHost(params);
                         break;
+                    case "get_setup_state":
+                        responseString = setup_state;
+                        break;
                     case "get_list_of_players_connected_to_host":
                         JSONArray playerNames = new JSONArray();
                         for(String name : host.getConnectedPlayerNames())
                             playerNames.add(name);
-                        responseString = playerNames.toJSONString();
+                        responseString = host.getNUMBER_OF_PLAYERS() + playerNames.toJSONString();
                         break;
                     case "get_list_of_available_ai":
                         JSONArray aiNames = new JSONArray();
@@ -197,6 +201,7 @@ class ParamHandler extends DefaultHandler {
 
             case "attack":
                 if((params.get("end_attack") != null && params.get("end_attack")[0].equals("yes"))){
+                    if(webClient.getState().isAttackCaptureNeeded()) return "Need to move armies into captured territory!";
                     webClient.getState().nextStage();
                     //check if a risk card needs to be obtained...
                     ObtainRiskCardAction obtainRiskCardAction = new ObtainRiskCardAction(myself);
@@ -382,10 +387,11 @@ class ParamHandler extends DefaultHandler {
                 String[] aiPlayerData = aiPlayerArray[i].split(",");
                 String aiType = aiPlayerData[0];
                 String aiName = aiPlayerData[1];
-                AIRunner aiRunner = new AIRunner(AIApp.createAiClient(aiType), aiName, "127.0.0.1", port);
-                (new Thread(aiRunner)).start();
+                AIRunner aiRunner = new AIRunner(AIApp.createAiClient(aiType), aiName, "127.0.0.1", port, null);
+                aiRunner.attemptConnecitonAndStartAi();
             }
         }
+        setup_state = "hosting," + is_host_playing;
         return "true";
     }
 
@@ -417,10 +423,23 @@ class ParamHandler extends DefaultHandler {
             playerName = nameArray[0];
 
         //Attempt Connection
-        if(ClientApp.run(address, port, webClient, playerName) != ClientApp.SUCCESS)
-            return "Connect to " + address + ":" + port + " failed!";
+        String[] aiPlayerArray = params.get("ai_player");
+        if(aiPlayerArray != null) {
+            //Connect as AI Player
+            String[] aiPlayerData = aiPlayerArray[0].split(",");
+            String aiType = aiPlayerData[0];
+            Client aiClient = AIApp.createAiClient(aiType);
+            AIRunner aiRunner = new AIRunner(aiClient, playerName, address, port, webClient);
+            if(aiRunner.attemptConnecitonAndStartAi() != ClientApp.SUCCESS)
+                return "Connect to " + address + ":" + port + " as AI failed!";
+        }else{
+            //Connect as Human Player
+            if(ClientApp.run(address, port, webClient, playerName) != ClientApp.SUCCESS)
+                return "Connect to " + address + ":" + port + " failed!";
+        }
 
         webClient.setHostAndPlayingBooleans(false, false);
+        setup_state = "connected";
         return "true";
     }
 }

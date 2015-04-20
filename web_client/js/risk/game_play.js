@@ -61,7 +61,6 @@ function updateTurnPanel(){
                 break;
             case "STAGE_TRADING":
                     panelHtml += generateTradeInPanel();
-
                 break;
             case "STAGE_DEPLOYING":
                 panelHtml += "<br/>You have " + game_state.currentPlayer.unassignedArmies + " armies to deploy.";
@@ -271,9 +270,9 @@ function generateAttackCapturePanel(){
 
     panelHtml += '<p>You <strong>must</strong> move at least ' + game_state.attack_capture_min_armies_to_move_in + " armies from: ";
     panelHtml += '<p><strong>' + game_state.attack_capture_origin.name + '</strong></p><p>to:</p>';
-    panelHtml += '<p><strong>' + game_state.attack_capture_destination.name + '</strong></p>'
+    panelHtml += '<p><strong>' + game_state.attack_capture_destination.name + '</strong></p>';
     panelHtml += '<p>How many armies do you want to move in?</p><div class="form-group">' +
-    '<div class="col-sm-4"> ' +
+    '<div class="col-sm-5"> ' +
     '<select name="num_of_armies" class="form-control">';
     for(var i = game_state.attack_capture_min_armies_to_move_in; i<= game_state.attack_capture_origin.troop_count -1; i++) {
         panelHtml += '<option>' + i +'</option>';
@@ -324,8 +323,8 @@ function attempt_deployment(){
     $.get('/?' + $('#deployArmies').serialize(), function(response){
         console.log(response);
         if(response.indexOf("true") == 0){
-            $("#turnPanel").html("");
-            $("#deployOutcome").html("<h4>Waiting for Server...</h4>");
+            $("#turnPanel").html("<h4>Waiting for Server...</h4>");
+            selectedTerriories = [];
             waitForServer();
         }else{
             $("#deployOutcome").html('<div class="alert alert-danger alert-dismissible" role="alert">' +
@@ -424,13 +423,15 @@ function attemptFortification(){
     if(queryString == "") queryString = "operation=perform_action&action=fortify&skip_fortity=yes";
     $.get('/?' + queryString, function(response){
         if(response.indexOf("true") == 0){
-            $("#turnPanel").html("");
-            $("#fortifyStatus").html("<h4>Waiting for Server...</h4>" +
+            $("#turnPanel").html("<h4>Waiting for Server...</h4>" +
             '<br/><br/><div class="alert alert-success alert-dismissible" role="alert">' +
             '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             'Fortification Successful' +
             '</div>');
-            waitForServer();
+            fortificationDestination = null;
+            fortificationOrigin = null;
+            updateDisplay();
+            waitForMyTurn();
         }else{
             $("#fortifyStatus").html('<div class="alert alert-danger alert-dismissible" role="alert">' +
             '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -469,7 +470,7 @@ function waitForMyTurn(){
         if(game_state.currentPlayer.ID == my_player_id){
             updateDisplay();
         }else{
-            setTimeout(waitForMyTurn, 1300);
+            setTimeout(waitForMyTurn, 1000);
         }
     })
 }

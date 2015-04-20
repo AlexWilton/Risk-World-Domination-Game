@@ -1,7 +1,5 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
@@ -12,7 +10,7 @@ import java.util.Random;
 /**
  * Created by patrick on 17/04/15.
  */
-public class ChihuahuaAIClient extends Client {
+public class ChihuahuaAIClient extends AI{
 
 
     public ChihuahuaAIClient(State gameState){
@@ -98,7 +96,9 @@ public class ChihuahuaAIClient extends Client {
 
                 case STAGE_GET_CARD: {
                     if (gameState.wonBattle()) {
-                        ret.add(new DrawCardCommand(gameState.peekCard().getCardID(), playerId));
+                        RiskCard c = gameState.peekCard();
+                        if (c != null)
+                            ret.add(new DrawCardCommand(c.getCardID(), playerId));
                     }
                 } //NO BREAK, we can go straight to the next stage
 
@@ -115,7 +115,7 @@ public class ChihuahuaAIClient extends Client {
 
         return ret;
     }
-
+/*
     private ArrayList<Command> getAllPossiblePlayCardsCommands(){
         ArrayList<Command> ret = new ArrayList<>();
         //can always choose not to play a card
@@ -134,7 +134,7 @@ public class ChihuahuaAIClient extends Client {
         }
         return ret;
     }
-
+*/
     private ArrayList<Command> getAllPossibleDeployCommands(){
         ArrayList<Command> ret = new ArrayList<>();
         //for now, deploy everything into one country
@@ -187,7 +187,7 @@ public class ChihuahuaAIClient extends Client {
         }
         return ret;
     }
-
+/*
     private ArrayList<Command> getAllPossibleSetupCommands(){
         ArrayList<Command> ret = new ArrayList<>();
 
@@ -203,4 +203,5 @@ public class ChihuahuaAIClient extends Client {
         }
         return ret;
     }
+    */
 }

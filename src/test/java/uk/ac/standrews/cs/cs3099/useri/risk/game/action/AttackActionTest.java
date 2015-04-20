@@ -1,9 +1,13 @@
-package uk.ac.standrews.cs.cs3099.useri.risk.action;
+package uk.ac.standrews.cs.cs3099.useri.risk.game.action;
 
 
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.CountrySet;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Map;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Player;
 
 import java.util.ArrayList;
 

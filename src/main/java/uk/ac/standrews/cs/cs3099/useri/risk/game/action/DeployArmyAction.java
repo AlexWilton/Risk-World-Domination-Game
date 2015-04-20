@@ -1,7 +1,7 @@
-package uk.ac.standrews.cs.cs3099.useri.risk.action;
+package uk.ac.standrews.cs.cs3099.useri.risk.game.action;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 /**

@@ -1,10 +1,10 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.action.TradeAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.CountrySet;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.CountrySet;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;

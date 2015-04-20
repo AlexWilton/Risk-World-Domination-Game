@@ -12,7 +12,7 @@ import java.util.Random;
 /**
  * Always attacks if it can. Will continue attacking one weak country until it is out of armies to do so, or it has conquered the country.
  */
-public class BulldogAIClient extends Client {
+public class BulldogAIClient extends AI{
 
 
     private AttackCommand lastAttack;
@@ -131,7 +131,7 @@ public class BulldogAIClient extends Client {
 
         return ret;
     }
-
+/*
     private ArrayList<Command> getAllPossiblePlayCardsCommands(){
         ArrayList<Command> ret = new ArrayList<>();
         //can always choose not to play a card
@@ -150,7 +150,7 @@ public class BulldogAIClient extends Client {
         }
         return ret;
     }
-
+*/
     private ArrayList<Command> getAllPossibleDeployCommands(){
         ArrayList<Command> ret = new ArrayList<>();
         //for now, deploy everything into one country

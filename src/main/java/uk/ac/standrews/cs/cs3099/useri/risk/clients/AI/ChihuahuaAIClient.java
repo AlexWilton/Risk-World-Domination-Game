@@ -12,7 +12,7 @@ import java.util.Random;
 /**
  * Created by patrick on 17/04/15.
  */
-public class ChihuahuaAIClient extends Client {
+public class ChihuahuaAIClient extends AI{
 
 
     public ChihuahuaAIClient(State gameState){
@@ -115,7 +115,7 @@ public class ChihuahuaAIClient extends Client {
 
         return ret;
     }
-
+/*
     private ArrayList<Command> getAllPossiblePlayCardsCommands(){
         ArrayList<Command> ret = new ArrayList<>();
         //can always choose not to play a card
@@ -134,7 +134,7 @@ public class ChihuahuaAIClient extends Client {
         }
         return ret;
     }
-
+*/
     private ArrayList<Command> getAllPossibleDeployCommands(){
         ArrayList<Command> ret = new ArrayList<>();
         //for now, deploy everything into one country

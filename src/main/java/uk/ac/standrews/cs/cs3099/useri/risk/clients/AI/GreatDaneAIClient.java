@@ -14,7 +14,7 @@ import java.util.Random;
 /**
  * Always attacks if it can. Will continue attacking one weak country until it is out of armies to do so, or it has conquered the country.
  */
-public class GreatDaneAIClient extends Client {
+public class GreatDaneAIClient extends AI{
 
 
     private AttackCommand lastAttack;
@@ -138,7 +138,7 @@ public class GreatDaneAIClient extends Client {
 
         return ret;
     }
-
+/*
     private ArrayList<Command> getAllPossiblePlayCardsCommands(){
         ArrayList<Command> ret = new ArrayList<>();
         //can always choose not to play a card
@@ -157,7 +157,7 @@ public class GreatDaneAIClient extends Client {
         }
         return ret;
     }
-
+*/
     private ArrayList<Command> getAllPossibleDeployCommands(){
         //deploy to all boundary countries
 

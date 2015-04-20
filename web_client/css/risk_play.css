@@ -21,3 +21,9 @@ html,body {
     color: #4cae4c;
     font-size: larger;
 }
+
+.jumbotron{
+    padding-top: 10px;
+    margin-bottom: 5px;
+    padding-bottom: 15px;
+}

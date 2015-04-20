@@ -32,11 +32,15 @@ class HostForwarder {
 
     private BufferedReader input;
     private MessageQueue messageQueue;
+    private Player defender;
     private boolean ack_received;
     private boolean move_required;
     private boolean getRolls;
     private double timer = System.currentTimeMillis();
     private int last_ack = 0;
+    private boolean playing = true;
+    private RollHashCommand hash;
+    private RollNumberCommand number;
 
     public HostForwarder(MessageQueue q, int move_timeout, int ack_timeout, int id, BufferedReader input) {
         messageQueue = q;
@@ -70,7 +74,12 @@ class HostForwarder {
      * @throws InterruptedException
      */
     void getRolls() throws IOException, InterruptedException, HashMismatchException{
-        Command comm = Command.parseCommand(input.readLine());
+        Command comm;
+        if (hash == null)
+            comm = Command.parseCommand(input.readLine());
+        else
+            comm = hash;
+        hash = null;
         messageQueue.sendAll(comm, ID);
         while (!(comm instanceof RollHashCommand)) {
             //System.out.println(comm instanceof RollHashCommand);
@@ -82,10 +91,15 @@ class HostForwarder {
         }
         RollHashCommand hash = (RollHashCommand) comm;
         //System.out.println("Got hash from " + ID);
+        while (seed == null) {Thread.sleep(10);}
         String hashStr = hash.get("payload").toString();
         seed.addHash(ID, hashStr);
 
-        comm = Command.parseCommand(input.readLine());
+        if (number == null)
+            comm = Command.parseCommand(input.readLine());
+        else
+            comm = number;
+        number = null;
         messageQueue.sendAll(comm, ID);
         if (!(comm instanceof RollNumberCommand)) {
             throw new RollException();
@@ -94,46 +108,60 @@ class HostForwarder {
         String rollStr = roll.get("payload").toString();
         while (seed.getNumberHashes() != ListenerThread.getPlayers().size()) Thread.sleep(5);
         seed.addNumber(ID, rollStr);
+
+        getRolls = false;
     }
 
     /**
      * Forwards and applies commands. Throws exception up one level.
      * @throws IOException
      */
-    protected void playGame() throws IOException {
-        while(true) {
-            if (getRolls) {
-                try {
-                    getRolls();
-                } catch (InterruptedException | HashMismatchException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (move_required && System.currentTimeMillis() > timer + MOVE_TIMEOUT) {
-                System.err.println("Mov from " + ID + " timed out");
-                throw new SocketTimeoutException();
-            }
-            if (!ack_received && System.currentTimeMillis() > timer + ACK_TIMEOUT) {
-                System.err.println("Ack from " + ID + " timed out");
-                throw new SocketTimeoutException();
-            }
-            if (!move_required && state.getCurrentPlayer().getID() == ID){
-                move_required = true;
-                //System.out.println("Player " + ID + "'s turn'");
-                timer = System.currentTimeMillis();
-            }
-            if (input.ready()) {
-                Command reply = Command.parseCommand(input.readLine());
-                //System.out.println("in Player " + ID + ": " + reply);
-                messageQueue.sendAll(reply, ID);
-                checkAckCases(reply);
-            }
-            if (state.winConditionsMet()) break;
+    protected void playGame() throws IOException, HashMismatchException, InterruptedException {
+        while(playing) {
+            playGameIteration();
+        }
+    }
+
+    /**
+     * Method to handle the game flow, checking timeouts and handles transactions
+     *
+     * @throws IOException
+     * @throws HashMismatchException
+     * @throws InterruptedException
+     */
+    private synchronized void playGameIteration() throws IOException, HashMismatchException, InterruptedException {
+        if (getRolls) {
             try {
-                Thread.sleep(1); // Just sleep a bit to prevent busy looping
-            } catch (InterruptedException e) {
+                getRolls();
+            } catch (InterruptedException | HashMismatchException e) {
                 e.printStackTrace();
             }
+        }
+        if (move_required && System.currentTimeMillis() > timer + MOVE_TIMEOUT) {
+            System.err.println("Mov from " + ID + " timed out");
+            throw new SocketTimeoutException();
+        }
+        if (!ack_received && System.currentTimeMillis() > timer + ACK_TIMEOUT) {
+            System.err.println("Ack from " + ID + " timed out");
+            throw new SocketTimeoutException();
+        }
+        if (!move_required && state.getCurrentPlayer().getID() == ID){
+            move_required = true;
+            //System.out.println("Player " + ID + "'s turn'");
+            timer = System.currentTimeMillis();
+        }
+        if (input.ready()) {
+            if (getRolls) getRolls();
+            Command reply = Command.parseCommand(input.readLine());
+            //System.out.println("in Player " + ID + ": " + reply);
+            messageQueue.sendAll(reply, ID);
+            checkAckCases(reply);
+        }
+        if (state.winConditionsMet()) playing = false;
+        try {
+            Thread.sleep(1); // Just sleep a bit to prevent busy looping
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -141,7 +169,7 @@ class HostForwarder {
      * Check for acknowledgement, otherwise applies command to game state.
      * @param comm the command to be checked.
      */
-    private void checkAckCases(Command comm) {
+    private void checkAckCases(Command comm) throws InterruptedException, IOException, HashMismatchException {
         if (comm instanceof AcknowledgementCommand) {
             if (((AcknowledgementCommand) comm).getAcknowledgementId() == last_ack) {
                 ack_received = true;
@@ -149,8 +177,11 @@ class HostForwarder {
                 //diff = MOVE_TIMEOUT;
             }
         } else {
+            if (comm instanceof AttackCommand) {
+                messageQueue.getRolls(ID);
+                getRolls();
+            }
             processCommand(comm);
-
         }
     }
 
@@ -158,32 +189,41 @@ class HostForwarder {
      * Processes game commands and applies them to game state.
      * @param comm The command to be processed
      */
-    private void processCommand(Command comm) {
-        Player currentPlayer = state.getCurrentPlayer();
+    private synchronized void processCommand(Command comm) throws HashMismatchException, InterruptedException, IOException{
+        if (comm instanceof DefendCommand){
+            processDefendCommand((DefendCommand) comm);
+            return;
+        } else if (comm instanceof RollHashCommand) {
+            hash = (RollHashCommand)comm;
+            return;
+        } else if (comm instanceof RollNumberCommand) {
+            number = (RollNumberCommand)comm;
+            return;
+        }
+
+        while (comm.getPlayer() != (state.getCurrentPlayer().getID())) Thread.sleep(10);
         ArrayList<Action> playerActions = new ArrayList<>();
+
         if (comm instanceof AttackCommand){
             playerActions.add(processAttackCommand((AttackCommand) comm));
         }
         else if (comm instanceof AttackCaptureCommand) {
             playerActions.add(processAttackCaptureCommand((AttackCaptureCommand) comm));
         }
-        else if (comm instanceof DeployCommand){
+        else if (comm instanceof DeployCommand) {
             playerActions.addAll(processDeployCommand((DeployCommand) comm));
         }
-        else if (comm instanceof FortifyCommand){
+        else if (comm instanceof FortifyCommand) {
             playerActions.add(processFortifyCommand((FortifyCommand) comm));
         }
-        else if (comm instanceof DrawCardCommand){
+        else if (comm instanceof DrawCardCommand) {
             playerActions.add(processDrawCardCommand((DrawCardCommand) comm));
         }
-        else if (comm instanceof SetupCommand){
+        else if (comm instanceof SetupCommand) {
             playerActions.add(processSetupCommand((SetupCommand) comm));
         }
-        else if (comm instanceof PlayCardsCommand){
+        else if (comm instanceof PlayCardsCommand) {
             playerActions.addAll(processPlayCardsCommand((PlayCardsCommand) comm));
-        }
-        else if (comm instanceof DefendCommand){
-            processDefendCommand((DefendCommand) comm);
         }
         else {
             System.err.println("Player " + ID + " cant process command " + comm.toJSONString());
@@ -192,15 +232,39 @@ class HostForwarder {
 
         if (playerActions.size() == 0 && !(comm instanceof DefendCommand)){
             //System.out.println("End turn");
-            playerActions.add(new FortifyAction(currentPlayer));
+            playerActions.add(new FortifyAction(state.getPlayer(comm.getPlayer())));
         }
 
         for(Action playerAction : playerActions) {
-            if (playerAction.validateAgainstState(state)) {
+
+            int waited = 0;
+            while (!playerAction.validateAgainstState(state) && waited < 1000) {
+                Thread.sleep(10);
+                waited += 10;
+            }
+            if (waited < 1000) {
                 playerAction.performOnState(state);
-            } else {
-                System.err.println("Error move did not validate: " + comm);
-                System.exit(1);
+
+                if (playerAction instanceof AttackCaptureAction) {
+                    System.out.println("Player " + defender.getID() + " has " + defender.getOccupiedCountries().size() + " countries left.");
+                    if (defender.getOccupiedCountries().size() == 0) {
+                        System.out.println("Player " + defender.getID() + " has lost");
+                        System.out.flush();
+                        state.removePlayer(defender.getID());
+                        messageQueue.removePlayer(defender.getID());
+                    }
+                }
+            }
+            else {
+                try {
+                    System.err.println("Error move did not validate: " + comm);
+                    Thread.sleep(1000);
+                    while (true)
+                        Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //System.exit(1);
             }
         }
 
@@ -288,30 +352,27 @@ class HostForwarder {
 
         // Get rolls from all clients...
         // HostForwarder.setSeed(new RNGSeed(ListenerThread.getPlayers().size()));
-        messageQueue.getRolls(ID);
         try {
-            getRolls();
-            //while (!seed.isFinalised()) Thread.sleep(1);
             while (seed.getNumberSeedSources() != ListenerThread.getPlayers().size()) Thread.sleep(5);
             seed.finalise();
+            defender = state.getCountryByID(objectiveId).getOwner();
 
-            DefendCommand def = state.getCountryByID(objectiveId).getOwner().getClient().popDefendCommand(originId, objectiveId, attackArmies);
+            // Get defend command
+            DefendCommand def = defender.getClient().popDefendCommand(originId, objectiveId, attackArmies);
             int defendArmies = def.getPayloadAsInt();
-            //System.out.println("Defend armies: " + defendArmies);
+            // Roll the dice
             int[] attackDice = new int [attackArmies];
             for (int i = 0; i<attackArmies; i++){
                 attackDice[i] = (int)(seed.nextInt() % 6 + 1);
-                //System.out.println(attackDice[i]);
             }
 
             int[] defendDice = new int [defendArmies];
             for (int i = 0; i<defendArmies; i++){
                 defendDice[i] = (int)(seed.nextInt() % 6 + 1);
-                //System.out.println(defendDice[i]);
             }
 
             return new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
-        } catch (InterruptedException | IOException | HashMismatchException e) {
+        } catch (InterruptedException | HashMismatchException e) {
             e.printStackTrace();
         }
         return null;
@@ -333,7 +394,7 @@ class HostForwarder {
         int objectiveId = Integer.parseInt(fortification.get(1).toString());
         int armies = Integer.parseInt(fortification.get(2).toString());
 
-        return new FortifyAction(state.getPlayers().get(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),armies);
+        return new FortifyAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),armies);
     }
 
     /**
@@ -344,7 +405,7 @@ class HostForwarder {
     private ObtainRiskCardAction processDrawCardCommand(DrawCardCommand command){
         int player = command.getPlayer();
         //System.out.println("Interpreted draw command");
-        return new ObtainRiskCardAction(state.getPlayers().get(player));
+        return new ObtainRiskCardAction(state.getPlayer(player));
     }
 
     /**
@@ -390,5 +451,9 @@ class HostForwarder {
 
     public void getRollsLater(){
         getRolls = true;
+    }
+
+    public void stop() {
+        playing = false;
     }
 }

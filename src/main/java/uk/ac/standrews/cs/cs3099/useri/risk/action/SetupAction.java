@@ -33,8 +33,10 @@ public class SetupAction extends Action {
     @Override
     public boolean validateAgainstState(State state) {
         //must be player's turn
-        if(player != state.getCurrentPlayer())
+        if(player != state.getCurrentPlayer()){
+            System.err.println("Not current player");
             return false;
+        }
 
         //treat situation where all countries claimed separately
         if(state.hasUnassignedCountries()){

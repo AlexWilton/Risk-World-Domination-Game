@@ -12,22 +12,44 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Message Queue to distribute message to all the nodes connected
+ */
 class MessageQueue {
     private final Integer ID;
     private HashMap<Integer, ListenerThread> sockets = new HashMap<>();
 
+    /**
+     * Constructor to create message queue
+     * @param isHostPlaying boolean variable to tell whether the host is playing or not
+     */
     public MessageQueue(boolean isHostPlaying) {
         ID = isHostPlaying? 0 : null;
     }
 
+    /**
+     * Synchronised method to send ping message to all
+     * @param payload
+     * @throws IOException
+     */
     public synchronized void sendPing(int payload) throws IOException {
         sendAll(new PingCommand(ID, payload), ID);
     }
 
+    /**
+     * Synchronised method to send everyone ready message
+     * @throws IOException
+     */
     public synchronized void sendReady() throws IOException {
         sendAll(new ReadyCommand(ID), ID);
     }
 
+    /**
+     * synchronised method to send message to all
+     * @param comm Command to be sent
+     * @param id
+     * @throws IOException
+     */
     public synchronized void sendAll(Command comm, Integer id)  throws IOException {
         boolean signal_ack = comm.requiresAcknowledgement();
         int ack_id = -1;
@@ -45,6 +67,13 @@ class MessageQueue {
         }
     }
 
+    /**
+     * Notifying all the connected nodes that the player has been added
+     * @param id integer ID
+     * @param t Thread t
+     * @param player Player object
+     * @throws IOException
+     */
     public synchronized void addPlayer(int id, ListenerThread t, Player player) throws IOException {
         sockets.put(id, t);
         ArrayList<Player> players = new ArrayList<>();
@@ -52,7 +81,11 @@ class MessageQueue {
         sendAll(new PlayersJoinedCommand(players), id);
     }
 
-    public void getRolls(int id){
+    /**
+     * Getting Dice rolls
+     * @param id
+     */
+    public synchronized void getRolls(int id){
         HostForwarder.setSeed(new RandomNumberGenerator());
         try {
             for (Map.Entry<Integer, ListenerThread> e : sockets.entrySet()){
@@ -67,5 +100,14 @@ class MessageQueue {
             System.err.println("Could not get dice rolls, protocol failed");
             System.exit(1);
         }
+    }
+
+    /**
+     * Remove player
+     * @param id
+     */
+    public synchronized void removePlayer(int id) {
+        ListenerThread w = sockets.get(id);
+        w.removePlayer();
     }
 }

@@ -1,6 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import org.json.simple.JSONArray;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.Map;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
@@ -9,12 +10,17 @@ import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGe
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.InitialiseGameCommand;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/**
+ * main network communication thread.
+ * handles sending and receiving messages
+ */
 public class ServerSocketHandler implements Runnable {
-    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 1, MOVE_TIMEOUT = 30000;
+    private final int PORT, NUMBER_OF_PLAYERS, ACK_TIMEOUT = 30, MOVE_TIMEOUT = 30000;
     public static final int MAX_PLAYER_COUNT = 6, MIN_PLAYER_COUNT = 2; //needed for web client to know the range of allowed number of players. (needs to be public)
     private WebClient webClient;
     private ServerSocket server;
@@ -24,7 +30,27 @@ public class ServerSocketHandler implements Runnable {
     private RejectingThread reject;
 
     private boolean gameInProgress = false;
+    private RandomNumberGenerator seed;
 
+    /**
+     * getter of all the connected player names
+     * @return String ArrayList to return all the player names
+     */
+    public ArrayList<String> getConnectedPlayerNames(){
+        ArrayList<String> ret = new ArrayList<>();
+        for (ListenerThread t : clientSocketPool){
+            ret.add(t.getPlayerName());
+        }
+        return ret;
+    }
+
+    /**
+     * Constructor of server socket handler
+     * @param port number to be connected to (integer)
+     * @param numberOfPlayers integer defining number of playes allowed
+     * @param webClient webclient instance, 
+     * @param isServerPlaying
+     */
     public ServerSocketHandler(int port, int numberOfPlayers, WebClient webClient, boolean isServerPlaying) {
         this.webClient = webClient;
         NUMBER_OF_PLAYERS = numberOfPlayers;
@@ -40,6 +66,9 @@ public class ServerSocketHandler implements Runnable {
         }
     }
 
+    /**
+     * Main thread loop
+     */
     public void run() {
         int i = 0;
         clientSocketPool = new ArrayList<>();
@@ -49,7 +78,7 @@ public class ServerSocketHandler implements Runnable {
                 // Open the gates!
                 Socket temp = server.accept();
                 System.out.println("New client connected");
-                ListenerThread client = new ListenerThread(temp, i, webClient, ACK_TIMEOUT, MOVE_TIMEOUT, s);
+                ListenerThread client = new ListenerThread(temp, i, new NetworkClient(null,null), ACK_TIMEOUT, MOVE_TIMEOUT, s);
                 clientSocketPool.add(i++, client);
                 // Make new Thread for client.
                 Thread t = new Thread(client);
@@ -83,19 +112,16 @@ public class ServerSocketHandler implements Runnable {
             Map map = new Map();
             gameState.setup(map, ListenerThread.getPlayers());
             HostForwarder.setState(gameState);
-            RandomNumberGenerator seed = new RandomNumberGenerator();
+            seed = new RandomNumberGenerator();
             HostForwarder.setSeed(seed);
 
             // Elect first player by dice roll and shuffle cards deck.
             while (notAllInitialised(InitState.FIRST_PLAYER_ELECTABLE));
             seed.finalise();
-            int startingPlayer = (int)(seed.nextInt() % ListenerThread.getPlayers().size());
-            gameState.setFirstPlayer(gameState.getPlayer(startingPlayer));
-            gameState.setCurrentPlayer(startingPlayer);
-            HostForwarder.setSeed(null);
-            System.err.println("STARTING PLAYER IS " + startingPlayer);
+            getFirstPlayer(gameState);
 
-            seed = new RandomNumberGenerator();
+            Thread.sleep(10);
+
             HostForwarder.setSeed(seed);
             ListenerThread.shuffleCards();
             while (notAllInitialised(InitState.DECK_SHUFFLED));
@@ -107,6 +133,8 @@ public class ServerSocketHandler implements Runnable {
         } catch (IOException e){
             System.err.println("Error while initialising game");
         } catch (HashMismatchException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
         //TODO ListenerThread remove player if error occurs!
@@ -126,6 +154,15 @@ public class ServerSocketHandler implements Runnable {
             e.printStackTrace();
         }
 
+    }
+
+    private synchronized void getFirstPlayer(State gameState) throws HashMismatchException {
+        int startingPlayer = (int)(seed.nextInt() % ListenerThread.getPlayers().size());
+        HostForwarder.setSeed(null);
+        gameState.setFirstPlayer(gameState.getPlayer(startingPlayer));
+        gameState.setCurrentPlayer(startingPlayer);
+        System.err.println("STARTING PLAYER IS " + startingPlayer);
+        this.seed = new RandomNumberGenerator();
     }
 
     private InitialiseGameCommand generateInitGame() {
@@ -156,5 +193,7 @@ public class ServerSocketHandler implements Runnable {
         return false;
     }
 
-
+    public int getNUMBER_OF_PLAYERS() {
+        return NUMBER_OF_PLAYERS;
+    }
 }

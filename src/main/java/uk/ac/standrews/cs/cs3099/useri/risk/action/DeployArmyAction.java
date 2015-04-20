@@ -6,7 +6,6 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 
 /**
  * Deploying armies at the beginning of the turn. This is compulsory!
- * Created by bs44 on 30/01/15.
  */
 public class DeployArmyAction extends Action{
     private final int armies;

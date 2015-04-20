@@ -4,7 +4,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-
+/**
+ * Object representing the command sent as part of protocol
+ */
 public class Command extends JSONObject {
 
     static int ack_id = 0;

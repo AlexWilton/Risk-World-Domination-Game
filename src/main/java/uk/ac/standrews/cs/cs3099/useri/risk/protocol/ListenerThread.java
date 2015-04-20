@@ -37,6 +37,10 @@ class ListenerThread implements Runnable {
     private HostForwarder fw;
 
 
+
+    public String getPlayerName() {
+        return player.getName();
+    }
     public ListenerThread(Socket sock, int id, Client client, int ack_timeout, int move_timeout, MessageQueue q) {
         ACK_TIMEOUT = ack_timeout * 1000;
         MOVE_TIMEOUT = move_timeout * 1000;
@@ -85,7 +89,7 @@ class ListenerThread implements Runnable {
     void reply(Command command) {
         if (command == null)
             return;
-        //System.out.println("Player " + ID + ": " + command);
+        System.out.println("out Player " + ID + ": " + command);
         output.println(command);
         output.flush();
     }
@@ -197,5 +201,12 @@ class ListenerThread implements Runnable {
 
     public void getRollsLater() throws IOException, InterruptedException {
         fw.getRollsLater();
+    }
+
+    public synchronized void removePlayer() {
+        System.out.println("Player " + ID + " removed");
+        players.remove(player);
+        fw.stop();
+        purgeConnection();
     }
 }

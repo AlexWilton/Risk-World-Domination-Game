@@ -48,7 +48,7 @@
                                     <input type="number" class="form-control" name="port" value=8888 style="width : 90px;">
                                 </div>
                                 <br/><br/>
-                                <label style="margin-left: 20px;">Is Host Playing?</label>
+                                <label style="margin-left: 20px;">Is Host Playing (As Human)?</label>
                                 <div class="btn-group" data-toggle="buttons">
                                     <label class="btn btn-primary active">
                                         <input type="radio" name="is_host_playing" id="yes" value="true" autocomplete="off" checked> Yes
@@ -64,8 +64,17 @@
                                         <input type="text" class="form-control" name="player_name" value="Harry" style="width:150px;">
                                     </div>
                                 </div>
-                                    <br/><br/>
-                                    <button type="button" class="btn btn-primary btn-lg btn-block" id="hostButton">Host Game!</button>
+                                <br/><br/>
+                                <div id="hostAIoptions"></div>
+                                <div id="aiAdder" class="btn-group">
+                                    <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><strong>Add AI player to Game</strong><span class="caret"></span></button>
+                                    <ul class="dropdown-menu" id="aiOptions">
+                                    </ul>
+                                </div>
+                                <br/><br/>
+                                <div id="host">
+                                <button type="button" class="btn btn-primary btn-lg btn-block" onclick="host()" id="hostButton">Host Game!</button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -96,7 +105,7 @@
                                     <input type="text" class="form-control" name="player_name" value="Carol" style="width:150px;">
                                 </div>
                                 <br/><br/><br/>
-                                <button type="button" class="btn btn-primary btn-lg btn-block" id="connectButton">Connect To Game!</button>
+                                <button type="button" class="btn btn-primary btn-lg btn-block" onclick="connect()" id="connectButton">Connect To Game!</button>
                             </form>
                         </div>
                     </div>

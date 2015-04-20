@@ -3,7 +3,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.game;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.ObtainRiskCardAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 
 import java.util.ArrayList;
@@ -31,11 +30,16 @@ public class State implements JSONAware {
     private Country attackCaptureDestination = null;
     private int attackCaptureMinimumArmiesToMove = -1;
 
+
+
     public State(){};
 
     public State(Map map, ArrayList<Player> players){
         setup(map, players);
+
     }
+
+
 
     public void setup(Map map, ArrayList<Player> players){
         this.map = map;
@@ -44,7 +48,7 @@ public class State implements JSONAware {
         this.currentPlayer = players.get(0);
 
         //set number of inital troops for each player (based on the total number of players in the game)
-        int armiesForEachPlayer = 20 + (6 - players.size()) * 5 - 18; //TODO remove -17
+        int armiesForEachPlayer = 20 + (6 - players.size()) * 5;// - 18; //TODO remove -17
         for(Player p : players){
             p.setUnassignedArmies(armiesForEachPlayer);
         }
@@ -56,6 +60,10 @@ public class State implements JSONAware {
 
     public Player getCurrentPlayer() {
         return currentPlayer;
+    }
+
+    public Continent getContinentById (int id){
+        return getContinents().get(id);
     }
 
     public boolean winConditionsMet() {
@@ -117,12 +125,16 @@ public class State implements JSONAware {
      * @return the top card from the deck.
      */
     public RiskCard getCard() {
+        if (cardsDeck.size() == 0)
+            return null;
         RiskCard c = cardsDeck.get(0);
         cardsDeck.remove(0);
         return c;
     }
 
     public RiskCard peekCard() {
+        if (cardsDeck.size() == 0)
+            return null;
         RiskCard c = cardsDeck.get(0);
 
         return c;
@@ -231,7 +243,15 @@ public class State implements JSONAware {
     }
 
     public void nextPlayer(){
-        currentPlayer = getPlayer((currentPlayer.getID()+1)%getPlayerAmount());
+        int i = currentPlayer.getID();
+        int maxPlayerId = -1;
+        for (Player p : players){
+            if (p.getID() > maxPlayerId)
+                maxPlayerId = p.getID();
+        }
+        do {
+            currentPlayer = getPlayer((++i) % (maxPlayerId+1));
+        } while (currentPlayer == null);
     }
 
     int getPlayerAmount(){
@@ -248,6 +268,8 @@ public class State implements JSONAware {
     }
 
     void preTurnCalculateUnassignedArmies(Player player) {
+        if (player == null)
+            return;
         int territoryCount = player.getOccupiedCountries().size();
         int amount = territoryCount / 3;
         if(amount < 3) amount = 3;

@@ -6,18 +6,18 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
+import java.util.Map;
 
 /**
  * Always attacks if it can. Will continue attacking one weak country until it is out of armies to do so, or it has conquered the country.
  */
-public class BulldogAIClient extends Client {
+public class GreyhoundAIClient extends Client {
 
 
     private AttackCommand lastAttack;
 
-    public BulldogAIClient(State gameState){
+    public GreyhoundAIClient(State gameState){
         super(gameState,new RandomNumberGenerator());
     }
 
@@ -26,8 +26,12 @@ public class BulldogAIClient extends Client {
 
     @Override
     public Command popCommand() {
-
-        //if we attacked before and havent won or havent lost all armies, attack again
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //if we attacked before and haven't won or haven't lost all armies, attack again
         if (lastAttack != null){
             int lastOrigin = Integer.parseInt(lastAttack.getPayloadAsArray().get(0).toString());
             int lastTarget = Integer.parseInt(lastAttack.getPayloadAsArray().get(1).toString());
@@ -38,7 +42,6 @@ public class BulldogAIClient extends Client {
             }
 
             if (gameState.getCountryByID(lastTarget).getOwner().getID() != playerId){
-
                 if (gameState.getCountryByID(lastOrigin).getTroops() > gameState.getCountryByID(lastTarget).getTroops()){
                     int atkArmies = gameState.getCountryByID(lastOrigin).getTroops() > 3 ? 3 : (gameState.getCountryByID(lastOrigin).getTroops()-1);
                     //go again
@@ -76,6 +79,11 @@ public class BulldogAIClient extends Client {
 
     @Override
     public DefendCommand popDefendCommand(int origin, int target, int armies) {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         return new DefendCommand((gameState.getCountryByID(target).getTroops() > 1) ? 2 : 1, playerId);
     }
@@ -95,7 +103,11 @@ public class BulldogAIClient extends Client {
             //only setup commands
             ret.addAll(getAllPossibleSetupCommands());
         }else {
-
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             TurnStage stage = gameState.getTurnStage();
             switch (stage) {
                 case STAGE_TRADING: {
@@ -152,23 +164,62 @@ public class BulldogAIClient extends Client {
     }
 
     private ArrayList<Command> getAllPossibleDeployCommands(){
-        ArrayList<Command> ret = new ArrayList<>();
-        //for now, deploy everything into one country
-        int armies = getPlayer().getUnassignedArmies();
-        //TODO
-        if (getPlayer().getCountryWhichMustBeDeployedTo() != null){
-            ArrayList<DeployTuple> tuples = new ArrayList<>();
-            tuples.add(new DeployTuple(getPlayer().getCountryWhichMustBeDeployedTo().getCountryId(),armies));
-            ret.add(new DeployCommand(tuples,playerId));
-            return ret;
-        } else {
-            for ( Country c : getPlayer().getOccupiedCountries()){
-                ArrayList<DeployTuple> tuples = new ArrayList<>();
-                tuples.add(new DeployTuple(c.getCountryId(),armies));
-                ret.add(new DeployCommand(tuples,playerId));
+        //deploy to all boundary countries
+
+        CountrySet allTargets = getPlayer().getOwnedCountriesWithEnemyBoundaries();
+
+        HashMap<Integer,Integer> troopDiff = new HashMap<>();
+        HashMap<Integer,Integer> troopDeploy = new HashMap<>();
+
+        int armies_left = getPlayer().getUnassignedArmies();
+
+        for (Country target : allTargets){
+            int diff = target.getTroops();
+            for (Country opp : target.getEnemyNeighbours()){
+                diff -= opp.getTroops();
             }
+
+            troopDiff.put(target.getCountryId(),diff);
         }
+
+        while (armies_left > 0){
+            //find min
+            int curr_min = 10000000;
+            int curr_country = -1;
+
+            for (Map.Entry<Integer,Integer> troopDiffPair : troopDiff.entrySet()){
+                if (troopDiffPair.getValue() <= curr_min){
+                    curr_country = troopDiffPair.getKey();
+                    curr_min = troopDiffPair.getValue();
+                }
+            }
+            //add deploy
+            if (troopDeploy.keySet().contains(curr_country)){
+                troopDeploy.put(curr_country,troopDeploy.get(curr_country)+1);
+            } else {
+                troopDeploy.put(curr_country,1);
+            }
+            //remove diff
+            troopDiff.put(curr_country,troopDiff.get(curr_country)+1);
+            armies_left--;
+        }
+
+
+
+        ArrayList<DeployTuple> depTups = new ArrayList<>();
+
+        for (Map.Entry<Integer,Integer> depTuple : troopDeploy.entrySet()){
+            if (gameState.getCountryByID(depTuple.getKey()).getOwner().getID() != getPlayerId()){
+                System.out.println("WRONG");
+            }
+            depTups.add(new DeployTuple(depTuple.getKey(),depTuple.getValue()));
+        }
+
+
+        ArrayList<Command> ret = new ArrayList<>();
+        ret.add(new DeployCommand(depTups,playerId));
         return ret;
+
     }
 
     private ArrayList<Command> getAllPossibleAttackCommands(){
@@ -189,18 +240,68 @@ public class BulldogAIClient extends Client {
 
     private ArrayList<Command> getAllPossibleFortifyCommands(){
         ArrayList<Command> ret = new ArrayList<>();
-        //no fortification
-        ret.add(new FortifyCommand(playerId));
-        for (Country c : getPlayer().getOccupiedCountries()){
+        CountrySet allTargets = getPlayer().getOwnedCountriesWithEnemyBoundaries();
+        //Todo improve
+        HashMap<Integer,Integer> troopDiff = new HashMap<>();
+        HashMap<Integer,Integer> troopDeploy = new HashMap<>();
 
-            for (Country target : c.getSamePlayerNeighbours()){
 
-                for (int i = 1; i<c.getTroops();i++){
-                    ret.add(new FortifyCommand(c.getCountryId(),target.getCountryId(),i,playerId));
+        for (Country target : allTargets){
+            int diff = target.getTroops();
+            for (Country opp : target.getEnemyNeighbours()){
+                diff -= opp.getTroops();
+            }
+
+            troopDiff.put(target.getCountryId(),diff);
+        }
+
+        while (troopDiff.size() > 0) {
+            //find min
+            int curr_min = 10000000;
+            int curr_country = -1;
+
+            for (Map.Entry<Integer, Integer> troopDiffPair : troopDiff.entrySet()) {
+                if (troopDiffPair.getValue() <= curr_min) {
+                    curr_country = troopDiffPair.getKey();
+                    curr_min = troopDiffPair.getValue();
+                }
+            }
+
+            //findBestNeighbour
+            int best_neighbour = -1;
+            int best_diff = 0;
+            for (Country friends : gameState.getCountryByID(curr_country).getSamePlayerNeighbours()){
+                int this_diff;
+                if (troopDiff.keySet().contains(friends.getCountryId())){
+                    this_diff = troopDiff.get(friends.getCountryId());
+                }
+                else {
+                    this_diff = friends.getTroops();
                 }
 
+                if (this_diff > best_diff){
+                    best_diff = this_diff;
+                    best_neighbour = friends.getCountryId();
+                }
+            }
+
+            if (best_neighbour == -1) {
+                troopDiff.remove(curr_country);
+                continue;
+            }
+
+            else {
+                ret.add(new FortifyCommand(best_neighbour,curr_country,gameState.getCountryByID(best_neighbour).getTroops()/2,playerId));
+                if (gameState.getCountryByID(best_neighbour).getOwner().getID() != getPlayerId() || gameState.getCountryByID(curr_country).getOwner().getID() != getPlayerId()){
+                    System.out.println("WRONG");
+                }
+                break;
             }
         }
+
+        if (ret.size() < 1)
+            ret.add(new FortifyCommand(playerId));
+
         return ret;
     }
 

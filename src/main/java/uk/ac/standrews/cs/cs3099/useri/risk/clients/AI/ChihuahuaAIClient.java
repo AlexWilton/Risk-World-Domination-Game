@@ -12,16 +12,17 @@ import java.util.Random;
 /**
  * Created by patrick on 17/04/15.
  */
-public class RandomAIClient extends Client {
+public class ChihuahuaAIClient extends Client {
 
 
-    public RandomAIClient(State gameState){
+    public ChihuahuaAIClient(State gameState){
         super(gameState,new RandomNumberGenerator());
     }
 
 
     @Override
     public Command popCommand() {
+
         // This cannot be random, if a country has been captured, move a random number of armies to it (at least 1).
         if (gameState.isAttackCaptureNeeded()) {
             Country origin = gameState.getAttackCaptureOrigin();
@@ -30,7 +31,7 @@ public class RandomAIClient extends Client {
             int maxArmies = origin.getTroops() - 1;
             Random rn = new Random();
             int n = maxArmies - minArmies + 1;
-            int i = rn.nextInt() % n;
+            int i = Math.abs(rn.nextInt()) % n;
             int armies =  minArmies + i;
             return new AttackCaptureCommand(origin.getCountryId(), destination.getCountryId(), armies, playerId);
         }
@@ -78,11 +79,7 @@ public class RandomAIClient extends Client {
             //only setup commands
             ret.addAll(getAllPossibleSetupCommands());
         }else {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
             TurnStage stage = gameState.getTurnStage();
             switch (stage) {
                 case STAGE_TRADING: {

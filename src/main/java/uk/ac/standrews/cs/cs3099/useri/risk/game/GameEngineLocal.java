@@ -15,17 +15,17 @@ import java.util.ArrayList;
  * runs the main game loop and gets turns from the players
  *
  */
-public class GameEngine implements Runnable{
+public class GameEngineLocal implements Runnable{
 
     private State state;
-    private ClientSocketHandler csh;
+    private ArrayList<Client> clients;
 
     /**
      * GameEngine constructor which takes clientsockethandler
-     * @param csh The ClientSocketHandler that this engine should call.
+     *
      */
-    public GameEngine(ClientSocketHandler csh){
-        this.csh = csh;
+    public GameEngineLocal(){
+
     }
 
     @Override
@@ -34,12 +34,14 @@ public class GameEngine implements Runnable{
         gameLoop();
     }
 
+
+
     /**
      * initialises game state with given state
-     * @param state : game's state object
      */
-    public void initialise(State state){
+    public void initialise(ArrayList<Client> clients){
         this.state = state;
+        this.clients = clients;
     }
 
     /**
@@ -53,38 +55,42 @@ public class GameEngine implements Runnable{
         //initialise map
         Map map = new Map();
 
-        //wait till we are "playing"
-        while (csh.getProtocolState() != ClientSocketHandler.ProtocolState.RUNNING){
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+
 
         //setup the players
         ArrayList<Player> players = new ArrayList<>();
 
-        for (Client c : csh.getAllClients()){
+        for (Client c : clients){
             players.add(new Player(c.getPlayerId(),c, c.getPlayerName()));
         }
         gameState.setup(map,players);
 
         //Now roll dice to determine first player
-        int firstPlayer = csh.determineFirstPlayer();
+        int firstPlayer = determineFirstPlayer();
 
-        System.out.println(firstPlayer);
-        System.out.println("Player " + gameState.getPlayer(firstPlayer).getName() + " goes first!");
+        //System.out.println(firstPlayer);
+        //System.out.println("Player " + gameState.getPlayer(firstPlayer).getName() + " goes first!");
         gameState.setFirstPlayer(gameState.getPlayer(firstPlayer));
         gameState.setCurrentPlayer(firstPlayer);
 
         //now shuffle cards
-        System.out.println("shuffling cards");
-        gameState.shuffleRiskCards(csh.popSeed());
-        System.out.println("shuffled cards");
+        //System.out.println("shuffling cards");
+        gameState.shuffleRiskCards(popSeed());
+        //System.out.println("shuffled cards");
 
         //setup the countries in the normal game loop
-        csh.linkGameState(state);
+        for (Client c : clients){
+            c.setState(state);
+        }
+    }
+
+    public int determineFirstPlayer() {
+
+
+        RandomNumberGenerator fpSeed = popSeed();
+        return (int) (fpSeed.nextInt() % clients.size());
+
+
     }
 
     /**
@@ -101,16 +107,21 @@ public class GameEngine implements Runnable{
         Player currentPlayer;
         while(true) {
             currentPlayer = state.getCurrentPlayer();
-            System.out.println("Ask player " + currentPlayer.getID() + " (" + currentPlayer.getName() + ")");
+            //System.out.println("Ask player " + currentPlayer.getID() + " (" + currentPlayer.getName() + ")");
             Command currentCommand = currentPlayer.getClient().popCommand();
-            //if its local, propagate
-            if (csh != null && currentPlayer.getClient().isLocal()){
-               csh.sendCommand(currentCommand);
-            }
+
             processCommand(currentPlayer, currentCommand);
 
-            if (checkIfPlayerLost() || state.winConditionsMet()) break;
+            if (checkIfPlayerLost() || state.winConditionsMet())
+                break;
         }
+
+    }
+
+    private int winner = -1;
+
+    public int getWinner(){
+        return state.getWinner().getID();
     }
 
     private boolean checkIfPlayerLost(){
@@ -124,9 +135,7 @@ public class GameEngine implements Runnable{
         }
 
         if (playerRemoved >= 0){
-            csh.removePlayer(playerRemoved);
-            if (playerRemoved == csh.getLocalClientId())
-                return true;
+            removePlayer(playerRemoved);
         }
         return false;
     }
@@ -160,12 +169,12 @@ public class GameEngine implements Runnable{
             playerActions.addAll(processPlayCardsCommand((PlayCardsCommand) currentCommand));
         }
         else {
-            System.out.println("cant process command " + currentCommand.toJSONString());
+           // System.out.println("cant process command " + currentCommand.toJSONString());
             return;
         }
 
         if (playerActions.size() == 0){
-            System.out.println("End turn");
+           // System.out.println("End turn");
             playerActions.add(new FortifyAction(currentPlayer));
         }
 
@@ -173,7 +182,7 @@ public class GameEngine implements Runnable{
             if (playerAction.validateAgainstState(state)) {
                 playerAction.performOnState(state);
             } else {
-                System.out.println("Error move did not validate: " + currentCommand);
+                //System.out.println("Error move did not validate: " + currentCommand);
                 System.exit(1);
             }
         }
@@ -181,7 +190,7 @@ public class GameEngine implements Runnable{
         if(state.winConditionsMet()) {
             Player winner = state.getWinner();
             System.out.println("Winner is " + winner.getID());
-            System.exit(0);
+            //System.exit(0);
         }
     }
 
@@ -243,7 +252,7 @@ public class GameEngine implements Runnable{
         for (ArrayList<RiskCard> triplet : triplets){
             TradeAction act = new TradeAction(state.getPlayer(player),triplet);
 
-            System.out.println("Interpreted trade command");
+            //System.out.println("Interpreted trade command");
             acts.add(act);
         }
         return acts;
@@ -271,28 +280,25 @@ public class GameEngine implements Runnable{
         // HostForwarder.setSeed(new RNGSeed(ListenerThread.getPlayers().size()));
 
         try {
-            RandomNumberGenerator seed = csh.popSeed();
+            RandomNumberGenerator seed = popSeed();
             //while (!seed.isFinalised()) Thread.sleep(1);
             seed.finalise();
             Player defender = state.getCountryByID(objectiveId).getOwner();
 
             DefendCommand def = defender.getClient().popDefendCommand(originId, objectiveId, attackArmies);
-            //if its local, propagate
-            if (csh != null && defender.getClient().isLocal()) {
-                csh.sendCommand(def);
-            }
+
             int defendArmies = def.getPayloadAsInt();
-            System.out.println("Defend armies: " + defendArmies);
+            //System.out.println("Defend armies: " + defendArmies);
             int[] attackDice = new int [attackArmies];
             for (int i = 0; i<attackArmies; i++){
                 attackDice[i] = (int)(seed.nextInt() % 6 + 1);
-                System.out.println(attackDice[i]);
+                //System.out.println(attackDice[i]);
             }
 
             int[] defendDice = new int [defendArmies];
             for (int i = 0; i<defendArmies; i++){
                 defendDice[i] = (int)(seed.nextInt() % 6 + 1);
-                System.out.println(defendDice[i]);
+                ///System.out.println(defendDice[i]);
             }
 
             return new AttackAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),attackDice,defendDice);
@@ -327,7 +333,7 @@ public class GameEngine implements Runnable{
         int armies = Integer.parseInt(fortification.get(2).toString());
 
         FortifyAction act = new FortifyAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),armies);
-        System.out.println("Interpreted fortify command");
+        //System.out.println("Interpreted fortify command");
         return act;
     }
 
@@ -346,7 +352,7 @@ public class GameEngine implements Runnable{
 
         int player = command.getPlayer();
         ObtainRiskCardAction act = new ObtainRiskCardAction(state.getPlayer(player));
-        System.out.println("Interpreted draw command");
+        //System.out.println("Interpreted draw command");
         return act;
     }
 
@@ -380,4 +386,51 @@ public class GameEngine implements Runnable{
         int countryId = command.getPayloadAsInt();
         return  new SetupAction(state.getPlayer(command.getPlayer()),state.getCountryByID(countryId));
     }
+
+    public RandomNumberGenerator popSeed() {
+
+
+
+        try {
+
+            RandomNumberGenerator seed = new RandomNumberGenerator();
+
+            for (Client c : clients) {
+                c.newSeedComponent();
+                seed.addHash(c.getPlayerId(), c.getHexSeedHash());
+            }
+
+
+
+            for (Client c : clients) {
+
+                seed.addNumber(c.getPlayerId(), c.getHexSeed());
+            }
+
+            seed.finalise();
+            return seed;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return null;
+
+    }
+
+    public void removePlayer(int id) {
+
+            state.removePlayer(id);
+            clients.remove((getClientById(id)));
+            //System.out.println("player " + id + "lost");
+
+        }
+
+
+public Client getClientById(int id){
+    for (Client c : clients){
+        if (c.getPlayerId() == id)
+            return c;
+    }
+    return null;
+}
 }

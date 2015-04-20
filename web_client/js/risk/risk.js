@@ -9,7 +9,7 @@ var Risk = {
 	},
 
 	Settings :{
-		colors: {cyan: '#00ffe4', green: '#0f0', blue: '#00f', red: '#f00', purple: '#f0f', pink: '##ffcccc'}
+		colors: {cyan: '#00ffe4', green: '#0f0', blue: '#00f', red: '#f00', purple: '#f0f', pink: '#ffcccc'}
 	},
 
 	Territories: {},
@@ -114,6 +114,7 @@ var Risk = {
 	},
 
 	updateMap: function(){
+        Risk.stage.destroy();
 		$("#map").html(""); //clear old displayed map
 		Risk.Territories = {};
 
@@ -134,7 +135,7 @@ var Risk = {
 			scale: Risk.GlobalScale()
 		});
 
-		//Risk.drawBackgroundImg();
+		Risk.drawBackgroundImg();
 		Risk.drawTerritories();
 
 		Risk.stage.add(Risk.backgroundLayer);

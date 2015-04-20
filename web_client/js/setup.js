@@ -1,4 +1,4 @@
-var nonPlayingHost = false, aiPlayers = [];
+var nonPlayingHost = false, aiPlayers = [], aiForConnecting;
 
 $( document ).ready(function(){
     setOnchangeForIsHostPlayingRadioBtn();
@@ -45,6 +45,7 @@ function connect(){
             .done(function(response) {
                 if(response.indexOf("true") == 0) {
                     $("#connectButton").html("<h3>Waiting for Host to Start Game</h3>");
+                    if(aiForConnecting != null) nonPlayingHost =true;
                     gotoGamePlayWhenReady();
                 }else{
                     alert(response);
@@ -97,10 +98,6 @@ function host(){
         });
 }
 
-function freezeControls(){
-    $(":input").prop("disabled", true);
-}
-
 function setOnchangeForIsHostPlayingRadioBtn(){
     $("#hostForm").find("input[name=is_host_playing]").change( "click", function(){
         if($("#hostForm").find("input:checked[name=is_host_playing]").val() == "true"){
@@ -112,22 +109,48 @@ function setOnchangeForIsHostPlayingRadioBtn(){
         showAddAiPlayerBtnIfMaxPlayersNotReach();
     });
 }
+
 function provideAIoptionsForHostSetupPanel(){
     $.ajax( "/?operation=get_list_of_available_ai")
         .done(function(data) {
+
             var availableAiArray = JSON.parse(data);
             availableAiArray.sort();
-            var optionHtml = "";
-            for(aiNameIndex in availableAiArray){
-                var name = availableAiArray[aiNameIndex];
-                optionHtml += '<li><a href="#" onclick="aiSelected(\'' + name + '\')">' + name + '</a></li>';
-            }
-            $("#aiOptions").html(optionHtml);
+            $("[name=aiOptions]").each(function(index){
+                var optionHtml = "";
+                for(aiNameIndex in availableAiArray){
+                    var name = availableAiArray[aiNameIndex];
+                    optionHtml += '<li><a href="#" onclick="aiSelected(\'' + index + name + '\')">' + name + '</a></li>';
+                }
+               $(this).html(optionHtml);
+            });
         });
     
 }
 
-function aiSelected(aiType){
+function aiSelectedForConnect(aiType){
+    aiForConnecting = aiType;
+    displayAiForConencting();
+}
+
+function displayAiForConencting(){
+    if(aiForConnecting == null){
+        $("#aiSelectorForConnect").show();
+        $("#selectedConnectAI").hide();
+    }else{
+        $("#aiSelectorForConnect").hide();
+        $("#selectedConnectAI").show().html("<p>Connect as AI Player: <strong>" + aiForConnecting +
+        "</strong><small><a href='#' onclick='aiForConnecting = null; displayAiForConencting();'> (Remove)</a> </small></p>" +
+        '<input type="hidden" class="form-control" name="ai_player" value="' + aiForConnecting + "," + aiForConnecting + '">');
+    }
+}
+
+function aiSelected(data){
+    var isHost = data.substr(0,1) == "0";
+    var aiType = data.substr(1);
+
+    if(!isHost) return aiSelectedForConnect(aiType);
+
     var aiPlayer = {};
     aiPlayer.name = "";
     aiPlayer.type = aiType;

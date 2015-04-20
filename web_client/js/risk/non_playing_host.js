@@ -12,6 +12,8 @@ function setup(){
             //keep requesting state until it is your turn
             updateLots();
         });
+
+    $("#turnPanel").html("<h4>Watching Game...</h4>");
 }
 
 function getStateFromServer(functionToCallAfter){
@@ -24,7 +26,6 @@ function getStateFromServer(functionToCallAfter){
 
 function updateDisplay(){
     updatePlayerDisplay();
-    updateTurnPanel();
     Risk.updateMap();
     Risk.setTerritoriesColour();
 }
@@ -32,7 +33,7 @@ function updateDisplay(){
 function updatePlayerDisplay(){
     var playerInfo = "";
 
-        playerInfo += "<br/><h5><strong>You are the host!</strong></h5>";
+        //playerInfo += "<br/><h5><strong>You are the host!</strong></h5>";
 
     playerInfo += "<h3>Players</h3>";
     game_state.players.forEach(function(player){
@@ -42,21 +43,10 @@ function updatePlayerDisplay(){
     $("#playerInfo").html(playerInfo);
 }
 
-function updateTurnPanel(){
-        $("#turnPanel").html("<h4>Watching Game...</h4>");
-}
-
-
-
 
 function updateLots(){
     getStateFromServer(function(){
             updateDisplay();
-            setTimeout(updateLots, 300);
-    });
-}
-
-function claimCountryDuringSetup(country_id){
-    $.get('/?operation=perform_action&action=setup_claim_country&country_id=' + country_id, function(response){
+            setTimeout(updateLots, 500);
     });
 }

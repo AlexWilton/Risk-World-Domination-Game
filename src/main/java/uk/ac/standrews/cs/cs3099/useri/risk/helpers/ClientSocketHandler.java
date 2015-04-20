@@ -6,6 +6,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.ClientApp;
@@ -26,7 +27,7 @@ import java.util.HashMap;
  */
 public class ClientSocketHandler implements Runnable {
 
-
+    private WebClient webClientForWatchOnlyServer = null;
     private HashMap<Integer,HashMap<Integer,Boolean>> ackRecieved;
 
     private int waitingOn = -1;
@@ -45,6 +46,10 @@ public class ClientSocketHandler implements Runnable {
             System.out.println("player " + id + "lost");
 
         }
+    }
+
+    public void setWebClientForWatchOnlyServer(WebClient webClient) {
+        webClientForWatchOnlyServer = webClient;
     }
 
     public enum ProtocolState {
@@ -87,6 +92,8 @@ public class ClientSocketHandler implements Runnable {
     public void linkGameState(State state) {
         gameState = state;
         localClient.setState(state);
+        if(webClientForWatchOnlyServer != null)
+            webClientForWatchOnlyServer.setState(state);
     }
 
 

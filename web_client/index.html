@@ -68,7 +68,7 @@
                                 <div id="hostAIoptions"></div>
                                 <div id="aiAdder" class="btn-group">
                                     <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><strong>Add AI player to Game</strong><span class="caret"></span></button>
-                                    <ul class="dropdown-menu" id="aiOptions">
+                                    <ul class="dropdown-menu" name="aiOptions">
                                     </ul>
                                 </div>
                                 <br/><br/>
@@ -104,7 +104,14 @@
                                     <label>Player's Name:</label>
                                     <input type="text" class="form-control" name="player_name" value="Carol" style="width:150px;">
                                 </div>
-                                <br/><br/><br/>
+                                <br/><br/>
+                                <div id="selectedConnectAI"></div>
+                                <div id="aiSelectorForConnect" class="btn-group">
+                                    <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><strong>Add AI player to Game</strong><span class="caret"></span></button>
+                                    <ul class="dropdown-menu" name="aiOptions">
+                                    </ul>
+                                </div>
+                                <br/><br/>
                                 <button type="button" class="btn btn-primary btn-lg btn-block" onclick="connect()" id="connectButton">Connect To Game!</button>
                             </form>
                         </div>

@@ -12,6 +12,8 @@ public class Continent implements JSONAware {
     private String name;
     private int id;
 
+
+
     /**
      * Constructor of the Continent Object
      * @param id integer defining the continent
@@ -68,6 +70,31 @@ public class Continent implements JSONAware {
         CountrySet ret = new CountrySet();
         for (Country c : countries){
             if (c.getOwner() == null){
+                ret.add(c);
+            }
+        }
+
+        return ret;
+    }
+
+    public CountrySet getCountriesNotOwnedBy(int id){
+        CountrySet ret = new CountrySet();
+        for (Country c : countries){
+            if (c.getOwner().getID() != id){
+                ret.add(c);
+            }
+        }
+
+        return ret;
+    }
+
+    public CountrySet getCountriesOwnedBy(int id){
+        CountrySet ret = new CountrySet();
+        for (Country c : countries){
+            if (c.getOwner() == null){
+                continue;
+            }
+            else if (c.getOwner().getID() == id){
                 ret.add(c);
             }
         }

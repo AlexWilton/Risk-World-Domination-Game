@@ -24,7 +24,28 @@ public class CountryStrategy {
     }
 
     public double getImportance () {
-        return importance;
+        Continent c = state.getCountryContinent(country.getCountryId());
+        double proportionOwned = ((double)c.getCountriesOwnedBy(player.getID()).size())/((double)c.getCountries().size());
+        double enemiesAround = 0;
+
+        for (Country en : country.getEnemyNeighbours()){
+            enemiesAround += en.getTroops();
+        }
+
+        if (country.getOwner() == null)
+            return 0;
+        if (country.getOwner().getID() == player.getID()){
+
+            return proportionOwned * c.getReinforcementValue() * enemiesAround/((double)country.getTroops()) ;
+        } else {
+            double sameAround = 0;
+            for (Country neighbour : country.getNeighboursOwnedBy(player.getID())){
+                sameAround += neighbour.getTroops();
+            }
+            //do we want it?
+            return proportionOwned * c.getReinforcementValue() - country.getTroops()/sameAround;
+        }
+
     }
     public Command getCommandForThisStrategy(){
 
@@ -201,8 +222,14 @@ public class CountryStrategy {
             CountrySet surr = country.getNeighboursOwnedBy(player.getID());
             if (surr.size() != 0) {
                 int armiesPC = player.getUnassignedArmies()/surr.size();
+                int rest = player.getUnassignedArmies()-armiesPC*surr.size();
                 for (Country c : surr) {
-                    deployTuples.add(new DeployTuple(c.getCountryId(),armiesPC));
+                    int dep = armiesPC;
+                    if (rest >= 1){
+                        dep ++;
+                        rest--;
+                    }
+                    deployTuples.add(new DeployTuple(c.getCountryId(),dep));
                 }
 
             } else {

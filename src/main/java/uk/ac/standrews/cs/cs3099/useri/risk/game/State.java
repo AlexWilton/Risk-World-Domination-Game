@@ -39,6 +39,16 @@ public class State implements JSONAware {
 
     }
 
+    public Continent getCountryContinent(int country){
+        for (Continent c : map.getContinents()){
+            if (c.getCountries().contains(getCountryByID(country))){
+                return c;
+            }
+        }
+
+        return null;
+    }
+
 
 
     public void setup(Map map, ArrayList<Player> players){

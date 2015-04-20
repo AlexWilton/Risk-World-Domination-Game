@@ -120,6 +120,17 @@ public class Country implements JSONAware{
         return ret;
     }
 
+    public CountrySet getNeighboursNotOwnedBy(int id) {
+        CountrySet ret = new CountrySet();
+        for (Country c : getNeighbours()){
+            if (c.getOwner().getID() != id){
+                ret.add(c);
+            }
+        }
+
+        return ret;
+    }
+
     public Country getClosestCountryOwnedBy(int id) {
         CountrySet currConnected = this.getNeighbours();
         while (true){

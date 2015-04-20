@@ -29,6 +29,7 @@ function updateDisplay(){
     updateTurnPanel();
     Risk.updateMap();
     Risk.setTerritoriesColour();
+    checkForEndGame();
 }
 
 function updatePlayerDisplay(){
@@ -491,5 +492,37 @@ function claimCountryDuringSetup(country_id){
             'Selection not valid. Please try again.' +
             '</div>');
         }
+    });
+}
+
+function checkForEndGame(){
+    if(game_state.winner != null) {
+        setTimeout(function(){
+            //window.location.href = "/endGame.html";
+            if(game_state.winner.ID == my_player_id){
+                $.ajax("/win.html").done(function(html){
+                    document.open();
+                    document.write(html);
+                    var newText = "<strong>Congratulations " + game_state.winner.name + "!</strong> (id: " + game_state.winner.ID + ")" +
+                        "<p/>You have successfully taken over the world!";
+                    $("#winText").html(newText);
+                });
+            }else{
+                $.ajax("/lose.html").done(function(html){
+                    document.open();
+                    document.write(html);
+                    var newText = "<strong>Unlucky! You have lost!</strong> " +
+                        "<p/> Player " + game_state.winner.name + " (id: " + game_state.winner.ID + ") has beaten you!" +
+                        "<p/><br/><small>Better luck next time.</small>";
+                    document.getElementById("loseText").innerHTML = newText;
+                });
+            }
+        }, 2000);
+    }
+}
+
+function restart(){
+    $.ajax("/?operation=restart_everything").done(function(response){
+        window.location.href = "/";
     });
 }

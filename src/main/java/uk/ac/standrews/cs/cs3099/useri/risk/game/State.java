@@ -343,4 +343,9 @@ public class State implements JSONAware {
         attackCaptureDestination = null;
         attackCaptureMinimumArmiesToMove = -1;
     }
+
+    public CountrySet getAllCounttriesInMap(){
+        return map.getAllCountries();
+    }
+
 }

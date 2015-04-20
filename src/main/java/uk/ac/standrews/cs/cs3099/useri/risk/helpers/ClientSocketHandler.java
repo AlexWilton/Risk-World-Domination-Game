@@ -266,7 +266,6 @@ public class ClientSocketHandler implements Runnable {
 
             } catch (IOException e) {
                 e.printStackTrace();
-                System.exit(0);
             }
 
         }
@@ -465,6 +464,7 @@ public class ClientSocketHandler implements Runnable {
             }
         }
         Command command = Command.parseCommand(currentIn);
+        //System.out.println("recieved: " + currentIn);
 
         //Acknowledge if required
         if (command.containsKey("ack_id")) {
@@ -474,7 +474,7 @@ public class ClientSocketHandler implements Runnable {
             out.flush();
         }
 
-        //System.err.println(command.toJSONString());
+        System.err.println(command.toJSONString());
 
 
         return command;

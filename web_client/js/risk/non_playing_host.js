@@ -6,7 +6,6 @@ function setup(){
         my_player_id = -1;
         getStateFromServer(function(){
             Risk.init();
-            console.log(game_state);
             updateDisplay();
 
             //keep requesting state until it is your turn
@@ -28,6 +27,7 @@ function updateDisplay(){
     updatePlayerDisplay();
     Risk.updateMap();
     Risk.setTerritoriesColour();
+    checkForEndGame();
 }
 
 function updatePlayerDisplay(){
@@ -48,5 +48,28 @@ function updateLots(){
     getStateFromServer(function(){
             updateDisplay();
             setTimeout(updateLots, 500);
+    });
+}
+
+
+function checkForEndGame(){
+    if(game_state.winner != null) {
+            setTimeout(function(){
+                //window.location.href = "/endGame.html";
+                $.ajax("/endGame.html").done(function(html){
+                    document.open();
+                    document.write(html);
+                    var newText = "<strong>Congratulations " + game_state.winner.name + "!</strong> (id: " + game_state.winner.ID + ")" +
+                        "<p/>They have successfully taken over the world!";
+                        document.getElementById("gameOverText").innerHTML = newText;
+                })
+
+            }, 2500);
+    }
+}
+
+function restart(){
+    $.ajax("/?operation=restart_everything").done(function(response){
+        window.location.href = "/";
     });
 }

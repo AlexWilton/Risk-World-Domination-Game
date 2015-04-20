@@ -1,4 +1,4 @@
-package uk.ac.standrews.cs.cs3099.useri.risk.helpers;
+package uk.ac.standrews.cs.cs3099.useri.risk.testHelper;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.CLIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;

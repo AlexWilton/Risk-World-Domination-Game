@@ -180,6 +180,15 @@ public class Map implements JSONAware{
                 }
             }
         }
+
+        int totalNumberOfWildcards = Integer.parseInt(mapData.get("wildcards").toString());
+
+        for(int wildCardNum=0; wildCardNum < totalNumberOfWildcards; wildCardNum++){
+            cards.push(new RiskCard(RiskCardType.TYPE_WILDCARD, cards.size() + wildCardNum));
+        }
+        
+
+
         return cards;
     }
 

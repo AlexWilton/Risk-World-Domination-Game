@@ -33,8 +33,9 @@ public class CommandRaterAIClient extends Client{
     double setupOpponentNeighboursWeight = .5f;
     double setupOwnNeighboursWeight = -.5;
     double continentCompletionWeight = 0.5f;
-    double maxSameCountryDeployments = 5;
     double importanceWeight = 1;
+
+    double maxSameCountryDeployments = 5;
 
 
 

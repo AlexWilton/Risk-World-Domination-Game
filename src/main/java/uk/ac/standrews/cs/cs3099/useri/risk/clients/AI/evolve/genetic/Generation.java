@@ -79,6 +79,15 @@ public class Generation {
 		individuals = new LinkedList<Genome>();
 	}
 
+    public Generation(FitnessTester fitnessTester, Initialiser initialiser,
+                       Crosser crosser, ArrayList<Genome> initialGenomes) {
+        this.crosser = crosser;
+        this.initialiser = initialiser;
+        this.fitnessTester = fitnessTester;
+        generationNumber = 0;
+        individuals = new LinkedList<Genome>();
+    }
+
 	/**
 	 * initialises a generation at random
 	 */

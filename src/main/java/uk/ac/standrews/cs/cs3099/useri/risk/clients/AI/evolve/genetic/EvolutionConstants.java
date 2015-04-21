@@ -8,7 +8,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic;
  */
 public abstract class EvolutionConstants {
 
-	public static final int POPULATION_SIZE = 200;
+	public static final int POPULATION_SIZE = 100;
 	public static final double MUTATION_RATE = 0.05d;
 	public static final double ELITE_PRESERVED = 0.10d;
 	public static final double FRESH_BLOOD = 0.10d;

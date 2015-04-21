@@ -11,7 +11,8 @@ import java.util.Scanner;
  */
 public class Genome {
 
-	int fitness = -1;
+	int fitness = 0;
+
 
 	private LinkedList<Gene> genes;
 	public static Random rand = new Random();
@@ -25,6 +26,7 @@ public class Genome {
 			if (rand.nextDouble() <= EvolutionConstants.MUTATION_RATE)
 				g.mutate();
 	}
+
 
 	public void addGene(Gene gene) {
 		this.genes.addLast(gene);

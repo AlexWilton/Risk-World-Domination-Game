@@ -38,4 +38,8 @@ public class MultiplierGene implements Gene{
         value = Double.parseDouble(in);
 
     }
+
+    public double getValue() {
+        return value;
+    }
 }

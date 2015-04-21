@@ -1,5 +1,8 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.CommandRaterFitnessTester;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.RatedCommand;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -79,13 +82,17 @@ public class Generation {
 		individuals = new LinkedList<Genome>();
 	}
 
+    /**
+     * Constructor, creates an empty generation and adds the initially contained genome
+     */
     public Generation(FitnessTester fitnessTester, Initialiser initialiser,
                        Crosser crosser, ArrayList<Genome> initialGenomes) {
         this.crosser = crosser;
         this.initialiser = initialiser;
         this.fitnessTester = fitnessTester;
         generationNumber = 0;
-        individuals = new LinkedList<Genome>();
+        individuals = new LinkedList<>();
+        individuals.addAll(initialGenomes);
     }
 
 	/**
@@ -94,11 +101,12 @@ public class Generation {
 	public void randomInit(int populationSize) throws InstantiationException,
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException, NoSuchMethodException, SecurityException {
-		for (int i = 0; i < populationSize; i++) {
+		for (int i = individuals.size(); i < populationSize; i++) {
 			Genome temp = new Genome();
 			temp.randomValidInitialisation(initialiser);
 			individuals.add(temp);
 		}
+        ((CommandRaterFitnessTester) fitnessTester).makeAllClients(individuals);
 		sortForFitness();
 
 	}
@@ -181,5 +189,9 @@ public class Generation {
 	public int getGenerationNumber() {
 		return this.generationNumber;
 	}
+
+    public LinkedList<Genome> getAllGenomes() {
+        return individuals;
+    }
 
 }

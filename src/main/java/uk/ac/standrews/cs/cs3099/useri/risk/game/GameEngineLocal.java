@@ -14,10 +14,11 @@ import java.util.ArrayList;
  * runs the main game loop and gets turns from the players
  *
  */
-public class GameEngineLocal implements Runnable{
+public class GameEngineLocal {
 
     private State state;
     private ArrayList<Client> clients;
+    private int maxTurns;
 
     /**
      * GameEngine constructor which takes clientsockethandler
@@ -27,12 +28,16 @@ public class GameEngineLocal implements Runnable{
 
     }
 
-    @Override
-    public void run(){
+
+    public void run(int maxTurns){
+        this.maxTurns = maxTurns;
         initialise();
         gameLoop();
     }
 
+    public int getPlayerPoints(int id) {
+        return state.getPlayerPoints(id);
+    }
 
 
     /**
@@ -104,7 +109,7 @@ public class GameEngineLocal implements Runnable{
     public void gameLoop(){
         System.out.println("Game Loop running...");
         Player currentPlayer;
-        while(true) {
+        while(state.getTurns() <= maxTurns) {
             currentPlayer = state.getCurrentPlayer();
             //System.out.println("Ask player " + currentPlayer.getID() + " (" + currentPlayer.getName() + ")");
             Command currentCommand = currentPlayer.getClient().popCommand();
@@ -396,30 +401,40 @@ public class GameEngineLocal implements Runnable{
     public RandomNumberGenerator popSeed() {
 
 
-
-        try {
-
             RandomNumberGenerator seed = new RandomNumberGenerator();
 
             for (Client c : clients) {
                 c.newSeedComponent();
-                seed.addHash(c.getPlayerId(), c.getHexSeedHash());
+                try {
+                    seed.addHash(c.getPlayerId(), c.getHexSeedHash());
+                } catch (HashMismatchException e) {
+                    e.printStackTrace();
+                    System.exit(0);
+                }
             }
 
 
 
             for (Client c : clients) {
 
-                seed.addNumber(c.getPlayerId(), c.getHexSeed());
+                try {
+                    seed.addNumber(c.getPlayerId(), c.getHexSeed());
+                } catch (HashMismatchException e) {
+                    e.printStackTrace();
+                    System.exit(0);
+                }
+
             }
 
+        try {
             seed.finalise();
-            return seed;
-        } catch (Exception e) {
+        } catch (HashMismatchException e) {
             e.printStackTrace();
-            System.exit(1);
+            System.exit(0);
         }
-        return null;
+        return seed;
+
+
 
     }
 

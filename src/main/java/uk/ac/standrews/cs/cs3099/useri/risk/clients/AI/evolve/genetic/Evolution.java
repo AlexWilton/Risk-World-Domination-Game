@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 
 /**
  * Performs the evolution, can save its state to a file and load from a file
@@ -18,6 +19,15 @@ public class Evolution {
 		currentGeneration = new Generation(fitnessTester, initialiser, crosser);
 		currentGeneration.randomInit(EvolutionConstants.POPULATION_SIZE);
 	}
+
+    public static void startEvolution(FitnessTester fitnessTester,
+                                      Initialiser initialiser, Crosser crosser, ArrayList<Genome> initialIndividuals)
+            throws InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException,
+            NoSuchMethodException, SecurityException {
+        currentGeneration = new Generation(fitnessTester, initialiser, crosser,initialIndividuals);
+        currentGeneration.randomInit(EvolutionConstants.POPULATION_SIZE);
+    }
 
 	/**
 	 * go 1 step further for the evolution

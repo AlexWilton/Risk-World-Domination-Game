@@ -40,6 +40,15 @@ public class Player implements JSONAware{
         return ID;
     }
 
+    public int sumAllTroops(){
+        int sum = 0;
+        for (Country c : occupiedCountries){
+            sum += c.getTroops();
+        }
+
+        return sum;
+    }
+
     public void addCountry(Country c){
         occupiedCountries.add(c);
     }

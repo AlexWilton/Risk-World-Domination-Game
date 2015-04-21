@@ -1,45 +1,48 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.json.simple.JSONArray;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.AttackAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic.Gene;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic.Genome;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by po26 on 20/04/15.
  */
 public class CommandRaterAIClient extends Client{
 
-    double fortifyOldEnemyNeighboursWeight = -0.5f;
-    double fortifyNewEnemyNeighboursWeight = .5f;
-    double fortifyOriginArmiesLeft = 1;
-    double fortifyTargetArmies = -1;
-    double attackCountryArmiesWeight = 1;
-    double attackEnemyArmiesWeight = -1;
-    double attackNewFriendlyHelpersWeight = .5f;
-    double attackNewEnemyNeighbours = -.5f;
-    double deployCountryOpponentsWeight = 1;
-    double deployCountryArmiesWeight = -1;
-    double setupOwnArmiesWeight = -1;
-    double setupOpponentNeighboursWeight = .5f;
-    double setupOwnNeighboursWeight = -.5;
-    double continentCompletionWeight = 0.5f;
-    double importanceWeight = 1;
 
-    double maxSameCountryDeployments = 5;
-
-
+        public static int FORTIFY_OLD_ENEMY_NEIGHBOURS_WEIGHT_INDEX = 0;
+        public static int FORTIFY_NEW_ENEMY_NEIGHBOURS_WEIGHT_INDEX= 1;
+        public static int FORTIFY_ORIGIN_ARMIES_LEFT_INDEX= 2;
+        public static int FORTIFY_TARGET_ARMIES_INDEX= 3;
+        public static int ATTACK_COUNTRY_ARMIES_WEIGHT_INDEX= 4;
+        public static int ATTACK_ENEMY_ARMIES_WEIGHT_INDEX= 5;
+        public static int ATTACK_NEW_FRIENDLY_HELPERS_WEIGHT_INDEX= 6;
+        public static int ATTACK_NEW_ENEMY_NEIGHBOURS_INDEX= 7;
+        public static int DEPLOY_COUNTRY_OPPONENTS_WEIGHT_INDEX= 8;
+        public static int DEPLOY_COUNTRY_ARMIES_WEIGHT_INDEX= 9;
+        public static int SETUP_OWN_ARMIES_WEIGHT_INDEX= 10;
+        public static int SETUP_OPPONENT_NEIGHBOURS_WEIGHT_INDEX= 11;
+        public static int SETUP_OWN_NEIGHBOURS_WEIGHT_INDEX= 12;
+        public static int CONTINENT_COMPLETION_WEIGHT_INDEX= 13;
+        public static int IMPORTANCE_WEIGHT_INDEX= 14;
+        public static int MAX_SAME_COUNTRY_DEPLOYMENTS_INDEX= 15;
 
 
+
+
+
+
+    private ArrayList<Double> weights;
     private int sameCountryDeployments = 0;
     private int blockedDeploy;
 
@@ -52,7 +55,46 @@ public class CommandRaterAIClient extends Client{
 
     public CommandRaterAIClient(){
         super(null,new RandomNumberGenerator());
+        weights = new ArrayList<>();
+        weights.add(-0.5d);
+        weights.add(.5d);
+        weights.add(1d);
+        weights.add(-1d);
+        weights.add(1d);
+        weights.add(-1d);
+        weights.add(.5d);
+        weights.add(-.5d);
+        weights.add(1d);
+        weights.add(-1d);
+        weights.add(-1d);
+        weights.add(.5d);
+        weights.add(-.5d);
+        weights.add(.5d);
+        weights.add(1d);
+        weights.add(5d);
 
+
+    }
+
+    public CommandRaterAIClient(LinkedList<Gene> genes){
+        super(null,new RandomNumberGenerator());
+        weights = new ArrayList<>();
+        weights.add(((MultiplierGene) genes.get(0)).getValue());
+        weights.add(((MultiplierGene) genes.get(1)).getValue());
+        weights.add(((MultiplierGene) genes.get(2)).getValue());
+        weights.add(((MultiplierGene) genes.get(3)).getValue());
+        weights.add(((MultiplierGene) genes.get(4)).getValue());
+        weights.add(((MultiplierGene) genes.get(5)).getValue());
+        weights.add(((MultiplierGene) genes.get(6)).getValue());
+        weights.add(((MultiplierGene) genes.get(7)).getValue());
+        weights.add(((MultiplierGene) genes.get(8)).getValue());
+        weights.add(((MultiplierGene) genes.get(9)).getValue());
+        weights.add(((MultiplierGene) genes.get(10)).getValue());
+        weights.add(((MultiplierGene) genes.get(11)).getValue());
+        weights.add(((MultiplierGene) genes.get(12)).getValue());
+        weights.add(((MultiplierGene)genes.get(13)).getValue());
+        weights.add(((MultiplierGene)genes.get(14)).getValue());
+        weights.add((double) ((ConstantVarGene)genes.get(15)).getValue());
 
     }
 
@@ -83,6 +125,18 @@ public class CommandRaterAIClient extends Client{
         return true;
     }
 
+    public void reset() {
+        sameCountryDeployments = 0;
+        blockedDeploy = -1;
+
+
+        lastCommand = null;
+        lastDeploy = null;
+        hasDrawn = false;
+
+        strategies = null;
+    }
+
     @Override
     public Command popCommand(){
 
@@ -93,9 +147,13 @@ public class CommandRaterAIClient extends Client{
             }
         }
 
-        if (sameCountryDeployments > maxSameCountryDeployments){
+        if (sameCountryDeployments > weights.get(MAX_SAME_COUNTRY_DEPLOYMENTS_INDEX) && lastDeploy != null){
             sameCountryDeployments = 0;
-            blockedDeploy = (Integer.parseInt(((JSONArray)lastDeploy.getPayloadAsArray().get(0)).get(0).toString()));
+            try {
+                blockedDeploy = (Integer.parseInt(((JSONArray) lastDeploy.getPayloadAsArray().get(0)).get(0).toString()));
+            } catch (NullPointerException e){
+                System.out.println("wrong");
+            }
         }
 
 
@@ -162,8 +220,21 @@ public class CommandRaterAIClient extends Client{
         }
 
         Collections.sort(commands);
+        if (commands.size() < 1) {
 
+            for (CountryStrategy strat : strategies.values()){
+                RatedCommand rc = rateDeployCommand(strat);
+                if (rc != null)
+                    commands.add(rc);
+            }
+        }
+    try {
         return commands.get(0).command;
+    } catch (IndexOutOfBoundsException e ){
+        if(true);
+        return null;
+    }
+
     }
 
     public Command getBestAttackCaptureCommand() {
@@ -211,7 +282,9 @@ public class CommandRaterAIClient extends Client{
 
         Collections.sort(commands);
 
-        return commands.get(0).command;
+        if (commands.size() > 0)
+            return commands.get(0).command;
+        else return null;
     }
 
     public Command getBestSetupCommand(){
@@ -244,9 +317,9 @@ public class CommandRaterAIClient extends Client{
         for (Country neighbour : country.getEnemyNeighbours()){
             friendlyArmiesAround += neighbour.getTroops();
         }
-        double rating = importanceWeight * strat.getImportance() + setupOwnArmiesWeight * countryArmies +
-                setupOpponentNeighboursWeight * opponentArmiesAround +
-                setupOwnNeighboursWeight * friendlyArmiesAround +
+        double rating = weights.get(IMPORTANCE_WEIGHT_INDEX) * strat.getImportance() + weights.get(SETUP_OWN_ARMIES_WEIGHT_INDEX) * countryArmies +
+                weights.get(SETUP_OPPONENT_NEIGHBOURS_WEIGHT_INDEX) * opponentArmiesAround +
+                weights.get(SETUP_OWN_NEIGHBOURS_WEIGHT_INDEX) * friendlyArmiesAround +
                 calcContinentImportance(strat.country);
 
 
@@ -261,7 +334,7 @@ public class CommandRaterAIClient extends Client{
             return null;
 
         JSONArray arr = c.getPayloadAsArray();
-        double rating = importanceWeight * strat.getImportance() ;
+        double rating = weights.get(IMPORTANCE_WEIGHT_INDEX) * strat.getImportance() ;
 
         for (Object row : arr ) {
             Country country = gameState.getCountryByID(Integer.parseInt(((JSONArray) row).get(0).toString()));
@@ -272,8 +345,8 @@ public class CommandRaterAIClient extends Client{
                 opponentArmiesAround += neighbour.getTroops();
             }
 
-            rating += (weight * (deployCountryArmiesWeight*countryArmies +
-                    deployCountryOpponentsWeight * opponentArmiesAround))+
+            rating += (weight * (weights.get(DEPLOY_COUNTRY_ARMIES_WEIGHT_INDEX)*countryArmies +
+                    weights.get(DEPLOY_COUNTRY_OPPONENTS_WEIGHT_INDEX) * opponentArmiesAround))+
                     calcContinentImportance(strat.country);
         }
 
@@ -305,11 +378,11 @@ public class CommandRaterAIClient extends Client{
             enemyArmies += neighbour.getTroops();
         }
 
-        double rating = importanceWeight * strat.getImportance() +
-                attackCountryArmiesWeight * origin.getTroops() +
-                attackEnemyArmiesWeight * target.getTroops() +
-                attackNewFriendlyHelpersWeight * friendlyArmies +
-                attackNewEnemyNeighbours * enemyArmies+
+        double rating = weights.get(IMPORTANCE_WEIGHT_INDEX) * strat.getImportance() +
+                weights.get(ATTACK_COUNTRY_ARMIES_WEIGHT_INDEX) * origin.getTroops() +
+                weights.get(ATTACK_ENEMY_ARMIES_WEIGHT_INDEX) * target.getTroops() +
+                weights.get(ATTACK_NEW_FRIENDLY_HELPERS_WEIGHT_INDEX) * friendlyArmies +
+                weights.get(ATTACK_NEW_ENEMY_NEIGHBOURS_INDEX) * enemyArmies+
                 calcContinentImportance(strat.country);
 
 
@@ -340,11 +413,11 @@ public class CommandRaterAIClient extends Client{
         }
 
 
-        double rating = importanceWeight * strat.getImportance() +
-                fortifyNewEnemyNeighboursWeight * newEnemyNeighbours +
-                fortifyOldEnemyNeighboursWeight * oldEnemyNeighbours +
-                fortifyOriginArmiesLeft * (origin.getTroops()-armies) +
-                fortifyTargetArmies * (target.getTroops()+armies)-100 +
+        double rating = weights.get(IMPORTANCE_WEIGHT_INDEX) * strat.getImportance() +
+                weights.get(FORTIFY_NEW_ENEMY_NEIGHBOURS_WEIGHT_INDEX) * newEnemyNeighbours +
+                weights.get(FORTIFY_OLD_ENEMY_NEIGHBOURS_WEIGHT_INDEX) * oldEnemyNeighbours +
+                weights.get(FORTIFY_ORIGIN_ARMIES_LEFT_INDEX) * (origin.getTroops()-armies) +
+                weights.get(FORTIFY_TARGET_ARMIES_INDEX) * (target.getTroops()+armies) +
         calcContinentImportance(strat.country);
 
 
@@ -395,6 +468,18 @@ public class CommandRaterAIClient extends Client{
 
    private double calcContinentImportance(Country c ){
        Continent conti = gameState.getCountryContinent(c.getCountryId());
-       return conti.getCountriesOwnedBy(playerId).size()/conti.getCountries().size() * continentCompletionWeight * conti.getReinforcementValue();
+       return conti.getCountriesOwnedBy(playerId).size()/conti.getCountries().size() * weights.get(CONTINENT_COMPLETION_WEIGHT_INDEX) * conti.getReinforcementValue();
    }
+
+    public Genome toWeightSet (){
+        Genome ret = new Genome();
+        for (double d : weights){
+            if (Math.abs(d) < 1.001f)
+                ret.addGene(new MultiplierGene(d));
+            else
+                ret.addGene(new ConstantVarGene((int) d));
+        }
+
+        return ret;
+    }
 }

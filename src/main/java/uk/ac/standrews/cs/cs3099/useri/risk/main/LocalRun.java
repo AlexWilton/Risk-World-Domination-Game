@@ -18,7 +18,7 @@ public class LocalRun {
     static int playLocalGame(ArrayList<Client> clients){
         GameEngineLocal g = new GameEngineLocal();
         g.initialise(clients);
-        g.run();
+        g.run(3000);
 
         return g.getWinner();
     }

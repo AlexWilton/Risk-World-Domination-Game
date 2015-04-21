@@ -23,6 +23,10 @@ public class ConstantVarGene implements Gene{
         this.value = value;
     }
 
+    public int getValue() {
+        return value;
+    }
+
     @Override
     public void mutate() {
         value = Math.abs(r.nextInt())%(MAX-MIN) + MIN;

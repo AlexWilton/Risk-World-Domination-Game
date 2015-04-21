@@ -183,7 +183,7 @@ public class GameEngineLocal {
             if (playerAction.validateAgainstState(state)) {
                 playerAction.performOnState(state);
             } else {
-                //System.out.println("Error move did not validate: " + currentCommand);
+                System.out.println("Error move did not validate: " + currentCommand);
                 System.exit(1);
             }
         }

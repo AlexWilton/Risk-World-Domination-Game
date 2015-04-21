@@ -1,6 +1,10 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Continent;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.CountrySet;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
 import java.util.ArrayList;
@@ -212,17 +216,40 @@ public class CountryStrategy {
 
         //deploy all to this, or around neighbours
         if (country.getOwner().getID() == player.getID()){
-            DeployTuple depTup = new DeployTuple(country.getCountryId(),player.getUnassignedArmies());
             ArrayList<DeployTuple> deployTuples = new ArrayList<>();
+            int armiesLeft = player.getUnassignedArmies();
+
+            CountrySet mustDeployTo = state.getSetOfCountriesWhereAtLeastOneNeedsToBeDeployedTo();
+            if (mustDeployTo != null) {
+                for (Country c : mustDeployTo) {
+                    DeployTuple temp = new DeployTuple(c.getCountryId(), 2);
+                    armiesLeft -= 2;
+                    deployTuples.add(temp);
+                }
+            }
+
+            DeployTuple depTup = new DeployTuple(country.getCountryId(),armiesLeft);
+
             deployTuples.add(depTup);
             return new DeployCommand(deployTuples,player.getID());
         } else{
             //put them equally into surrounding countries
             ArrayList<DeployTuple> deployTuples = new ArrayList<>();
+            int armiesLeft = player.getUnassignedArmies();
+
+            CountrySet mustDeployTo = state.getSetOfCountriesWhereAtLeastOneNeedsToBeDeployedTo();
+
+            if (mustDeployTo != null) {
+                for (Country c : mustDeployTo) {
+                    DeployTuple temp = new DeployTuple(c.getCountryId(), 2);
+                    armiesLeft -= 2;
+                    deployTuples.add(temp);
+                }
+            }
             CountrySet surr = country.getNeighboursOwnedBy(player.getID());
             if (surr.size() != 0) {
-                int armiesPC = player.getUnassignedArmies()/surr.size();
-                int rest = player.getUnassignedArmies()-armiesPC*surr.size();
+                int armiesPC = armiesLeft/surr.size();
+                int rest = armiesLeft-armiesPC*surr.size();
                 for (Country c : surr) {
                     int dep = armiesPC;
                     if (rest >= 1){
@@ -233,7 +260,7 @@ public class CountryStrategy {
                 }
 
             } else {
-                deployTuples.add(new DeployTuple(country.getClosestCountryOwnedBy(player.getID()).getCountryId(),player.getUnassignedArmies()));
+                deployTuples.add(new DeployTuple(country.getClosestCountryOwnedBy(player.getID()).getCountryId(),armiesLeft));
             }
 
             return new DeployCommand(deployTuples,player.getID());

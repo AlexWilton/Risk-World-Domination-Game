@@ -2,12 +2,15 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.json.simple.JSONArray;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.AttackAction;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.TradeAction;
+
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic.Gene;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic.Genome;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.action.TradeAction;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Continent;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 

@@ -5,7 +5,6 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.json.simple.JSONArray;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.AIApp;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.AIRunner;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.ClientApp;

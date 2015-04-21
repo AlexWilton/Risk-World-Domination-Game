@@ -1,6 +1,7 @@
-package uk.ac.standrews.cs.cs3099.useri.risk.clients;
+package uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient;
 
 
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.action.ObtainRiskCardAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.action.SetupAction;

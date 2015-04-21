@@ -2,7 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import org.json.simple.JSONArray;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Map;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.HashMismatchException;

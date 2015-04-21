@@ -1,6 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.main;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.WebClient;
 
 /**
  * Main Class for start of program execution

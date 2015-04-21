@@ -5,9 +5,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.webapp.WebAppContext;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
-
-import java.net.BindException;
 
 /**
  * Jetty Server for serving Web Client

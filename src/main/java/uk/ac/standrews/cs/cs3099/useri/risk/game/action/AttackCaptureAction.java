@@ -34,9 +34,7 @@ public class AttackCaptureAction  extends Action {
             return false;
         if (state.getCountryByID(origin).getTroops() <= armies)
             return false;
-        if(!state.isAttackCaptureNeeded())
-            return false;
-        return true;
+        return state.isAttackCaptureNeeded();
     }
 
     @Override

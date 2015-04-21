@@ -54,7 +54,7 @@ public class GreyhoundAIClient extends AI{
         }
         ArrayList<Command> possible = getAllPossibleCommands();
         Random r = new Random();
-        Command ret = possible.get((int)(r.nextDouble()*possible.size()));;
+        Command ret = possible.get((int)(r.nextDouble()*possible.size()));
         if (ret instanceof AttackCommand)
             lastAttack = (AttackCommand)ret;
         else

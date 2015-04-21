@@ -7,7 +7,7 @@ function AssetManager() {
 
 AssetManager.prototype.queueDownload = function(path) {
 	this.downloadQueue.push(path); 
-}
+};
 
 AssetManager.prototype.downloadAll = function(downloadCallback) {
 	//if no assets
@@ -33,7 +33,7 @@ AssetManager.prototype.downloadAll = function(downloadCallback) {
 		}, false);
 		img.src = path;
 		this.cache['path'] = img;
-	};
+	}
 };
 
 AssetManager.prototype.isDone = function() {

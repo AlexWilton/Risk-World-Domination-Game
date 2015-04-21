@@ -4,6 +4,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.BulldogAIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.ChihuahuaAIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.GreatDaneAIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.GreyhoundAIClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.CommandRaterAIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public class AIApp {
         aiClients.add("Greyhound");
         aiClients.add("GreatDane");
         aiClients.add("Chihuahua");
+        aiClients.add("CommandRater");
         return aiClients;
     }
 
@@ -31,13 +33,14 @@ public class AIApp {
             case "Greyhound" : return new GreyhoundAIClient(null);
             case "GreatDane" : return new GreatDaneAIClient(null);
             case "Chihuahua" : return new ChihuahuaAIClient(null);
+            case "CommandRater" : return new CommandRaterAIClient();
             default: return null;
         }
     }
 
 
     public static void main(String argv[]){
-        String[] names = {"Bulldog","Greyhound","GreatDane","Chihuahua"};
+        String[] names = {"Bulldog","Greyhound","GreatDane","Chihuahua","CommandRater"};
         ArrayList<Thread> threads = new ArrayList<>();
         for (int i = 0; i<names.length; i ++){
             Thread t = new Thread(new AIRunner(createAiClient(names[i]),names[i]));

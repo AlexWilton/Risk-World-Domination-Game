@@ -77,9 +77,12 @@ public class TradeAction extends Action {
         CountrySet occupied = null;
         for (RiskCard card : list) {
             Country country = state.getCountryByID(card.getCardID());
-            if (country.getOwner().equals(player)){
-                if(occupied == null) occupied = new CountrySet();
-                occupied.add(country);
+            if (country != null) {
+                //BREAKS if we dont check, not all risk cards have countries assigned
+                if (country.getOwner().equals(player)) {
+                    if (occupied == null) occupied = new CountrySet();
+                    occupied.add(country);
+                }
             }
         }
         return occupied;
@@ -123,7 +126,8 @@ public class TradeAction extends Action {
                 cavalry == 3 ||
                 infantry == 3 ||
                 artillery == 3 ||
-                (wild==1 && ((cavalry==2) || (artillery==2) || (infantry==2)))
+                (wild==1 && cavalry+infantry+artillery == 2) ||
+                (wild==2 && cavalry+infantry+artillery == 1)
         ) validSet = true;
 
         if(validSet) {

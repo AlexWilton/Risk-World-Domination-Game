@@ -26,12 +26,16 @@ public class State implements JSONAware {
     private int cardSetstradedIn = 0;
     private boolean preGamePlay = true;
 
+    private int turns = 0;
+
     private CountrySet setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo = null;
 
     private boolean attackCaptureNeeded = false;
     private Country attackCaptureOrigin = null;
     private Country attackCaptureDestination = null;
     private int attackCaptureMinimumArmiesToMove = -1;
+
+    private ArrayList<Integer> lostPlayers = new ArrayList<>();
 
 
 
@@ -40,6 +44,16 @@ public class State implements JSONAware {
     public State(Map map, ArrayList<Player> players){
         setup(map, players);
 
+    }
+
+    public Continent getCountryContinent(int country){
+        for (Continent c : map.getContinents()){
+            if (c.getCountries().contains(getCountryByID(country))){
+                return c;
+            }
+        }
+
+        return null;
     }
 
 
@@ -117,9 +131,34 @@ public class State implements JSONAware {
     public void removePlayer(int playerId) {
         for (int i = 0; i<players.size(); i++) {
             if (players.get(i).getID() == playerId) {
+
                 players.remove(i);
+
+                lostPlayers.add(i);
                 break;
             }
+        }
+    }
+
+    public int getPlayerPoints(int id ){
+        if (players.size() == 1) {
+            if (lostPlayers.contains(id))
+                return lostPlayers.indexOf(id);
+            else
+                return lostPlayers.size() *2;
+        }
+        else {
+            int worsePlayers = lostPlayers.size();
+            int troops = 0;
+            if (getPlayer(id) != null)
+                troops = getPlayer(id).sumAllTroops();
+
+            for (Player p : players){
+                if (p.sumAllTroops() < troops){
+                    worsePlayers ++;
+                }
+            }
+            return worsePlayers;
         }
     }
 
@@ -279,8 +318,13 @@ public class State implements JSONAware {
         do {
             currentPlayer = getPlayer((++i) % (maxPlayerId+1));
         } while (currentPlayer == null);
+
+        turns++;
     }
 
+    int getTurns(){
+        return turns;
+    }
     int getPlayerAmount(){
         return getPlayers().size();
     }
@@ -351,6 +395,10 @@ public class State implements JSONAware {
         attackCaptureOrigin = null;
         attackCaptureDestination = null;
         attackCaptureMinimumArmiesToMove = -1;
+    }
+
+    public CountrySet getAllCountries() {
+        return map.getAllCountries();
     }
 
     public CountrySet getAllCounttriesInMap(){

@@ -18,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -74,6 +75,9 @@ class ParamHandler extends DefaultHandler {
                         for(String name : host.getConnectedPlayerNames())
                             playerNames.add(name);
                         responseString = host.getNUMBER_OF_PLAYERS() + playerNames.toJSONString();
+                        try {
+                            responseString += "$$IP: " + InetAddress.getLocalHost().getHostAddress() + " Port: " + host.getPORT();
+                        }catch (Exception e){}
                         break;
                     case "get_list_of_available_ai":
                         JSONArray aiNames = new JSONArray();
@@ -372,10 +376,12 @@ class ParamHandler extends DefaultHandler {
                 return "Error! Valid is Host Playing boolean not provided";
             is_host_playing = Boolean.parseBoolean(is_host_playingArray[0]);
 
-        host = new ServerSocketHandler(port, numOfPlayers, webClient, false);
-        Thread t = new Thread(host);
-        t.start();
-        webClient.setHostAndPlayingBooleans(true, is_host_playing);
+        try {
+            host = new ServerSocketHandler(port, numOfPlayers, webClient, false);
+            Thread t = new Thread(host);
+            t.start();
+            webClient.setHostAndPlayingBooleans(true, is_host_playing);
+        }catch (Exception e){ return "Attempt to start Host failed. Try hosting on a different Port."; }
 
         //Get Player's Name
         String[] nameArray = params.get("player_name");
@@ -401,6 +407,10 @@ class ParamHandler extends DefaultHandler {
             }
         }
         setup_state = "hosting," + is_host_playing;
+
+        try {
+            return "true,IP: " + InetAddress.getLocalHost().getHostAddress() + " Port: " + port;
+        }catch (Exception e){}
         return "true";
     }
 

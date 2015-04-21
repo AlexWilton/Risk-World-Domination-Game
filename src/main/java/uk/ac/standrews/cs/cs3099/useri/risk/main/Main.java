@@ -18,7 +18,6 @@ public class Main {
      */
     public static void main(String[] args){
         new WebClient();
-
         try {
             PrintStream output = new PrintStream(new FileOutputStream("log.txt"));
             System.setOut(output);

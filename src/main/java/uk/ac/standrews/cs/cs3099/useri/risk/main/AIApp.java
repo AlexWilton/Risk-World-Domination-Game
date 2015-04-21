@@ -19,6 +19,7 @@ public class AIApp {
         aiClients.add("GreatDane");
         aiClients.add("Chihuahua");
         aiClients.add("CommandRater");
+        aiClients.add("CommandRaterEvolved");
         return aiClients;
     }
 
@@ -33,14 +34,14 @@ public class AIApp {
             case "Greyhound" : return new GreyhoundAIClient(null);
             case "GreatDane" : return new GreatDaneAIClient(null);
             case "Chihuahua" : return new ChihuahuaAIClient(null);
-            case "CommandRater" : return new CommandRaterAIClient();
+            case "CommandRaterEvolved" : return new CommandRaterAIClient();
             default: return null;
         }
     }
 
 
     public static void main(String argv[]){
-        String[] names = {"Bulldog","Greyhound","GreatDane","Chihuahua","CommandRater"};
+        String[] names = {"Bulldog","Greyhound","GreatDane","Chihuahua","CommandRater","CommandRaterEvolved"};
         ArrayList<Thread> threads = new ArrayList<>();
         for (int i = 0; i<names.length; i ++){
             Thread t = new Thread(new AIRunner(createAiClient(names[i]),names[i]));

@@ -1,0 +1,54 @@
+<!-- Adapted from Map and accompanying images, javascript and css from http://dev.filkor.org/RiskMap/ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Risk Game-Play - Junior Honours Team Project</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12">
+            <div class="jumbotron">
+                <h1>
+                    World Domination (Risk)
+                </h1>
+                <p>
+                    A World Domination Game based on the board game called Risk.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row clearfix">
+        <div class="col-md-3 column">
+            <div class="panel">
+                <div id="playerInfo"></div>
+            </div>
+            <div class="panel" id="turnPanel"></div>
+        </div>
+        <div class="col-md-9 column">
+            <br/>
+            <div id="map"></div>
+        </div>
+    </div>
+</div>
+
+
+<link rel="stylesheet" type="text/css" href="css/risk_play.css">
+<script src="js/risk/kinetic-v4.4.2.min.js"></script>
+<script src="js/risk/gameData.js"></script>
+<script src="js/risk/paths.js"></script>
+<script src="js/risk/coordinates.js"></script>
+<script src="js/risk/risk.js"></script>
+<script src="js/risk/assetManager.js"></script>
+<script src="js/risk/game_play.js"></script>
+<script src="js/risk/main.js"></script>
+
+</body>
+</html>

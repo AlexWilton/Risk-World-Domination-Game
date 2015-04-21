@@ -1,0 +1,42 @@
+0,North Amercia,0,Alaska,,Artillery
+,,1,Northwest territory,,Cavalry
+,,2,Greenland,,Cavalry
+,,3,Alberta,,Artillery
+,,4,Ontario,,Artillery
+,,5,Quebec,,Artillery
+,,6,Western United States,,Artillery
+,,7,Eastern United States,,Artillery
+,,8,Central America,,Infantry
+1,South America,9,Venezuela,,Cavalry
+,,10,Peru,,Cavalry
+,,11,Brazil,,Infantry
+,,12,Argentina,,Infantry
+2,Europe,13,Iceland,,Cavalry
+,,14,Scandinavia,,Infantry
+,,15,Ukraine,,Infantry
+,,16,Great Britain,,Infantry
+,,17,Northern Europe,,Cavalry
+,,18,Western Europe,,Infantry
+,,19,Southern Europe,,Infantry
+3,Africa,20,North Africa,,Infantry
+,,21,Egypt,,Cavalry
+,,22,Congo,,Artillery
+,,23,East Africa,,Infantry
+,,24,South Africa,,Artillery
+,,25,Madagaskar,,Cavalry
+4,Asia,26,Ural,,Infantry
+,,27,Siberia,,Infantry
+,,28,Yakutsk,,Canon
+,,29,Kamichatka,,Canon
+,,30,Irkutsk,,Canon
+,,31,Mongolia,,Horse
+,,32,Japan,,Horse
+,,33,Afghanistan,,Soldier
+,,34,China,,Canon
+,,35,Middle East,,Canon
+,,36,India,,Horse
+,,37,Siam,,Horse
+5,Australia,38,Indonesia,,Solider
+,,39,New Guinea,,Horse
+,,40,Western Australia,,Canon
+,,41,Eastern Australia,,Horse

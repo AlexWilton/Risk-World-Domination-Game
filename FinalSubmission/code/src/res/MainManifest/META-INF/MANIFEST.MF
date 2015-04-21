@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: uk.ac.standrews.cs.cs3099.useri.risk.main.Main
+

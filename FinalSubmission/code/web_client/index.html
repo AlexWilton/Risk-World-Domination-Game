@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Risk - Junior Honours Team Project</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/risk_play.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/setup.js"></script>
+
+</head>
+<body>
+
+
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <div class="jumbotron">
+                <h1>
+                    World Domination (Risk)
+                </h1>
+                <p>
+                    A World Domination Game based on the board game called Risk.
+                </p>
+            </div>
+            <div class="row clearfix">
+                <div class="col-md-6 column">
+                    <h3>
+                       Host Game
+                    </h3>
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Game Setup Panel
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <form class="form-inline form-center" style="text-align:center;" id="hostForm" action="/RiskMap/">
+                                <div class="form-group">
+                                    <label>Number Of Players: </label>
+                                    <input type="number" class="form-control" name="number_of_players" value="3" style="width:50px;">
+                                </div>
+                                <div class="form-group">
+                                    <label style="margin-left: 20px;">Port Number:</label>
+                                    <input type="number" class="form-control" name="port" value=8888 style="width : 90px;">
+                                </div>
+                                <br/><br/>
+                                <label style="margin-left: 20px;">Is Host Playing (As Human)?</label>
+                                <div class="btn-group" data-toggle="buttons">
+                                    <label class="btn btn-primary active">
+                                        <input type="radio" name="is_host_playing" id="yes" value="true" autocomplete="off" checked> Yes
+                                    </label>
+                                    <label class="btn btn-primary">
+                                        <input type="radio" name="is_host_playing" id="no" value="false" autocomplete="off"> No
+                                    </label>
+                                </div>
+                                <br/><br/>
+                                <div id="hostPlayerNameSection">
+                                    <div class="form-group">
+                                        <label>Player's Name:</label>
+                                        <input type="text" class="form-control" name="player_name" value="Harry" style="width:150px;">
+                                    </div>
+                                </div>
+                                <br/><br/>
+                                <div id="hostAIoptions"></div>
+                                <div id="aiAdder" class="btn-group">
+                                    <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><strong>Add AI player to Game</strong><span class="caret"></span></button>
+                                    <ul class="dropdown-menu" name="aiOptions">
+                                    </ul>
+                                </div>
+                                <br/><br/>
+                                <div id="host">
+                                <button type="button" class="btn btn-primary btn-lg btn-block" onclick="host()" id="hostButton">Host Game!</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 column">
+                    <h3>
+                        Connect to somebody else's game
+                    </h3>
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Game Connection Panel
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <form class="form-inline form-center" id="connectForm" style="text-align:center;" >
+                                <div class="form-group">
+                                    <label>Address: </label>
+                                    <input type="text" class="form-control" name="address" value="127.0.0.1" style="width:200px;">
+                                </div>
+                                <div class="form-group">
+                                    <label style="margin-left: 20px;">Port Number:</label>
+                                    <input type="number" class="form-control" name="port" value=8888 style="width : 90px;">
+                                </div>
+                                <br/><br/>
+                                <div class="form-group">
+                                    <label>Player's Name:</label>
+                                    <input type="text" class="form-control" name="player_name" value="Carol" style="width:150px;">
+                                </div>
+                                <br/><br/>
+                                <div id="selectedConnectAI"></div>
+                                <div id="aiSelectorForConnect" class="btn-group">
+                                    <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><strong>Play as AI Player</strong><span class="caret"></span></button>
+                                    <ul class="dropdown-menu" name="aiOptions">
+                                    </ul>
+                                </div>
+                                <br/><br/>
+                                <button type="button" class="btn btn-primary btn-lg btn-block" onclick="connect()" id="connectButton">Connect To Game!</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+</body>
+</html>

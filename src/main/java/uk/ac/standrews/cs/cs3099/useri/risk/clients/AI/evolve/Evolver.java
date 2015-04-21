@@ -24,8 +24,11 @@ public class Evolver {
 
 
         try {
-            Evolution.startEvolution(f, i, c, initial);
-            //Evolution.initFromFile("CommandRater.evo",f,i,c);
+            if (argv.length > 0)
+                Evolution.initFromFile(argv[0],f,i,c);
+            else
+                Evolution.startEvolution(f, i, c, initial);
+
 
             while (true){
                 System.out.println("Interpreting generation nr " + Evolution.getGenerationNumber());

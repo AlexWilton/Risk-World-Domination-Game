@@ -1,12 +1,10 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.json.simple.JSONArray;
-
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic.Gene;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic.Genome;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.action.TradeAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Continent;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Country;
@@ -14,8 +12,10 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * Created by po26 on 20/04/15.
@@ -259,7 +259,7 @@ public class CommandRaterAIClient extends Client{
             enemyArmiesAroundTarget += c.getTroops();
         }
 
-        if (enemyArmiesAroundOrig != 0){
+        if (enemyArmiesAroundOrig != 0) {
             double division = ((double) enemyArmiesAroundTarget) / ((double) enemyArmiesAroundOrig + enemyArmiesAroundTarget);
             int redepArmies = (int) (division * ((double) origin.getTroops()));
             if (redepArmies >= origin.getTroops()) {

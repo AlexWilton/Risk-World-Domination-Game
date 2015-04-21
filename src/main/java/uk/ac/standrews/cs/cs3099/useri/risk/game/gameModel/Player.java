@@ -20,7 +20,6 @@ public class Player implements JSONAware{
 	private CountrySet occupiedCountries;
 	private ArrayList<RiskCard> cards;
 	private int unassignedArmies;
-    private Country countryWhichMustBeDeployedTo  = null;
 	///enable if a player is disconnected to skip his turn
 	private boolean inactive;
 
@@ -81,20 +80,6 @@ public class Player implements JSONAware{
         return cards;
     }
 
-    /**
-     * Choose between countries to place 2 extra armies on when trading in risk cards.
-     * @param occ
-     * @return
-     */
-    public Country choose(ArrayList<Country> occ) {//TODO - Evaluate, is this not needed??
-        if(occ.size() > 0) {
-            Country chosen = occ.get(0);
-            countryWhichMustBeDeployedTo = chosen;
-            return chosen; //use first one found - to be improved!
-        }
-        return null;
-    }
-
     public void removeCards(ArrayList<RiskCard> list) {
         cards.removeAll(list);
     }
@@ -142,7 +127,6 @@ public class Player implements JSONAware{
             cardArray.add(c);
         player.put("cards", cardArray);
         player.put("unassignedArmies", unassignedArmies);
-        player.put("countryWhichMustBeDeployedTo", countryWhichMustBeDeployedTo);
         player.put("inactive", inactive);
         if(client instanceof WebClient){
             WebClient webClient = (WebClient) client;
@@ -199,12 +183,6 @@ public class Player implements JSONAware{
 
        return ret;
 
-    }
-
-    public Country getCountryWhichMustBeDeployedTo(){
-        Country c = countryWhichMustBeDeployedTo;
-        countryWhichMustBeDeployedTo = null;
-        return c;
     }
 
     public CountrySet getOwnedCountriesWithEnemyBoundaries(){

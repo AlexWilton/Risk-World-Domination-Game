@@ -35,7 +35,7 @@ public class PingCommand extends Command {
             return new PingCommand(id, payload);
 
         } catch(ParseException e){
-            System.err.println(commandJSON);
+            System.err.println("Could not parse: " + commandJSON);
             return null;
         }
 

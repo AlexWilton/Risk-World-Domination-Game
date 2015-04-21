@@ -89,7 +89,6 @@ public class MapTest {
         Stack<RiskCard> riskCards = defaultMap.getCardsFromMapData();
         assertTrue(riskCards.size()==44);
         assertTrue(riskCards.get(43).getType()==RiskCardType.TYPE_WILDCARD);
-        System.out.println(riskCards.get(43).getCardID());
         assertTrue(riskCards.peek().getCardID()==43);
         assertFalse(riskCards.isEmpty());
     }

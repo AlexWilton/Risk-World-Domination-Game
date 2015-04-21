@@ -60,7 +60,7 @@ class ParamHandler extends DefaultHandler {
                         responseString = setup_state;
                         break;
                     case "cheat":
-                        for(Country c :webClient.getState().getAllCounttriesInMap()){
+                        for(Country c :webClient.getState().getAllCountriesInMap()){
                             c.getOwner().removeCountry(c);
                             c.setOwner(webClient.getPlayer());
                             webClient.getPlayer().addCountry(c);

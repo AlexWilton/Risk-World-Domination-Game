@@ -178,6 +178,16 @@ public class GreyhoundAIClient extends AI{
 
         int armies_left = getPlayer().getUnassignedArmies();
 
+        CountrySet mustDeployTo = gameState.getSetOfCountriesWhereAtLeastOneNeedsToBeDeployedTo();
+        DeployTuple tuple = null;
+
+        if (mustDeployTo != null) {
+            Country c = mustDeployTo.get(mustDeployTo.getIDList().get(0));
+
+            tuple = new DeployTuple(c.getCountryId(), 2);
+            armies_left -= 2;
+        }
+
         for (Country target : allTargets){
             int diff = target.getTroops();
             for (Country opp : target.getEnemyNeighbours()){
@@ -212,6 +222,8 @@ public class GreyhoundAIClient extends AI{
 
 
         ArrayList<DeployTuple> depTups = new ArrayList<>();
+        if (tuple != null)
+            depTups.add(tuple);
 
         for (Map.Entry<Integer,Integer> depTuple : troopDeploy.entrySet()){
             if (gameState.getCountryByID(depTuple.getKey()).getOwner().getID() != getPlayerId()){

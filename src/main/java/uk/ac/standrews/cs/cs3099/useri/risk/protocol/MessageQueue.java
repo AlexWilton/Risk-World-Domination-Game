@@ -21,14 +21,16 @@ class MessageQueue {
 
     /**
      * Constructor to create message queue
+     *
      * @param isHostPlaying boolean variable to tell whether the host is playing or not
      */
     public MessageQueue(boolean isHostPlaying) {
-        ID = isHostPlaying? 0 : null;
+        ID = isHostPlaying ? 0 : null;
     }
 
     /**
      * Synchronised method to send ping message to all
+     *
      * @param payload
      * @throws IOException
      */
@@ -38,6 +40,7 @@ class MessageQueue {
 
     /**
      * Synchronised method to send everyone ready message
+     *
      * @throws IOException
      */
     public synchronized void sendReady() throws IOException {
@@ -46,22 +49,23 @@ class MessageQueue {
 
     /**
      * synchronised method to send message to all
+     *
      * @param comm Command to be sent
      * @param id
      * @throws IOException
      */
-    public synchronized void sendAll(Command comm, Integer id)  throws IOException {
+    public synchronized void sendAll(Command comm, Integer id) throws IOException {
         System.out.println(comm);
         boolean signal_ack = comm.requiresAcknowledgement();
         int ack_id = -1;
         if (signal_ack)
             ack_id = Integer.parseInt(comm.get("ack_id").toString());
 
-        for (Map.Entry<Integer, ListenerThread> e : sockets.entrySet()){
-            if (e.getKey() != id){
+        for (Map.Entry<Integer, ListenerThread> e : sockets.entrySet()) {
+            if (e.getKey() != id) {
                 ListenerThread w = e.getValue();
                 w.reply(comm);
-                if (signal_ack){
+                if (signal_ack) {
                     w.signalAck(ack_id);
                 }
             }
@@ -70,8 +74,9 @@ class MessageQueue {
 
     /**
      * Notifying all the connected nodes that the player has been added
-     * @param id integer ID
-     * @param t Thread t
+     *
+     * @param id     integer ID
+     * @param t      Thread t
      * @param player Player object
      * @throws IOException
      */
@@ -84,18 +89,19 @@ class MessageQueue {
 
     /**
      * Getting Dice rolls
+     *
      * @param id
      */
-    public synchronized void getRolls(int id){
+    public synchronized void getRolls(int id) {
         HostForwarder.setSeed(new RandomNumberGenerator());
         try {
-            for (Map.Entry<Integer, ListenerThread> e : sockets.entrySet()){
-                if (e.getKey() != id){
+            for (Map.Entry<Integer, ListenerThread> e : sockets.entrySet()) {
+                if (e.getKey() != id) {
                     ListenerThread w = e.getValue();
                     w.getRollsLater();
                 }
             }
-        } catch(IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             //There is nothing to do here, just exit, the protocol has failed.
             e.printStackTrace();
             System.err.println("Could not get dice rolls, protocol failed");
@@ -105,6 +111,7 @@ class MessageQueue {
 
     /**
      * Remove player
+     *
      * @param id
      */
     public synchronized void removePlayer(int id) {

@@ -148,6 +148,9 @@ public class State implements JSONAware {
                 return lostPlayers.size() *2;
         }
         else {
+            if (lostPlayers.contains(id)){
+                return lostPlayers.indexOf(id);
+            }
             int worsePlayers = lostPlayers.size();
             int troops = 0;
             if (getPlayer(id) != null)
@@ -158,7 +161,7 @@ public class State implements JSONAware {
                     worsePlayers ++;
                 }
             }
-            return worsePlayers;
+            return worsePlayers+1;
         }
     }
 

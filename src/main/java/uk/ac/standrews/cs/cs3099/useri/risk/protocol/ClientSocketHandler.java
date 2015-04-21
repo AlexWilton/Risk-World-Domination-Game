@@ -30,16 +30,20 @@ public class ClientSocketHandler implements Runnable {
     private WebClient webClientForWatchOnlyServer = null;
     private HashMap<Integer,HashMap<Integer,Boolean>> ackRecieved;
 
-    private int waitingOn = -1;
 
 
     public int getLocalClientId(){
         return localClient.getPlayerId();
     }
+
+    /**
+     * removes all links to a player, terminates if its this player
+     * @param id
+     */
     public void removePlayer(int id) {
         if (id == localClient.getPlayerId()) {
             System.out.println("this player lost");
-            //System.exit(0);
+
         } else {
             gameState.removePlayer(id);
             remoteClients.remove(getRemoteClientById(id));
@@ -48,6 +52,10 @@ public class ClientSocketHandler implements Runnable {
         }
     }
 
+    /**
+     * gives the client a watch only status
+     * @param webClient
+     */
     public void setWebClientForWatchOnlyServer(WebClient webClient) {
         webClientForWatchOnlyServer = webClient;
     }
@@ -89,6 +97,10 @@ public class ClientSocketHandler implements Runnable {
         return protocolState;
     }
 
+    /**
+     * links gamestate to local player
+     * @param state
+     */
     public void linkGameState(State state) {
         gameState = state;
         localClient.setState(state);
@@ -104,6 +116,10 @@ public class ClientSocketHandler implements Runnable {
 
     }
 
+    /**
+     * get all clients
+     * @return
+     */
     public ArrayList<Client> getAllClients() {
         ArrayList<Client> ret = new ArrayList<>();
 
@@ -224,17 +240,10 @@ public class ClientSocketHandler implements Runnable {
         return remoteClients.size() + 1;
     }
 
-    public boolean allRemoteClientsReady() {
-
-        for (NetworkClient c : remoteClients) {
-            if (!c.isReady())
-                return false;
-        }
-
-        return true;
-    }
-
+    @Override
     public void run() {
+        //gets commands and processes / queues them
+
         while (true) {
             try {
                 Command currentCommand = getNextCommand();
@@ -269,6 +278,10 @@ public class ClientSocketHandler implements Runnable {
 
     }
 
+    /**
+     * processes command while waiting for ping phase
+     * @param command
+     */
     void processCommandWaitingPing(Command command) {
         if (command instanceof PlayersJoinedCommand) {
             processPlayersJoinedCommand((PlayersJoinedCommand) command);
@@ -281,6 +294,10 @@ public class ClientSocketHandler implements Runnable {
         }
     }
 
+    /**
+     * processes command while waiting for ready command
+     * @param command
+     */
     void processCommandWaitingReady(Command command) {
         if (command instanceof ReadyCommand) {
             processReadyCommand((ReadyCommand) command);
@@ -293,6 +310,10 @@ public class ClientSocketHandler implements Runnable {
         }
     }
 
+    /**
+     * process command while waiting for init
+     * @param command
+     */
     void processCommandWaitingInit(Command command) {
 
         if (command instanceof InitialiseGameCommand) {
@@ -305,6 +326,10 @@ public class ClientSocketHandler implements Runnable {
 
     }
 
+    /**
+     * process command while normal operation
+     * @param command
+     */
     void processCommandRunning(Command command) {
 
         if (command instanceof RollHashCommand) {
@@ -351,6 +376,10 @@ public class ClientSocketHandler implements Runnable {
 
     }
 
+    /**
+     * add newly joined players to list
+     * @param command
+     */
     private void processPlayersJoinedCommand(PlayersJoinedCommand command) {
 
         JSONArray playersJSON = (JSONArray) command.get("payload");
@@ -377,6 +406,9 @@ public class ClientSocketHandler implements Runnable {
     }
 
 
+    /**
+     * proc hosts ping at start
+     */
     private void processHostPingCommand(PingCommand command) {
         hostId = command.getPlayer();
         proclaimedPlayerAmount = Integer.parseInt(command.get("payload").toString());
@@ -402,19 +434,13 @@ public class ClientSocketHandler implements Runnable {
         protocolState = ProtocolState.RUNNING;
     }
 
-
+    /**
+     * sends out command
+     * @param command
+     */
     public void sendCommand(Command command) {
 
-//        while (waitingOn != -1){
-//            if (!ackRecieved.get(waitingOn).containsValue(false)){
-//                waitingOn = -1;
-//            }
-//            try {
-//                Thread.sleep(10);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
+
         try {
             out.println(command.toJSONString());
             if (command.requiresAcknowledgement())
@@ -427,7 +453,7 @@ public class ClientSocketHandler implements Runnable {
 
         //if it needs ack, wait
         if (command.requiresAcknowledgement()){
-            waitingOn = command.getAck();
+
 
             if (!ackRecieved.keySet().contains(command.getAck())){
                 HashMap <Integer,Boolean> rec = new HashMap<>();
@@ -443,6 +469,11 @@ public class ClientSocketHandler implements Runnable {
 
     }
 
+    /**
+     * gets the nedxt command, sends ack and queues it
+     * @return
+     * @throws IOException
+     */
     synchronized Command getNextCommand() throws IOException {
 
         String currentIn = "";
@@ -473,7 +504,10 @@ public class ClientSocketHandler implements Runnable {
         return command;
     }
 
-
+    /**
+     * gets rng seed and rng from all players
+     * @return
+     */
     public RandomNumberGenerator popSeed() {
 
 

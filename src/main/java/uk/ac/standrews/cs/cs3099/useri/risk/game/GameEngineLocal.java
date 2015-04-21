@@ -14,7 +14,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 import java.util.ArrayList;
 
 /**
- * runs the main game loop and gets turns from the players
+ * runs the main game loop and gets turns from the players (run locally, to speed up AI evaluation
  *
  */
 public class GameEngineLocal {
@@ -187,9 +187,6 @@ public class GameEngineLocal {
         for(Action playerAction : playerActions) {
             if (playerAction.validateAgainstState(state)) {
                 playerAction.performOnState(state);
-            } else {
-                System.out.println("Error move did not validate: " + currentCommand);
-                System.exit(1);
             }
         }
 

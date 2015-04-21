@@ -387,6 +387,12 @@ public class State implements JSONAware {
     public void setSetOfCountriesWhereAtLeastOneNeedsToBeDeployedTo(CountrySet setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo) {
         this.setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo = setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo;
     }
+
+    /**
+     * calculates player score
+     * @param id
+     * @return
+     */
     public int getPlayerPoints(int id ){
         if (players.size() == 1) {
             if (lostPlayers.contains(id))
@@ -412,6 +418,11 @@ public class State implements JSONAware {
         }
     }
 
+    /**
+     * gets rank of player after game
+     * @param id
+     * @return
+     */
     public int getPlayerRank(int id) {
         int players = lostPlayers.size()+ getPlayers().size();
         int worsePlayers = 0;

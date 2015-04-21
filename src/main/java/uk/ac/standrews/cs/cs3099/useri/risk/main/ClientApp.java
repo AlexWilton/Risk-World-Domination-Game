@@ -4,7 +4,9 @@ import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.GameEngine;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.ClientSocketHandler;
 
-
+/**
+ * handles threads for clients
+ */
 public class ClientApp {
 
 

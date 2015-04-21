@@ -10,7 +10,9 @@ import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 
 import java.util.ArrayList;
 
-
+/**
+ * thishelper creates AI clients by name
+ */
 public class AIApp {
 
     public static ArrayList<String> getListOfAvailableAIs(){

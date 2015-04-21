@@ -8,11 +8,6 @@ public class AcknowledgementCommand extends Command {
 
     public static final String COMMAND_STRING = "acknowledgement";
 
-    /*public AcknowledgementCommand(int player_id) {
-        super(COMMAND_STRING);
-        this.put("payload", ack_id++);
-        this.put("player_id", player_id);
-    }*/
 
     public AcknowledgementCommand(int ack_id, int player_id) {
         super(COMMAND_STRING);

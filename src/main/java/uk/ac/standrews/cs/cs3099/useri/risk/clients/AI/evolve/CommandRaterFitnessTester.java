@@ -98,7 +98,7 @@ public class CommandRaterFitnessTester implements FitnessTester {
                         previousRunScores.put(usedGenomes.get(j),prevScores);
                     }
                 }
-            } catch (Exception e){
+            } catch (ArrayIndexOutOfBoundsException e){
                 i--;
                 e.printStackTrace();
             }

@@ -25,12 +25,12 @@ public class Evolver {
 
         try {
             Evolution.startEvolution(f, i, c, initial);
+            //Evolution.initFromFile("CommandRater.evo",f,i,c);
 
             while (true){
                 System.out.println("Interpreting generation nr " + Evolution.getGenerationNumber());
                 f.makeAllClients(Evolution.currentGeneration.getAllGenomes());
                 System.out.println("Evolving in generation " + Evolution.getGenerationNumber());
-                f.makeAllClients(Evolution.currentGeneration.getAllGenomes());
                 Evolution.advanceGeneration();
                 System.out.println("done... write to file");
                 Evolution.writeToFile("CommandRater.evo");

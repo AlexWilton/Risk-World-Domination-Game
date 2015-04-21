@@ -97,7 +97,11 @@ public class CommandRaterAIClient extends Client{
         weights.add(((MultiplierGene) genes.get(12)).getValue());
         weights.add(((MultiplierGene)genes.get(13)).getValue());
         weights.add(((MultiplierGene)genes.get(14)).getValue());
-        weights.add((double) ((ConstantVarGene)genes.get(15)).getValue());
+        try {
+            weights.add((double) ((ConstantVarGene) genes.get(15)).getValue());
+        } catch (ClassCastException e){
+            System.out.println();
+        }
 
     }
 

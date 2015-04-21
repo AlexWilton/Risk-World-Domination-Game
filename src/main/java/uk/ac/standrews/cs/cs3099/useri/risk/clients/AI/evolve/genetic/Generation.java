@@ -180,6 +180,7 @@ public class Generation {
 	private void sortForFitness() throws InstantiationException,
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException, NoSuchMethodException, SecurityException {
+        ((CommandRaterFitnessTester) fitnessTester).makeAllClients(individuals);
 		for (Genome g : individuals)
 			g.calculateFitness(fitnessTester);
 		Comparator<Genome> comp = new FitnessComparator();

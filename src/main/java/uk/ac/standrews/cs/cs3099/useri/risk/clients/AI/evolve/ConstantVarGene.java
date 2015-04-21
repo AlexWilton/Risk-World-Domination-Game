@@ -34,7 +34,7 @@ public class ConstantVarGene implements Gene{
 
     @Override
     public Gene clone() {
-        return new MultiplierGene(value);
+        return new ConstantVarGene(value);
     }
 
     @Override

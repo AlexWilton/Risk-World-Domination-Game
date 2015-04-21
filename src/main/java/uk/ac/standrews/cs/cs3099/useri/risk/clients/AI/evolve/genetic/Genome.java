@@ -1,5 +1,8 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.ConstantVarGene;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.MultiplierGene;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.Random;
@@ -98,9 +101,13 @@ public class Genome {
 		Scanner s = new Scanner(in);
 		s.useDelimiter(" ");
 		while (s.hasNext()) {
-			Gene g = EvolutionConstants.evolvedGene.getConstructor()
-					.newInstance();
-			g.initFromString(s.next());
+            String n = s.next();
+            Gene g = null;
+            if (genes.size() == 15)
+                g = new ConstantVarGene();
+            else
+                g = new MultiplierGene();
+			g.initFromString(n);
 			genes.add(g);
 		}
 		s.close();

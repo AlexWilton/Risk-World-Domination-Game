@@ -2,9 +2,9 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.action.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Player;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.HashMismatchException;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;

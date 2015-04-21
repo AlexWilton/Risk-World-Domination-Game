@@ -1,4 +1,4 @@
-package uk.ac.standrews.cs.cs3099.useri.risk.game;
+package uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
@@ -180,6 +180,15 @@ public class Map implements JSONAware{
                 }
             }
         }
+
+        int totalNumberOfWildcards = Integer.parseInt(mapData.get("wildcards").toString());
+
+        for(int wildCardNum=0; wildCardNum < totalNumberOfWildcards; wildCardNum++){
+            cards.push(new RiskCard(RiskCardType.TYPE_WILDCARD, cards.size() + wildCardNum));
+        }
+        
+
+
         return cards;
     }
 

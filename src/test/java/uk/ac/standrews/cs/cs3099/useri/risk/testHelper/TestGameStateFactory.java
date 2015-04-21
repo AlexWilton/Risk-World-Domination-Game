@@ -3,6 +3,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.testHelper;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.CLIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;

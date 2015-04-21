@@ -1,4 +1,4 @@
-package uk.ac.standrews.cs.cs3099.useri.risk.game;
+package uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel;
 
 /**
  * Different types of Risk cards.

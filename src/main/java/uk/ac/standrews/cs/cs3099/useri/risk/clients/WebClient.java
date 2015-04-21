@@ -1,13 +1,16 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients;
 
 
-import uk.ac.standrews.cs.cs3099.useri.risk.action.SetupAction;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.action.ObtainRiskCardAction;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.action.SetupAction;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.JettyServer;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.CountrySet;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.CountrySet;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.Command;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DefendCommand;
+import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.DrawCardCommand;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.SetupCommand;
 
 import java.awt.*;
@@ -65,6 +68,8 @@ public class WebClient extends Client {
 
     @Override
     public Command popCommand() {
+
+        //quick claim counties
         CountrySet uc = gameState.unoccupiedCountries();
         if(uc.size() > 0){
             for(Country c : uc){
@@ -72,6 +77,26 @@ public class WebClient extends Client {
                 if(sa.validateAgainstState(gameState)) return new SetupCommand(c.getCountryId(), playerId);
             }
         }
+
+        //quick init deploy
+        if(gameState.isPreGamePlay()){
+            CountrySet ownedCountries = getPlayer().getOccupiedCountries();
+            for(Country c : ownedCountries){
+                SetupAction sa = new SetupAction(gameState.getPlayer(playerId), c);
+                if(sa.validateAgainstState(gameState)) return new SetupCommand(c.getCountryId(), playerId);
+            }
+        }
+
+        //Deal with STAGE_GET_CARD
+        if(gameState.getTurnStage() == TurnStage.STAGE_GET_CARD){
+            ObtainRiskCardAction obtainRiskCardAction = new ObtainRiskCardAction(getPlayer());
+            if(obtainRiskCardAction.validateAgainstState(gameState))
+                return new DrawCardCommand(gameState.peekCard().getCardID(), playerId);
+            else
+                gameState.nextStage();
+        }
+
+
         try {
             return commandQueue.take();
         } catch (InterruptedException e) {

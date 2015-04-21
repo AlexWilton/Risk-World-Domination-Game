@@ -10,9 +10,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGe
 
 import java.util.ArrayList;
 
-/**
- * Created by patrick on 19/04/15.
- */
+
 public class LocalRun {
 
     static int playLocalGame(ArrayList<Client> clients){

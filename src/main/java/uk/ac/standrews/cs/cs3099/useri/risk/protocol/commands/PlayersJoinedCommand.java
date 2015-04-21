@@ -3,7 +3,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Player;
 
 import java.util.ArrayList;
 

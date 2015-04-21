@@ -3,15 +3,15 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.json.simple.JSONArray;
-import uk.ac.standrews.cs.cs3099.useri.risk.action.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.AIApp;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.AIRunner;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.ClientApp;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Country;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.RiskCard;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Player;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.ServerSocketHandler;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
@@ -20,9 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 class ParamHandler extends DefaultHandler {
     private WebClient webClient;

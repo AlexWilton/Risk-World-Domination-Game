@@ -1,7 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.protocol;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
-import uk.ac.standrews.cs.cs3099.useri.risk.game.Player;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.HashMismatchException;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.exceptions.InitialisationException;

@@ -134,36 +134,13 @@ public class State implements JSONAware {
 
                 players.remove(i);
 
-                lostPlayers.add(i);
+                lostPlayers.add(playerId);
                 break;
             }
         }
     }
 
-    public int getPlayerPoints(int id ){
-        if (players.size() == 1) {
-            if (lostPlayers.contains(id))
-                return lostPlayers.indexOf(id);
-            else
-                return lostPlayers.size() *2;
-        }
-        else {
-            if (lostPlayers.contains(id)){
-                return lostPlayers.indexOf(id);
-            }
-            int worsePlayers = lostPlayers.size();
-            int troops = 0;
-            if (getPlayer(id) != null)
-                troops = getPlayer(id).sumAllTroops();
 
-            for (Player p : players){
-                if (p.sumAllTroops() < troops){
-                    worsePlayers ++;
-                }
-            }
-            return worsePlayers+1;
-        }
-    }
 
     /**
      * Get the top card (index 0, as proposed in the drawing protocol) from the deck and remove it from the deck.
@@ -409,5 +386,58 @@ public class State implements JSONAware {
 
     public void setSetOfCountriesWhereAtLeastOneNeedsToBeDeployedTo(CountrySet setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo) {
         this.setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo = setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo;
+    }
+    public int getPlayerPoints(int id ){
+        if (players.size() == 1) {
+            if (lostPlayers.contains(id))
+                return lostPlayers.indexOf(id);
+            else
+                return lostPlayers.size() *2;
+        }
+        else {
+            if (lostPlayers.contains(id)){
+                return lostPlayers.indexOf(id);
+            }
+            int worsePlayers = lostPlayers.size();
+            int troops = 0;
+            if (getPlayer(id) != null)
+                troops = getPlayer(id).sumAllTroops();
+
+            for (Player p : players){
+                if (p.sumAllTroops() < troops){
+                    worsePlayers ++;
+                }
+            }
+            return worsePlayers+1;
+        }
+    }
+
+    public int getPlayerRank(int id) {
+        int players = lostPlayers.size()+ getPlayers().size();
+        int worsePlayers = 0;
+        boolean pContains = false;
+
+        for (Player p : getPlayers()){
+            if (p.getID() == id){
+                pContains = true;
+            }
+        }
+        if (pContains){
+            worsePlayers = lostPlayers.size();
+            int troops = 0;
+            if (getPlayer(id) != null)
+                troops = getPlayer(id).sumAllTroops();
+
+            for (Player p : getPlayers()){
+                if (p.sumAllTroops() < troops){
+                    worsePlayers ++;
+                }
+            }
+
+        } else {
+            worsePlayers = lostPlayers.indexOf(id) ;
+        }
+
+        return players-worsePlayers;
     }
 }

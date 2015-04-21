@@ -22,6 +22,7 @@ public class GameEngineLocal {
     private State state;
     private ArrayList<Client> clients;
     private int maxTurns;
+    private int maxSeconds;
 
     /**
      * GameEngine constructor which takes clientsockethandler
@@ -32,8 +33,9 @@ public class GameEngineLocal {
     }
 
 
-    public void run(int maxTurns){
+    public void run(int maxTurns,int maxSeconds){
         this.maxTurns = maxTurns;
+        this.maxSeconds = maxSeconds;
         initialise();
         gameLoop();
     }
@@ -42,6 +44,8 @@ public class GameEngineLocal {
         return state.getPlayerPoints(id);
     }
 
+
+    public int getPlayerRank(int id) { return state.getPlayerRank(id);}
 
     /**
      * initialises game state with given state
@@ -112,7 +116,8 @@ public class GameEngineLocal {
     public void gameLoop(){
         System.out.println("Game Loop running...");
         Player currentPlayer;
-        while(state.getTurns() <= maxTurns) {
+        long endTime = System.currentTimeMillis()+(maxSeconds*1000);
+        while(state.getTurns() <= maxTurns && System.currentTimeMillis()<endTime) {
             currentPlayer = state.getCurrentPlayer();
             //System.out.println("Ask player " + currentPlayer.getID() + " (" + currentPlayer.getName() + ")");
             Command currentCommand = currentPlayer.getClient().popCommand();

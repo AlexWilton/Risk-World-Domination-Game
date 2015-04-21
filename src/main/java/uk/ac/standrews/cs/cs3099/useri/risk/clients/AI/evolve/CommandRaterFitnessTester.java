@@ -87,7 +87,7 @@ public class CommandRaterFitnessTester implements FitnessTester {
 
                 GameEngineLocal g = new GameEngineLocal();
                 g.initialise(c);
-                g.run(6000);
+                g.run(6000,20);
                 fitness += g.getPlayerPoints(0);
 
                 for (int j = 1; j < usedGenomes.size(); j++){
@@ -129,7 +129,7 @@ public class CommandRaterFitnessTester implements FitnessTester {
                 c.get(5).setPlayerId(5);
                 GameEngineLocal g = new GameEngineLocal();
                 g.initialise(c);
-                g.run(6000);
+                g.run(6000,20);
 
                 int multiplier = (int) Math.sqrt(g.getPlayerPoints(0));
 

@@ -9,6 +9,6 @@ public class TimeOutCommand extends Command {
         super("timeout");
         put("payload", player_id);
         put("player_id", null);
-        put("ack_id", ack_id++);
+        put("ack_id", getNextAck());
     }
 }

@@ -417,6 +417,8 @@ public class ClientSocketHandler implements Runnable {
 //        }
         try {
             out.println(command.toJSONString());
+            if (command.requiresAcknowledgement())
+                Command.increaseAckId();
         }catch (NullPointerException e){
             System.err.println("what");
         }

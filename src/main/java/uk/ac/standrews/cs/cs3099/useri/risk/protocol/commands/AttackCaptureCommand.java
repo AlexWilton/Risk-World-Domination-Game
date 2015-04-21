@@ -36,7 +36,7 @@ public class AttackCaptureCommand extends Command {
         payload.add(2,armies);
         this.put("payload", payload);
         this.put("player_id", player);
-        this.put("ack_id", ack_id++);
+        this.put("ack_id", getNextAck());
     }
 
 

@@ -269,6 +269,7 @@ public class GameEngine implements Runnable{
         int[] dice = new int [size];
         for(int i = 0; i<size; i++){
             dice[i] = (int)(seed.nextInt() % 6 + 1);
+            //System.out.println(dice[i]);
         }
         return dice;
     }

@@ -5,14 +5,27 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.webapp.WebAppContext;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 
-import java.net.BindException;
-
+/**
+ * Jetty Server for serving Web Client
+ */
 public class JettyServer implements Runnable {
+
+    /**
+     * File path of web client files
+     */
     private static final String WEB_CLIENT_FILEPATH = "web_client";
+
+    /**
+     * Server
+     */
     private Server server = null;
 
+    /**
+     * Create Jetty Server.
+     * Sets up File and Parameters handlers for deals with requests
+     * @param webClient Web Client
+     */
     public JettyServer(WebClient webClient){
         server = new Server(0); //find random open port on runtime
 
@@ -35,7 +48,10 @@ public class JettyServer implements Runnable {
         return ((ServerConnector)server.getConnectors()[0]).getLocalPort();
     }
 
-
+    /**
+     * Stop Server
+     * @throws Exception
+     */
     public void stop() throws Exception {
         server.stop();
         server.join();

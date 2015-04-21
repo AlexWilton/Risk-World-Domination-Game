@@ -39,7 +39,7 @@ public class State implements JSONAware {
 
 
 
-    public State(){};
+    public State(){}
 
     public State(Map map, ArrayList<Player> players){
         setup(map, players);
@@ -255,9 +255,9 @@ public class State implements JSONAware {
         JSONArray countriesWhereAtLeastOneNeedsToBeDeployedTo = new JSONArray();
         if(setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo != null){
             for(Country c : setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo)
-                setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo.add(c);
+                countriesWhereAtLeastOneNeedsToBeDeployedTo.add(c);
         }
-        state.put("setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo", setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo);
+        state.put("setOfCountriesWhereAtLeastOneNeedsToBeDeployedTo", countriesWhereAtLeastOneNeedsToBeDeployedTo);
         return state.toJSONString();
     }
 
@@ -286,11 +286,6 @@ public class State implements JSONAware {
             cardsDeck.set(i,cardsDeck.get(swapPos));
             cardsDeck.set(swapPos,c1);
         }
-
-        /* Print card list for debugging purposes.
-        for (RiskCard c : cardsDeck){
-            System.err.println(c.toJSONString());
-        }*/
     }
 
     public boolean hasUnassignedCountries(){
@@ -401,7 +396,7 @@ public class State implements JSONAware {
         return map.getAllCountries();
     }
 
-    public CountrySet getAllCounttriesInMap(){
+    public CountrySet getAllCountriesInMap(){
         return map.getAllCountries();
     }
 

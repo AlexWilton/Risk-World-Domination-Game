@@ -2,6 +2,7 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI;
 
 import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Country;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.CountrySet;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.RiskCard;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
@@ -10,11 +11,15 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Created by patrick on 17/04/15.
+ * Chihuahua AI Client
+ * Always performs a Random valid move.
  */
 public class ChihuahuaAIClient extends AI{
 
-
+    /**
+     * Create a Chihuahua AI Client
+     * @param gameState Game State
+     */
     public ChihuahuaAIClient(State gameState){
         super(gameState,new RandomNumberGenerator());
     }
@@ -60,7 +65,6 @@ public class ChihuahuaAIClient extends AI{
 
     @Override
     public DefendCommand popDefendCommand(int origin, int target, int armies) {
-
         return new DefendCommand((gameState.getCountryByID(target).getTroops() > 1) ? 2 : 1, playerId);
     }
 
@@ -70,11 +74,12 @@ public class ChihuahuaAIClient extends AI{
         return rng.generateNumber();
     }
 
-
+    /**
+     * Collects a list of all possible commands the AI can make
+     * @return A list of all possible commands the AI can make
+     */
     private ArrayList<Command> getAllPossibleCommands(){
         ArrayList<Command> ret = new ArrayList<>();
-
-
         if (gameState.isPreGamePlay()){
             //only setup commands
             ret.addAll(getAllPossibleSetupCommands());
@@ -113,50 +118,42 @@ public class ChihuahuaAIClient extends AI{
                 }
             }
         }
-
-
         return ret;
     }
-/*
-    private ArrayList<Command> getAllPossiblePlayCardsCommands(){
-        ArrayList<Command> ret = new ArrayList<>();
-        //can always choose not to play a card
-        ret.add(new PlayCardsCommand(playerId));
-        //now get all combinations
-        for (ArrayList<Integer> combo : getPlayer().getAllValidCardCombinations()) {
-            //make Riscard array
-            ArrayList<RiskCard> cCombo = new ArrayList<>();
-            for (int i : combo){
-                cCombo.add(getPlayer().getRiskCardById(i));
-            }
-            int armies = (new TradeAction(getPlayer(),cCombo)).calculateArmies(gameState);
-            ArrayList<ArrayList<Integer>> comboWrapper = new ArrayList<>();
-            comboWrapper.add(combo);
-            ret.add(new PlayCardsCommand(comboWrapper,armies,playerId));
-        }
-        return ret;
-    }
-*/
+
+    /**
+     * Collects a list of all possible deploy commands the AI can make
+     * @return A list of all possible deploy commands the AI can make
+     */
     private ArrayList<Command> getAllPossibleDeployCommands(){
         ArrayList<Command> ret = new ArrayList<>();
         //for now, deploy everything into one country
         int armies = getPlayer().getUnassignedArmies();
-        //TODO
-        if (getPlayer().getCountryWhichMustBeDeployedTo() != null){
-            ArrayList<DeployTuple> tuples = new ArrayList<>();
-            tuples.add(new DeployTuple(getPlayer().getCountryWhichMustBeDeployedTo().getCountryId(),armies));
-            ret.add(new DeployCommand(tuples,playerId));
-            return ret;
-        } else {
-            for ( Country c : getPlayer().getOccupiedCountries()){
-                ArrayList<DeployTuple> tuples = new ArrayList<>();
-                tuples.add(new DeployTuple(c.getCountryId(),armies));
-                ret.add(new DeployCommand(tuples,playerId));
-            }
+        CountrySet mustDeployTo = gameState.getSetOfCountriesWhereAtLeastOneNeedsToBeDeployedTo();
+        DeployTuple tuple = null;
+
+        if (mustDeployTo != null) {
+            Country c = mustDeployTo.get(mustDeployTo.getIDList().get(0));
+
+            tuple = new DeployTuple(c.getCountryId(), 2);
+            armies -= 2;
         }
+
+        for ( Country c1 : getPlayer().getOccupiedCountries()){
+            ArrayList<DeployTuple> tuples = new ArrayList<>();
+            if (tuple != null)
+                tuples.add(tuple);
+            tuples.add(new DeployTuple(c1.getCountryId(),armies));
+            ret.add(new DeployCommand(tuples,playerId));
+        }
+
         return ret;
     }
 
+    /**
+     * Collects a list of all possible attack commands the AI can make
+     * @return A list of all possible attack commands the AI can make
+     */
     private ArrayList<Command> getAllPossibleAttackCommands(){
         ArrayList<Command> ret = new ArrayList<>();
 
@@ -173,6 +170,10 @@ public class ChihuahuaAIClient extends AI{
         return ret;
     }
 
+    /**
+     * Collects a list of all possible fortify commands the AI can make
+     * @return A list of all possible fortify commands the AI can make
+     */
     private ArrayList<Command> getAllPossibleFortifyCommands(){
         ArrayList<Command> ret = new ArrayList<>();
         //no fortification
@@ -189,21 +190,4 @@ public class ChihuahuaAIClient extends AI{
         }
         return ret;
     }
-/*
-    private ArrayList<Command> getAllPossibleSetupCommands(){
-        ArrayList<Command> ret = new ArrayList<>();
-
-        CountrySet possibleTargets = null;
-        if (gameState.hasUnassignedCountries()) {
-            possibleTargets = gameState.getAllUnassignedCountries();
-        } else {
-            possibleTargets = getPlayer().getOccupiedCountries();
-        }
-        for (Country c : possibleTargets){
-
-            ret.add(new SetupCommand(c.getCountryId(),playerId));
-        }
-        return ret;
-    }
-    */
 }

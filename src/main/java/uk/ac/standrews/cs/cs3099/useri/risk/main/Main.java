@@ -1,6 +1,10 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.main;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.WebClient;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 
 /**
  * Main Class for start of program execution
@@ -14,6 +18,15 @@ public class Main {
      */
     public static void main(String[] args){
         new WebClient();
+
+        try {
+            PrintStream output = new PrintStream(new FileOutputStream("log.txt"));
+            System.setOut(output);
+            System.setErr(output);
+        } catch (FileNotFoundException e) {
+            System.err.println("log.txt could not be opened!");
+        }
+
     }
 
 }

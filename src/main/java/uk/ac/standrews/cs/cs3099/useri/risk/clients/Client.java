@@ -10,14 +10,42 @@ import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGe
  * can take multiple forms, eg local, network or AIClient
  */
 public abstract class Client extends CommandQueuer {
+
+    /**
+     * Game State
+     */
     protected State gameState;
+
+    /**
+     * ID of player associated with Client
+     */
     protected int playerId;
+
+    /**
+     * Random Number Generator
+     */
     protected RandomNumberGenerator rng;
 
+    /**
+     * Player Name
+     */
     private String playerName;
+
+    /**
+     * Hex Seed Component
+     */
     private byte[] hexSeedComponent;
+
+    /**
+     * Is Player Ready
+     */
     private boolean playReady = false;
 
+    /**
+     * Create Client
+     * @param gameState Game State
+     * @param rng Random Number Generator
+     */
     protected Client(State gameState, RandomNumberGenerator rng){
         this.rng = rng;
         this.gameState = gameState;
@@ -28,8 +56,15 @@ public abstract class Client extends CommandQueuer {
      */
     public abstract int getDefenders(Country attackingCountry, Country defendingCountry, int attackingArmies);
 
+    /**
+     * Calculate seed for random number generator
+     * @return
+     */
     protected abstract byte[] getSeedComponent();
 
+    /**
+     * New Seed Component
+     */
     public void newSeedComponent(){
         hexSeedComponent = getSeedComponent();
     }

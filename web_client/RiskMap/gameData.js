@@ -96,7 +96,7 @@ var Neighbours = {
 	NewGuinea: ['Indonesia','WesternAustralia','EasternAustralia'],
 	WesternAustralia: ['Indonesia','NewGuinea','EasternAustralia'],
 	EasternAustralia: ['NewGuinea','WesternAustralia'],
-}
+};
 
 
 var CenterPoints = {
@@ -187,7 +187,7 @@ var ArmyPoints = {
 	NewGuinea: {x: 1473, y: 707}, 
 	WesternAustralia: {x: 1384, y: 920}, 
 	EasternAustralia: {x: 1546, y: 957}
-}
+};
 
 
 /*

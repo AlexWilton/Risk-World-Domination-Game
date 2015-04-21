@@ -42,7 +42,7 @@ Ontario: {sx: 0, sy: 1156, sWidth: 71, sHeight: 12},
 Alberta: {sx: 0, sy: 1168, sWidth: 78, sHeight: 14},
 NorthWestTerritory: {sx: 0, sy: 1182, sWidth: 218, sHeight: 14},
 Alaska: {sx: 0, sy: 1196, sWidth: 74, sHeight: 14}
-}
+};
 
 var FontDestinationCoords = 
 {
@@ -88,4 +88,4 @@ WesternAustralia: {x: 1346, y: 947},
 EasternAustralia: {x: 1470, y: 901},
 Madagascar: {x: 997, y: 919},
 CentralAmerica: {x: 218, y: 454}
-}
+};

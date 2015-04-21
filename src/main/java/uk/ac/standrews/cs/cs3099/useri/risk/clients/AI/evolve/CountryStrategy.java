@@ -1,6 +1,7 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve;
 
-import uk.ac.standrews.cs.cs3099.useri.risk.game.*;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
+import uk.ac.standrews.cs.cs3099.useri.risk.game.TurnStage;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Continent;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Country;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.CountrySet;
@@ -8,7 +9,6 @@ import uk.ac.standrews.cs.cs3099.useri.risk.game.gameModel.Player;
 import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Created by po26 on 20/04/15.
@@ -215,17 +215,18 @@ public class CountryStrategy {
     public DeployCommand getBeneficialDeployCommand() {
 
         //deploy all to this, or around neighbours
-        if (country.getOwner().getID() == player.getID()){
+        if (country.getOwner().getID() == player.getID()) {
             ArrayList<DeployTuple> deployTuples = new ArrayList<>();
             int armiesLeft = player.getUnassignedArmies();
 
             CountrySet mustDeployTo = state.getSetOfCountriesWhereAtLeastOneNeedsToBeDeployedTo();
+
             if (mustDeployTo != null) {
-                for (Country c : mustDeployTo) {
-                    DeployTuple temp = new DeployTuple(c.getCountryId(), 2);
-                    armiesLeft -= 2;
-                    deployTuples.add(temp);
-                }
+                Country c = mustDeployTo.get(mustDeployTo.getIDList().get(0));
+                DeployTuple temp = new DeployTuple(c.getCountryId(), 2);
+                armiesLeft -= 2;
+                deployTuples.add(temp);
+
             }
 
             DeployTuple depTup = new DeployTuple(country.getCountryId(),armiesLeft);

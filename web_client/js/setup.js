@@ -13,7 +13,7 @@ $( document ).ready(function(){
                 gotoGamePlayWhenReady();
             }
             if(response.indexOf("connected") == 0){
-                $("#connectButton").html("<h3>Waiting for Host to Start Game</h3>")
+                $("#connectButton").html("<h3>Waiting for Host to Start Game</h3>");
                 gotoGamePlayWhenReady();
             }
         });

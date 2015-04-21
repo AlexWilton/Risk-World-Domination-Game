@@ -11,8 +11,19 @@ import java.util.Queue;
  */
 public class CommandQueuer {
 
+    /**
+     * Queue of Commands
+     */
     private Queue<Command> commandQueue;
+
+    /**
+     * Queue of Roll Hashes
+     */
     private Queue<String> hashQueue;
+
+    /**
+     * Queue of Roll Numbers
+     */
     private Queue<String> numberQueue;
 
     private DefendCommand defendCommand;

@@ -36,7 +36,7 @@ function updatePlayerDisplay(){
     if(typeof game_state.players[my_player_id].isHost != 'undefined' && game_state.players[my_player_id].isHost == true){ //if this is the host
         playerInfo += "<br/><h5><strong>You are the host!</strong></h5>";
     }else
-        playerInfo += "<br/><h5><strong>You are connected to the host!</strong></h5>"
+        playerInfo += "<br/><h5><strong>You are connected to the host!</strong></h5>";
 
     playerInfo += "<h3>Players</h3>";
     game_state.players.forEach(function(player){

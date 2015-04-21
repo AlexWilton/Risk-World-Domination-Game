@@ -100,22 +100,14 @@ public class GameEngine implements Runnable{
      * 5. sends out update notification to all clients
      */
     public void gameLoop(){
-        System.out.println("Game Loop running...");
         Player currentPlayer;
         while(true) {
             currentPlayer = state.getCurrentPlayer();
-            System.out.println("Ask player " + currentPlayer.getID() + " (" + currentPlayer.getName() + ")");
             Command currentCommand = currentPlayer.getClient().popCommand();
-            //if its local, propagate - sendIfLocal
-            /*
-            if (csh != null && currentPlayer.getClient().isLocal()){
-               csh.sendCommand(currentCommand);
-            }
-            */
+
             sendIfLocal(csh, currentPlayer,currentCommand);
 
             processCommand(currentPlayer, currentCommand);
-
             if (checkIfPlayerLost() || state.winConditionsMet()) break;
         }
     }
@@ -172,7 +164,6 @@ public class GameEngine implements Runnable{
         }
 
         if (playerActions.size() == 0){
-            //System.out.println("End turn");
             playerActions.add(new FortifyAction(currentPlayer));
         }
 
@@ -181,7 +172,6 @@ public class GameEngine implements Runnable{
                 playerAction.performOnState(state);
             } else {
                 System.out.println("Error move did not validate: " + currentCommand);
-                //System.exit(1);
             }
         }
 
@@ -212,19 +202,6 @@ public class GameEngine implements Runnable{
      * @return List of actions the command implies.
      */
     private ArrayList<TradeAction> processPlayCardsCommand(PlayCardsCommand command){
-        /*{
-            "command": "play_cards",
-            "payload": {
-                "cards": [
-                    [1, 2, 3],
-                    [4, 5, 6]
-                ],
-                "armies": 3
-            },
-            "player_id": 0,
-            "ack_id": 1
-        }*/
-
         JSONObject payload = command.getPayload();
         int player = command.getPlayer();
         if (payload == null){
@@ -249,7 +226,6 @@ public class GameEngine implements Runnable{
         for (ArrayList<RiskCard> triplet : triplets){
             TradeAction act = new TradeAction(state.getPlayer(player),triplet);
 
-            //System.out.println("Interpreted trade command");
             acts.add(act);
         }
         return acts;
@@ -261,55 +237,24 @@ public class GameEngine implements Runnable{
      * @return The AttackAction created from this command.
      */
     private AttackAction processAttackCommand(AttackCommand command) {
-        /*{
-            "command": "attack",
-            "payload": [1,2,1],
-            "player_id" : 1
-        }*/
-
         JSONArray attackPlan = command.getPayloadAsArray();
         int player = command.getPlayer();
         int originId = Integer.parseInt(attackPlan.get(0).toString());
         int objectiveId = Integer.parseInt(attackPlan.get(1).toString());
         int attackArmies = Integer.parseInt(attackPlan.get(2).toString());
 
-        // Get rolls from all clients...
-        // HostForwarder.setSeed(new RNGSeed(ListenerThread.getPlayers().size()));
-
         try {
 
             Player defender = state.getCountryByID(objectiveId).getOwner();
-
             DefendCommand def = defender.getClient().popDefendCommand(originId, objectiveId, attackArmies);
-            //if its local, propagate - sendIfLocal
-            /*
-            if (csh != null && defender.getClient().isLocal()) {
-                csh.sendCommand(def);
-            }
-            */
+
             sendIfLocal(csh, defender, def);
 
             RandomNumberGenerator seed = csh.popSeed();
-            //while (!seed.isFinalised()) Thread.sleep(1);
             seed.finalise();
 
-
             int defendArmies = def.getPayloadAsInt();
-            System.out.println("Defend armies: " + defendArmies);
 
-            /*
-            int[] attackDice = new int [attackArmies];
-            for (int i = 0; i<attackArmies; i++){
-                attackDice[i] = (int)(seed.nextInt() % 6 + 1);
-                //System.out.println(attackDice[i]);
-            }
-
-            int[] defendDice = new int [defendArmies];
-            for (int i = 0; i<defendArmies; i++){
-                defendDice[i] = (int)(seed.nextInt() % 6 + 1);
-                //System.out.println(defendDice[i]);
-            }
-*/
             int[] attackDice = makeDice(seed, attackArmies);
             int[] defendDice = makeDice(seed, defendArmies);
 
@@ -324,7 +269,6 @@ public class GameEngine implements Runnable{
         int[] dice = new int [size];
         for(int i = 0; i<size; i++){
             dice[i] = (int)(seed.nextInt() % 6 + 1);
-            System.out.println(dice[i]);
         }
         return dice;
     }
@@ -334,15 +278,6 @@ public class GameEngine implements Runnable{
      * @return Action to be taken by the player.
      */
     private FortifyAction processFortifyCommand(FortifyCommand command) {
-        /*
-        {
-            "command": "fortify",
-            "payload": [1, 2, 5],
-            "player_id": 0,
-            "ack_id": 1
-        }
-        */
-
         if (command.get("payload") == null){
             return new FortifyAction(state.getPlayer(command.getPlayer()));
         }
@@ -353,7 +288,7 @@ public class GameEngine implements Runnable{
         int armies = Integer.parseInt(fortification.get(2).toString());
 
         FortifyAction act = new FortifyAction(state.getPlayer(player),state.getCountryByID(originId),state.getCountryByID(objectiveId),armies);
-        //System.out.println("Interpreted fortify command");
+
         return act;
     }
 
@@ -363,16 +298,8 @@ public class GameEngine implements Runnable{
      * @return the action corresponding to the command.
      */
     private ObtainRiskCardAction processDrawCardCommand(DrawCardCommand command) {
-        /*{
-            "command": "draw_card",
-            "payload": 12,
-            "player_id": 0,
-            "ack_id": 1
-        }*/
-
         int player = command.getPlayer();
         ObtainRiskCardAction act = new ObtainRiskCardAction(state.getPlayer(player));
-        //System.out.println("Interpreted draw command");
         return act;
     }
 

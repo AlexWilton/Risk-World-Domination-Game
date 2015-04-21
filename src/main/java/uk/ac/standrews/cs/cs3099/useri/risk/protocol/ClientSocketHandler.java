@@ -6,7 +6,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.NetworkClient;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.webClient.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.State;
 import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGenerator;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.ClientApp;
@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 
 /**
- * Created by po26 on 12/02/15.
+ * Class to handle the
  */
 public class ClientSocketHandler implements Runnable {
 
@@ -159,8 +159,6 @@ public class ClientSocketHandler implements Runnable {
                     new BufferedReader(
                             new InputStreamReader(clientSocket.getInputStream()));
 
-            System.out.println("Connected");
-
         } catch (IOException e) {
             System.out.println("Can't connect to server");
             return ClientApp.BAD_ADDRESS;
@@ -175,7 +173,6 @@ public class ClientSocketHandler implements Runnable {
             JSONArray featuresJSON = new JSONArray();
             Collections.addAll(featuresJSON, features);
             JoinGameCommand joinCommand = new JoinGameCommand(versionsJSON, featuresJSON, name);
-            System.out.println(joinCommand.toJSONString());
             sendCommand(joinCommand);
 
 
@@ -280,8 +277,7 @@ public class ClientSocketHandler implements Runnable {
         } else if (command instanceof AcknowledgementCommand) {
             processAcknowledgenmentCommand((AcknowledgementCommand) command);
         }else {
-            System.out.println("Command ignored:");
-            System.out.println(command.toJSONString());
+            System.out.println("Command ignored: " + command.toJSONString());
         }
     }
 
@@ -293,8 +289,7 @@ public class ClientSocketHandler implements Runnable {
         } else if (command instanceof AcknowledgementCommand) {
             processAcknowledgenmentCommand((AcknowledgementCommand) command);
         }else {
-            System.out.println("Command ignored:");
-            System.out.println(command.toJSONString());
+            System.out.println("Command ignored: " + command.toJSONString());
         }
     }
 
@@ -305,8 +300,7 @@ public class ClientSocketHandler implements Runnable {
         } else if (command instanceof AcknowledgementCommand) {
             processAcknowledgenmentCommand((AcknowledgementCommand) command);
         } else {
-            System.out.println("Command ignored:");
-            System.out.println(command.toJSONString());
+            System.out.println("Command ignored: " + command.toJSONString());
         }
 
     }
@@ -474,9 +468,6 @@ public class ClientSocketHandler implements Runnable {
             out.flush();
         }
 
-        System.err.println(command.toJSONString());
-
-
         return command;
     }
 
@@ -498,12 +489,10 @@ public class ClientSocketHandler implements Runnable {
                     continue;
                 }
                 String hash = c.popRollHash();
-                //System.err.println(c.getPlayerId() + " use this roll number " + hash);
                 seed.addHash(c.getPlayerId(), hash);
             }
 
             seed.addNumber(localClient.getPlayerId(), localClient.getHexSeed());
-            //System.out.println("has all hashes");
 
             sendCommand(new RollNumberCommand(localClient.getHexSeed(), localClient.getPlayerId()));
 
@@ -513,12 +502,10 @@ public class ClientSocketHandler implements Runnable {
                     continue;
                 }
                 String number = c.popRollNumber();
-                //System.err.println(c.getPlayerId() + " use this roll number " + number);
 
                 seed.addNumber(c.getPlayerId(), number);
             }
 
-            //System.out.println("has all numbers");
             seed.finalise();
             RandomNumberGenerator ret = seed;
             seed = null;
@@ -528,7 +515,5 @@ public class ClientSocketHandler implements Runnable {
             System.exit(1);
         }
         return null;
-
     }
-
 }

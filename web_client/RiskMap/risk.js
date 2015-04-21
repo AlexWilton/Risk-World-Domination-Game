@@ -197,4 +197,4 @@ var Risk = {
 			return colors[randomNum];
 		}
 	}
-}
+};

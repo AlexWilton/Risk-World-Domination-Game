@@ -87,10 +87,10 @@ public class MapTest {
     @Test
     public void testCardParsing(){
         Stack<RiskCard> riskCards = defaultMap.getCardsFromMapData();
+        assertTrue(riskCards.size()==44);
+        assertTrue(riskCards.get(43).getType()==RiskCardType.TYPE_WILDCARD);
+        assertTrue(riskCards.peek().getCardID()==43);
         assertFalse(riskCards.isEmpty());
-
-
-
     }
 
 

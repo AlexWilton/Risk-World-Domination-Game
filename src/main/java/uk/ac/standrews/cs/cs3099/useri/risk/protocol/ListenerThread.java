@@ -212,7 +212,6 @@ class ListenerThread implements Runnable {
     }
 
     public synchronized void removePlayer() {
-        System.out.println("Player " + ID + " removed");
         players.remove(player);
         fw.stop();
         purgeConnection();

@@ -5,7 +5,6 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.json.simple.JSONArray;
 import uk.ac.standrews.cs.cs3099.useri.risk.game.action.*;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
-import uk.ac.standrews.cs.cs3099.useri.risk.clients.WebClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.AIApp;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.AIRunner;
 import uk.ac.standrews.cs.cs3099.useri.risk.main.ClientApp;
@@ -39,9 +38,6 @@ class ParamHandler extends DefaultHandler {
             ServletException
     {
 
-        //use test state if not set
-//        if(webClient.getState() == null) webClient.setState(TestGameStateFactory.getWebClientTestState(webClient));
-
         Map<String, String[]> params = request.getParameterMap();
         if (params.size() > 0)
         {
@@ -61,7 +57,7 @@ class ParamHandler extends DefaultHandler {
                         responseString = setup_state;
                         break;
                     case "cheat":
-                        for(Country c :webClient.getState().getAllCounttriesInMap()){
+                        for(Country c :webClient.getState().getAllCountriesInMap()){
                             c.getOwner().removeCountry(c);
                             c.setOwner(webClient.getPlayer());
                             webClient.getPlayer().addCountry(c);

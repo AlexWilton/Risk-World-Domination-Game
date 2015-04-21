@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 public interface FitnessTester {
 
-	public int testFitness(Genome genome) throws InstantiationException,
+	int testFitness(Genome genome) throws InstantiationException,
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException, NoSuchMethodException, SecurityException;
 }

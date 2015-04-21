@@ -82,15 +82,11 @@ class HostForwarder {
         hash = null;
         messageQueue.sendAll(comm, ID);
         while (!(comm instanceof RollHashCommand)) {
-            //System.out.println(comm instanceof RollHashCommand);
             checkAckCases(comm);
             comm = Command.parseCommand(input.readLine());
             messageQueue.sendAll(comm, ID);
-            //System.err.println(comm);
-            //throw new RollException();
         }
         RollHashCommand hash = (RollHashCommand) comm;
-        //System.out.println("Got hash from " + ID);
         while (seed == null) {Thread.sleep(10);}
         String hashStr = hash.get("payload").toString();
         seed.addHash(ID, hashStr);
@@ -147,13 +143,11 @@ class HostForwarder {
         }
         if (!move_required && state.getCurrentPlayer().getID() == ID){
             move_required = true;
-            //System.out.println("Player " + ID + "'s turn'");
             timer = System.currentTimeMillis();
         }
         if (input.ready()) {
             if (getRolls) getRolls();
             Command reply = Command.parseCommand(input.readLine());
-            //System.out.println("in Player " + ID + ": " + reply);
             messageQueue.sendAll(reply, ID);
             checkAckCases(reply);
         }
@@ -174,7 +168,6 @@ class HostForwarder {
             if (((AcknowledgementCommand) comm).getAcknowledgementId() == last_ack) {
                 ack_received = true;
                 timer = System.currentTimeMillis();
-                //diff = MOVE_TIMEOUT;
             }
         } else {
             if (comm instanceof AttackCommand) {
@@ -231,7 +224,6 @@ class HostForwarder {
         }
 
         if (playerActions.size() == 0 && !(comm instanceof DefendCommand)){
-            //System.out.println("End turn");
             playerActions.add(new FortifyAction(state.getPlayer(comm.getPlayer())));
         }
 
@@ -246,7 +238,6 @@ class HostForwarder {
                 playerAction.performOnState(state);
 
                 if (playerAction instanceof AttackCaptureAction) {
-                    System.out.println("Player " + defender.getID() + " has " + defender.getOccupiedCountries().size() + " countries left.");
                     if (defender.getOccupiedCountries().size() == 0) {
                         System.out.println("Player " + defender.getID() + " has lost");
                         System.out.flush();
@@ -264,7 +255,6 @@ class HostForwarder {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                //System.exit(1);
             }
         }
 
@@ -281,7 +271,6 @@ class HostForwarder {
      * @param comm The command to be processed
      */
     private void processDefendCommand(DefendCommand comm) {
-        //System.out.println("Processed Defend command by player " + ID);
         state.getPlayer(ID).getClient().pushCommand(comm);
     }
 
@@ -350,27 +339,16 @@ class HostForwarder {
         int attackArmies = Integer.parseInt(attackPlan.get(2).toString());
 
         // Get rolls from all clients...
-        // HostForwarder.setSeed(new RNGSeed(ListenerThread.getPlayers().size()));
         try {
-            while (seed.getNumberSeedSources() != ListenerThread.getPlayers().size()) Thread.sleep(5);
-            seed.finalise();
             defender = state.getCountryByID(objectiveId).getOwner();
-
             // Get defend command
             DefendCommand def = defender.getClient().popDefendCommand(originId, objectiveId, attackArmies);
-            int defendArmies = def.getPayloadAsInt();
-            // Roll the dice
-/*
-            int[] attackDice = new int [attackArmies];
-            for (int i = 0; i<attackArmies; i++){
-                attackDice[i] = (int)(seed.nextInt() % 6 + 1);
-            }
 
-            int[] defendDice = new int [defendArmies];
-            for (int i = 0; i<defendArmies; i++){
-                defendDice[i] = (int)(seed.nextInt() % 6 + 1);
-            }
-            */
+            // Get roll hashes
+            while (seed.getNumberSeedSources() != ListenerThread.getPlayers().size()) Thread.sleep(5);
+            seed.finalise();
+            int defendArmies = def.getPayloadAsInt();
+
             int[] attackDice = makeDice(seed, attackArmies);
             int[] defendDice = makeDice(seed, defendArmies);
 

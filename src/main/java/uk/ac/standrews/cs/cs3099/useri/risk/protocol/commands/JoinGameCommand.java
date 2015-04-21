@@ -49,7 +49,7 @@ public class JoinGameCommand extends Command {
             return new JoinGameCommand(versions, features, name);
 
         } catch(ParseException e){
-            System.err.println(parseable);
+            System.err.println("Could not parse: " + parseable);
             return null;
         }
 

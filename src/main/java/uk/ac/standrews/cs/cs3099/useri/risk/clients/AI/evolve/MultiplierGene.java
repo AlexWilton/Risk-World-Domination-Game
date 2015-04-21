@@ -4,7 +4,9 @@ import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic.Gene;
 
 import java.util.Random;
 
-
+/**
+ * encodes a multiplier weight
+ */
 public class MultiplierGene implements Gene{
     private static Random r = new Random();
 

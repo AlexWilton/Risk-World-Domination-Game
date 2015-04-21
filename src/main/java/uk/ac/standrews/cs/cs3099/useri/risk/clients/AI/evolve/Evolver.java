@@ -9,13 +9,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 /**
- * Created by po26 on 20/04/15.
+ * Evolves a CommandRaterAI generation, need to kill when needed, will save progress
  */
 public class Evolver {
 
     public static void main (String argv[]){
 
 
+
+        //init tools
         CommandRaterCrosser c = new CommandRaterCrosser();
         CommandRaterFitnessTester f = new CommandRaterFitnessTester();
         CommandRaterWeightSetInitialiser i = new CommandRaterWeightSetInitialiser();
@@ -24,6 +26,7 @@ public class Evolver {
 
 
         try {
+            //get from file, or from scratch if no file is supplied
             if (argv.length > 0)
                 Evolution.initFromFile(argv[0],f,i,c);
             else
@@ -36,6 +39,7 @@ public class Evolver {
                 System.out.println("Evolving in generation " + Evolution.getGenerationNumber());
                 Evolution.advanceGeneration();
                 System.out.println("done... write to file");
+                //save it
                 Evolution.writeToFile("CommandRater.evo");
             }
 

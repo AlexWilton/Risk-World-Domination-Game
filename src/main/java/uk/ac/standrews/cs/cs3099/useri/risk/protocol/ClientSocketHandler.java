@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 
 /**
- * Class to handle the
+ * Class to handle the socket on the client side
  */
 public class ClientSocketHandler implements Runnable {
 

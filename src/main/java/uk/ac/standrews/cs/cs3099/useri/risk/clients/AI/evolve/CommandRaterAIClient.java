@@ -18,7 +18,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
- * Created by po26 on 20/04/15.
+ *
+ * Rates the moves we can make at any time.
+ * It has a strategy for every country, Hold or Capture.For each stage, the strategies
+ * all suggest a move that would benet its goal.  Then themoves are all rated using
+ * data about the troops (enemy and friend) in and around them,and multiplying them by
+ * definable weights.  Choosing the right weights can result in a powerful, strategy- and board-aware player.
  */
 public class CommandRaterAIClient extends Client{
 
@@ -56,6 +61,9 @@ public class CommandRaterAIClient extends Client{
 
     HashMap<Integer, CountryStrategy> strategies = null;
 
+    /**
+     * initialises the rate with standard weights
+     */
     public CommandRaterAIClient(){
         super(null,new RandomNumberGenerator());
         weights = new ArrayList<>();
@@ -79,6 +87,10 @@ public class CommandRaterAIClient extends Client{
 
     }
 
+    /**
+     * initialise rater from a weight set encoded in genome
+     * @param genes
+     */
     public CommandRaterAIClient(LinkedList<Gene> genes){
         super(null,new RandomNumberGenerator());
         weights = new ArrayList<>();
@@ -97,11 +109,9 @@ public class CommandRaterAIClient extends Client{
         weights.add(((MultiplierGene) genes.get(12)).getValue());
         weights.add(((MultiplierGene)genes.get(13)).getValue());
         weights.add(((MultiplierGene)genes.get(14)).getValue());
-        try {
-            weights.add((double) ((ConstantVarGene) genes.get(15)).getValue());
-        } catch (ClassCastException e){
-            System.out.println();
-        }
+
+        weights.add((double) ((ConstantVarGene) genes.get(15)).getValue());
+
 
     }
 
@@ -132,6 +142,9 @@ public class CommandRaterAIClient extends Client{
         return true;
     }
 
+    /**
+     * resets strategies
+     */
     public void reset() {
         sameCountryDeployments = 0;
         blockedDeploy = -1;
@@ -147,6 +160,8 @@ public class CommandRaterAIClient extends Client{
     @Override
     public Command popCommand(){
 
+
+        //check if we need to initialise strategies (start of game)
         if (strategies == null){
             strategies = new HashMap<>();
             for (Country c : gameState.getAllCountries()){
@@ -154,6 +169,7 @@ public class CommandRaterAIClient extends Client{
             }
         }
 
+        //check if we have deployed to the same country too much, if so, dont deploy again (to prevent "cold war phenomenon")
         if (sameCountryDeployments > weights.get(MAX_SAME_COUNTRY_DEPLOYMENTS_INDEX) && lastDeploy != null){
             sameCountryDeployments = 0;
             try {
@@ -166,9 +182,11 @@ public class CommandRaterAIClient extends Client{
 
         Command ret = null;
 
+        //send atk capture if we have to
         if (gameState.isAttackCaptureNeeded()){
             ret = getBestAttackCaptureCommand();
         }
+        //draw card if we can
         else if ((lastCommand instanceof AttackCaptureCommand || lastCommand instanceof AttackCommand) && !hasDrawn && gameState.peekCard() != null){
             //draw card
             if (gameState.wonBattle()) {
@@ -182,12 +200,12 @@ public class CommandRaterAIClient extends Client{
 
             TurnStage stage = gameState.getTurnStage();
             switch (stage) {
-
+                //play cards if its the stage
                 case STAGE_TRADING: {
                     ret = getPlayCardsCommand();
                     hasDrawn = false;
                 } break;
-
+                //deploy correctly
                 case STAGE_DEPLOYING: {
                     ret = getBestDeployCommand();
                     if (lastDeploy != null) {
@@ -198,6 +216,7 @@ public class CommandRaterAIClient extends Client{
                     lastDeploy = ret;
                 } break;
 
+                //final stages can be ordered as wanted
                 case STAGE_BATTLES:
                 case STAGE_GET_CARD:
                 case STAGE_FORTIFY:{
@@ -206,6 +225,8 @@ public class CommandRaterAIClient extends Client{
                 } break;
 
                 default: {
+
+                    //if this happens, something is wrong and we end our turn
                     System.out.println("AI problem, unknown turn stage, problem!!");
                 }
             }
@@ -217,15 +238,21 @@ public class CommandRaterAIClient extends Client{
         return ret;
     }
 
+    /**
+     * gets the best deploy command rated from all strategies, is rule conforming
+     * @return
+     */
     public Command getBestDeployCommand(){
         ArrayList<RatedCommand> commands = new ArrayList<>();
 
+        //add them all if they rate well
         for (CountryStrategy strat : strategies.values()){
             RatedCommand rc = rateDeployCommand(strat);
             if (rc != null && Integer.parseInt(((JSONArray)rc.command.getPayloadAsArray().get(0)).get(0).toString()) != blockedDeploy)
                 commands.add(rc);
         }
 
+        //add rest if we have none
         Collections.sort(commands);
         if (commands.size() < 1) {
 
@@ -244,6 +271,10 @@ public class CommandRaterAIClient extends Client{
 
     }
 
+    /**
+     * gets the best attack capture, decides how many armies to send
+     * @return
+     */
     public Command getBestAttackCaptureCommand() {
         //make attack capture
         JSONArray payload = lastCommand.getPayloadAsArray();
@@ -273,6 +304,10 @@ public class CommandRaterAIClient extends Client{
         return new AttackCaptureCommand(origin.getCountryId(),target.getCountryId(),origin.getTroops() -1,playerId);
     }
 
+    /**
+     * gets best attack o fortify command
+     * @return
+     */
     public Command getBestAttackOrFortifyCommand(){
         ArrayList<RatedCommand> commands = new ArrayList<>();
 
@@ -294,6 +329,10 @@ public class CommandRaterAIClient extends Client{
         else return null;
     }
 
+    /**
+     * best setup commands
+     * @return
+     */
     public Command getBestSetupCommand(){
         ArrayList<RatedCommand> commands = new ArrayList<>();
 
@@ -308,6 +347,11 @@ public class CommandRaterAIClient extends Client{
         return commands.get(0).command;
     }
 
+    /**
+     * rate setup command
+     * @param strat
+     * @return
+     */
 
     private RatedCommand rateSetupCommand(CountryStrategy strat) {
 
@@ -333,6 +377,11 @@ public class CommandRaterAIClient extends Client{
         return new RatedCommand(c,rating);
     }
 
+    /**
+     * rate deploy command
+     * @param strat
+     * @return
+     */
 
     public RatedCommand rateDeployCommand(CountryStrategy strat){
 
@@ -364,7 +413,11 @@ public class CommandRaterAIClient extends Client{
     }
 
 
-
+    /**
+     * rate attack command
+     * @param strat
+     * @return
+     */
     private RatedCommand rateAttackCommand(CountryStrategy strat) {
         AttackCommand c = strat.getBeneficialAttackCommand();
         if (c == null)
@@ -396,6 +449,11 @@ public class CommandRaterAIClient extends Client{
         return new RatedCommand(c,rating);
     }
 
+    /**
+     * rate fortify command
+     * @param strat
+     * @return
+     */
     private RatedCommand rateFortifyCommand(CountryStrategy strat) {
 
         FortifyCommand c = strat.getBeneficialFortifyCommand();
@@ -433,6 +491,10 @@ public class CommandRaterAIClient extends Client{
         return new RatedCommand(c,rating);
     }
 
+    /**
+     * dont rate this, just play cards that give the most armies
+     * @return
+     */
     private PlayCardsCommand getPlayCardsCommand(){
         ArrayList<ArrayList<Integer>> possibleCombos = getPlayer().getAllValidCardCombinations();
 
@@ -463,6 +525,10 @@ public class CommandRaterAIClient extends Client{
         } else return new PlayCardsCommand(playerId);
     }
 
+    /**
+     * auto draw next card
+     * @return
+     */
     private DrawCardCommand getDrawCommand(){
         if (gameState.wonBattle()){
             if (gameState.peekCard() != null)
@@ -473,10 +539,22 @@ public class CommandRaterAIClient extends Client{
         else return null;
     }
 
+
+    /**
+     * calculates how important a continent is based on how many counbtries there are owned
+     * @param c
+     * @return
+     */
    private double calcContinentImportance(Country c ){
        Continent conti = gameState.getCountryContinent(c.getCountryId());
        return conti.getCountriesOwnedBy(playerId).size()/conti.getCountries().size() * weights.get(CONTINENT_COMPLETION_WEIGHT_INDEX) * conti.getReinforcementValue();
    }
+
+    /**
+     * converts this to weight set
+     *
+     * @return
+     */
 
     public Genome toWeightSet (){
         Genome ret = new Genome();

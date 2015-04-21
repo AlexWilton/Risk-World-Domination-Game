@@ -48,6 +48,8 @@ public class CommandRaterFitnessTester implements FitnessTester {
         int fitness = 0;
         int prevRuns = 0;
 
+
+        //see if we have results from previous runs on other genomes
         if (previousRunScores.containsKey(genome)){
             System.out.println("found previous scores!");
             ArrayList<Integer> prevScores = previousRunScores.get(genome);
@@ -57,10 +59,12 @@ public class CommandRaterFitnessTester implements FitnessTester {
             }
         }
 
+        //play games against random others
         for (int i = prevRuns ; i < 12; i++){
             try {
                 ArrayList<Genome> usedGenomes = new ArrayList<>();
                 usedGenomes.add(genome);
+                //make sure we dont use the same instance twice
                 while (usedGenomes.size() < 6) {
                     int randNr = r.nextInt(clients.keySet().size());
                     while (usedGenomes.contains(allGenomes[randNr])) {
@@ -82,14 +86,13 @@ public class CommandRaterFitnessTester implements FitnessTester {
                 }
 
 
-
-
-
+                //run for most 20 secs, or 6000 turns
                 GameEngineLocal g = new GameEngineLocal();
                 g.initialise(c);
                 g.run(6000,20);
                 fitness += g.getPlayerPoints(0);
 
+                //save runs to save time
                 for (int j = 1; j < usedGenomes.size(); j++){
                     if (previousRunScores.containsKey(usedGenomes.get(j))){
                         ArrayList<Integer> prevScores = previousRunScores.get(usedGenomes.get(j));

@@ -11,7 +11,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.protocol.commands.*;
 import java.util.ArrayList;
 
 /**
- * Created by po26 on 20/04/15.
+ * Strategy for one country
  */
 public class CountryStrategy {
 
@@ -27,6 +27,10 @@ public class CountryStrategy {
         importance = i;
     }
 
+    /**
+     * calcs importance of this strategy, more important if we almost own its continent
+     * @return
+     */
     public double getImportance () {
         Continent c = state.getCountryContinent(country.getCountryId());
         double proportionOwned = ((double)c.getCountriesOwnedBy(player.getID()).size())/((double)c.getCountries().size());
@@ -51,54 +55,21 @@ public class CountryStrategy {
         }
 
     }
-    public Command getCommandForThisStrategy(){
 
-
-
-        if (state.isPreGamePlay()){
-            //only setup command
-            return (getBeneficialSetupCommand());
-        }else {
-
-            TurnStage stage = state.getTurnStage();
-            switch (stage) {
-                case STAGE_TRADING: {
-                    //Do general collection
-                }
-                break;
-
-                case STAGE_DEPLOYING: {
-                    return (getBeneficialDeployCommand());
-                }
-
-                case STAGE_BATTLES: {
-                    return (getBeneficialAttackCommand());
-                }
-
-                case STAGE_GET_CARD: {
-                    //Do general collection
-                } break;
-
-                case STAGE_FORTIFY: {
-                    return (getBeneficialFortifyCommand());
-                }
-
-                default: {
-                    System.out.println("AI problem, unknown turn stage, problem!!");
-                }
-            }
-        }
-
-
-        return null;
-    }
-
+    /**
+     * just put a troop here is the beneficial commands if we own it
+     * @return
+     */
     public SetupCommand getBeneficialSetupCommand () {
         if ((!state.hasUnassignedCountries() && country.getOwner().getID() == player.getID()) || country.getOwner() == null)
             return new SetupCommand(country.getCountryId(),player.getID());
         return null;
     }
 
+    /**
+     * fortify here, or fortify to neighbour if we dont own it so we can capture it
+     * @return
+     */
     public  FortifyCommand getBeneficialFortifyCommand() {
 
         //deploy all to this, or around neighbours
@@ -180,6 +151,10 @@ public class CountryStrategy {
         return null;
     }
 
+    /**
+     * attack this if we can, if its ours, dont attack
+     * @return
+     */
     public AttackCommand getBeneficialAttackCommand() {
 
 
@@ -212,6 +187,11 @@ public class CountryStrategy {
         return null;
     }
 
+
+    /**
+     * deployu where we have to, and then to this country is beneficial
+     * @return
+     */
     public DeployCommand getBeneficialDeployCommand() {
 
         //deploy all to this, or around neighbours

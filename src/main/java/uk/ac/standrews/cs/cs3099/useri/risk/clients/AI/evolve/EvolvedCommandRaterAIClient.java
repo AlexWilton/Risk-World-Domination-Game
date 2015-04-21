@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Created by po26 on 21/04/15.
+ * is initialised from the latest generation, found in CommandRater.evo, where the Evolver puts it, works the same as parent class
  */
 public class EvolvedCommandRaterAIClient extends CommandRaterAIClient {
 

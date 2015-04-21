@@ -5,7 +5,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic.Gene;
 import java.util.Random;
 
 /**
- * Created by po26 on 20/04/15.
+ * represents a constant var weight
  */
 public class ConstantVarGene implements Gene{
 

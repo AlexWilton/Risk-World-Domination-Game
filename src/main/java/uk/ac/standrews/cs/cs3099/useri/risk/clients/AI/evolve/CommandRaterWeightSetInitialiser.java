@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.Random;
 
 /**
- * Created by po26 on 20/04/15.
+ * Randomly inits the weight set for CommandRater.
  */
 public class CommandRaterWeightSetInitialiser implements Initialiser {
     

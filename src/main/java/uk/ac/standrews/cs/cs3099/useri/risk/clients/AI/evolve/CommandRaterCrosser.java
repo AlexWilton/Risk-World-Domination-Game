@@ -8,7 +8,7 @@ import uk.ac.standrews.cs.cs3099.useri.risk.helpers.randomnumbers.RandomNumberGe
 import java.util.Random;
 
 /**
- * Created by po26 on 21/04/15.
+ * Crosses two genomes representing a CommandRateAI
  */
 public class CommandRaterCrosser implements Crosser {
     private static Random r = new Random();

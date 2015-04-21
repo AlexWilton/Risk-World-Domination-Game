@@ -14,7 +14,7 @@ public class ReadyCommand extends Command {
         super("ready");
         this.put("payload", null);
         this.put("player_id", id);
-        this.put("ack_id", ack_id++);
+        this.put("ack_id", getNextAck());
     }
     public ReadyCommand(JSONObject object){
         super(object);

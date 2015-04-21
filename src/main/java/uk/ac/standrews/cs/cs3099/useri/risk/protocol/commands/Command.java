@@ -47,6 +47,11 @@ public class Command extends JSONObject {
         return Integer.parseInt(this.get("ack_id").toString());
     }
 
+    public int getNextAck() {
+        //System.out.println(ack_id);
+        return ack_id;
+    }
+
     public int getPlayer(){
         Object playerObj = this.get("player_id");
         if(playerObj == null) return -1; //for non-playing host
@@ -150,6 +155,12 @@ public class Command extends JSONObject {
                 ret = null;
         }
 
+        if (ret.requiresAcknowledgement()) {
+            int ackid = ret.getAck();
+            if (ackid >= ack_id)
+                ack_id = ackid + 1;
+        }
+
         return ret;
     }
 
@@ -166,9 +177,12 @@ public class Command extends JSONObject {
         JSONObject envelope = new JSONObject();
         envelope.put("message",escapeString(super.toJSONString()));
         envelope.put("signature",""); //TODO
-        return envelope.toJSONString();
+        return super.toJSONString();
     }
 
     public boolean requiresAcknowledgement() {return containsKey("ack_id");}
 
+    public static void increaseAckId() {
+        ack_id++;
+    }
 }

@@ -112,6 +112,8 @@ public class AttackAction extends Action {
     public void performOnState(State state) {
         // calculate number of armies lost by each player, depending on the dice rolls.
         calculateArmiesLost();
+        //System.out.println(attackerArmiesLost);
+        //System.out.println(defenderArmiesLost);
 
         if (defenderArmiesLost == defendingCountry.getTroops()){ //Attacker won!
             //change owners
@@ -184,10 +186,11 @@ public class AttackAction extends Action {
         array = negation(array);
     }
 
-    private int[] negation(int[] arr){
-        for(int i : arr) {
-            i = -i;
+    private int[] negation(int[] arr) {
+        int[] j = new int[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            j[i] = -arr[i];
         }
-        return arr;
+        return j;
     }
 }

@@ -1,5 +1,6 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.CommandRaterAIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.CommandRaterFitnessTester;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.RatedCommand;
 
@@ -118,8 +119,10 @@ public class Generation {
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException, NoSuchMethodException, SecurityException {
 		LinkedList<Genome> newIndividuals = new LinkedList<Genome>();
+        //add origin
+        newIndividuals.add((new CommandRaterAIClient()).toWeightSet());
 		// Add fresh blood
-		for (int i = 0; i < individuals.size() * EvolutionConstants.FRESH_BLOOD; i++) {
+		for (int i = 1; i < individuals.size() * EvolutionConstants.FRESH_BLOOD; i++) {
 			Genome temp = new Genome();
 			temp.randomValidInitialisation(initialiser);
 			newIndividuals.add(temp);

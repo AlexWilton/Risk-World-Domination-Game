@@ -29,11 +29,7 @@ public class GreyhoundAIClient extends AI{
 
     @Override
     public Command popCommand() {
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
         //if we attacked before and haven't won or haven't lost all armies, attack again
         if (lastAttack != null){
             int lastOrigin = Integer.parseInt(lastAttack.getPayloadAsArray().get(0).toString());
@@ -82,11 +78,7 @@ public class GreyhoundAIClient extends AI{
 
     @Override
     public DefendCommand popDefendCommand(int origin, int target, int armies) {
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
 
         return new DefendCommand((gameState.getCountryByID(target).getTroops() > 1) ? 2 : 1, playerId);
     }
@@ -106,11 +98,7 @@ public class GreyhoundAIClient extends AI{
             //only setup commands
             ret.addAll(getAllPossibleSetupCommands());
         }else {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
             TurnStage stage = gameState.getTurnStage();
             switch (stage) {
                 case STAGE_TRADING: {

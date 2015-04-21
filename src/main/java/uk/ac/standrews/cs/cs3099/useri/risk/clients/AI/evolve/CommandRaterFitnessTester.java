@@ -1,6 +1,9 @@
 package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve;
 
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.BulldogAIClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.ChihuahuaAIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.GreatDaneAIClient;
+import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.GreyhoundAIClient;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic.FitnessTester;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic.Genome;
 import uk.ac.standrews.cs.cs3099.useri.risk.clients.Client;
@@ -104,6 +107,39 @@ public class CommandRaterFitnessTester implements FitnessTester {
             }
         }
 
-        return fitness;
+        //factor in environment
+        //play game against everyone and multiply by square root of score
+
+
+            while (true){
+                try{
+                ArrayList<Client> c = new ArrayList<>();
+                c.add(clients.get(genome));
+                c.get(0).setPlayerId(0);
+                    ((CommandRaterAIClient) c.get(0)).reset();
+                c.add(new BulldogAIClient(null));
+                c.get(1).setPlayerId(1);
+                c.add(new ChihuahuaAIClient(null));
+                c.get(2).setPlayerId(2);
+                c.add(new GreatDaneAIClient(null));
+                c.get(3).setPlayerId(3);
+                c.add(new GreyhoundAIClient(null));
+                c.get(4).setPlayerId(4);
+                c.add(new CommandRaterAIClient());
+                c.get(5).setPlayerId(5);
+                GameEngineLocal g = new GameEngineLocal();
+                g.initialise(c);
+                g.run(6000);
+
+                int multiplier = (int) Math.sqrt(g.getPlayerPoints(0));
+
+
+                return fitness*multiplier;
+                } catch (Exception e){
+                    System.out.println("error in game, try again");
+                }
+            }
+
+
     }
 }

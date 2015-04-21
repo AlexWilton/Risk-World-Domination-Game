@@ -51,19 +51,12 @@ public class ServerSocketHandler implements Runnable {
      * @param webClient webclient instance, 
      * @param isServerPlaying
      */
-    public ServerSocketHandler(int port, int numberOfPlayers, WebClient webClient, boolean isServerPlaying) {
+    public ServerSocketHandler(int port, int numberOfPlayers, WebClient webClient, boolean isServerPlaying) throws IOException {
         this.webClient = webClient;
         NUMBER_OF_PLAYERS = numberOfPlayers;
         PORT = port;
         this.isServerPlaying = isServerPlaying;
-        try {
-            this.server = new ServerSocket(PORT);
-            // Initially, the socket timeout would be 1s.
-            // server.setSoTimeout(1000);
-        } catch (IOException e) {
-            System.err.print("The server could not be started:\n\t");
-            System.err.println(e.getMessage());
-        }
+        this.server = new ServerSocket(PORT);
     }
 
     /**
@@ -197,4 +190,9 @@ public class ServerSocketHandler implements Runnable {
     public int getNUMBER_OF_PLAYERS() {
         return NUMBER_OF_PLAYERS;
     }
+
+    public int getPORT() {
+        return PORT;
+    }
+
 }

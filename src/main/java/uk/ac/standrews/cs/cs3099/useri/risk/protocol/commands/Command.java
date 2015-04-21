@@ -177,7 +177,7 @@ public class Command extends JSONObject {
         JSONObject envelope = new JSONObject();
         envelope.put("message",escapeString(super.toJSONString()));
         envelope.put("signature",""); //TODO
-        return super.toJSONString();
+        return envelope.toJSONString();
     }
 
     public boolean requiresAcknowledgement() {return containsKey("ack_id");}

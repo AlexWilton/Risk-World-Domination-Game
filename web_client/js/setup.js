@@ -62,8 +62,11 @@ function keepGameLobbyInfoUpdated() {
     $.ajax("/?operation=get_list_of_players_connected_to_host")
         .done(function (response) {
             var num_of_players = parseInt(response.substr(0,1));
-            var names = JSON.parse(response.substr(1));
-            var html = '<div class="well"><h4><strong>Players Currently Connected:</strong></h4><ul>';
+            var names = JSON.parse(response.substr(1, response.indexOf("$$")-1));
+            var hostInfo = response.substr(response.indexOf("$$") + 2);
+
+            var html = '<div class="well"><h4>Hosting on ' + hostInfo  + "</h4>" +
+                '<h4><strong>Players Currently Connected:</strong></h4><ul>';
             for(i in names){
                 html += '<p>' + names[i] + '</p>';
             }

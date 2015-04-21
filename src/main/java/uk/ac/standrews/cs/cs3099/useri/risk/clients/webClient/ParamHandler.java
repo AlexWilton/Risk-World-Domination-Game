@@ -38,9 +38,6 @@ class ParamHandler extends DefaultHandler {
             ServletException
     {
 
-        //use test state if not set
-//        if(webClient.getState() == null) webClient.setState(TestGameStateFactory.getWebClientTestState(webClient));
-
         Map<String, String[]> params = request.getParameterMap();
         if (params.size() > 0)
         {

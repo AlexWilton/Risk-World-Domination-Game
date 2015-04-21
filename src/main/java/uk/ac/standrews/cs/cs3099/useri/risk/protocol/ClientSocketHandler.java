@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 
 /**
- * Created by po26 on 12/02/15.
+ * Class to handle the
  */
 public class ClientSocketHandler implements Runnable {
 

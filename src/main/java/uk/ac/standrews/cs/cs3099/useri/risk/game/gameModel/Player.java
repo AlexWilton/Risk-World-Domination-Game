@@ -86,7 +86,7 @@ public class Player implements JSONAware{
      * @param occ
      * @return
      */
-    public Country choose(ArrayList<Country> occ) {
+    public Country choose(ArrayList<Country> occ) {//TODO - Evaluate, is this not needed??
         if(occ.size() > 0) {
             Country chosen = occ.get(0);
             countryWhichMustBeDeployedTo = chosen;

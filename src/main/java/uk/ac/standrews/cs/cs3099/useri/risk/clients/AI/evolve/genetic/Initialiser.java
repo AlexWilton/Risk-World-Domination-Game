@@ -8,6 +8,6 @@ import java.util.LinkedList;
  */
 public interface Initialiser {
 
-	public LinkedList<Gene> randomValidInitialisation();
+	LinkedList<Gene> randomValidInitialisation();
 
 }

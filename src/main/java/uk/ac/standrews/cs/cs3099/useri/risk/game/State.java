@@ -39,7 +39,7 @@ public class State implements JSONAware {
 
 
 
-    public State(){};
+    public State(){}
 
     public State(Map map, ArrayList<Player> players){
         setup(map, players);

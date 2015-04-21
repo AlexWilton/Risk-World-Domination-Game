@@ -5,6 +5,6 @@ package uk.ac.standrews.cs.cs3099.useri.risk.clients.AI.evolve.genetic;
  * 
  */
 public interface Crosser {
-	public Genome cross(Genome p1, Genome p2);
+	Genome cross(Genome p1, Genome p2);
 
 }

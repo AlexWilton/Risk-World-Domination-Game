@@ -22,10 +22,12 @@
 ![Image of Playing on Tablet](https://github.com/AlexWilton/Risk-World-Domination-Game/raw/master/images/Tablet.jpg)
 
 ### Description
-Our task this year was to implement a ”peer-to-peer world domination game”. The class has decided very quickly in favour of the famous board game Risk. We (the class) have chosen a version of Risk that is focused on World Domination, therefore the objectives were completely removed from the game except for one: the player who manages to beat all other players is going to be the winner. We also decided that the P2P structure will rely on a known, trusted host implementation and that there will be weekly meetings of groups, where an elected ”group representative” will always be present. At these meetings, the groups have defined a protocol for message passing over the network. See issues about the protocol below.
+Our task was to implement a ”peer-to-peer world domination game”. We has decided very quickly in favour of the famous board game Risk. We have chosen a version of Risk that is focused on World Domination, therefore the objectives were completely removed from the game except for one: the player who manages to beat all other players is going to be the winner. We also decided that the P2P structure will rely on a known, trusted host implementation and that there will be weekly meetings of groups.
+
 Our implementation aims to provide all the functionality specified in the protocol in Java and JavaScript, using an MVC (Model/View/Controller) pattern. The game engine is built in Java, that allowed for easy unit testing and object orientation, The game engine implements and checks the logic of the game while keeping everything in the network communication separate from here.
 The back-end of the game relies on Java Sockets for network communication. Both the server and the client are multi-threaded and update the game engine in the background while still keeping a constant flow of network protocol messages. These messages are implemented via separate classes as well to increase decoupling of components in the system.
-The front-end however appears and runs inside a web browser, in a scalable window, heavily relying on JavaScript and bootstrap. It queries the game state from time to time and sends messages to the game engine. This completes the circle of MVC architecture.
+
+The front-end appears and runs inside a web browser, in a scalable window, heavily relying on JavaScript and bootstrap. It queries the game state from time to time and sends messages to the game engine. This completes the circle of MVC architecture.
 
 ### Team Members
 [Alex Wilton](https://github.com/AlexWilton)  

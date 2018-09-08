@@ -27,6 +27,15 @@ Our implementation aims to provide all the functionality specified in the protoc
 The back-end of the game relies on Java Sockets for network communication. Both the server and the client are multi-threaded and update the game engine in the background while still keeping a constant flow of network protocol messages. These messages are implemented via separate classes as well to increase decoupling of components in the system.
 The front-end however appears and runs inside a web browser, in a scalable window, heavily relying on JavaScript and bootstrap. It queries the game state from time to time and sends messages to the game engine. This completes the circle of MVC architecture.
 
+### Team Members
+[Alex Wilton](https://github.com/AlexWilton)  
+[Bence Szabo](https://github.com/bentlor)  
+[Ryo Yanagida](https://github.com/yryo617)  
+[Patrick Opgenoorth](https://www.linkedin.com/in/patrickopgenoorth/)
+
+### Supervisor
+[Professor Steve Linton](https://www.cs.st-andrews.ac.uk/directory/person?id=sal)
+
 ### Grade and Reception
 Project received a First-class honours classifcation.
 

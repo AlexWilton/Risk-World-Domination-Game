@@ -10,5 +10,5 @@
 ### Get Started
 1. Clone this Repository or Download as a zip.
 2. Run release/v1/Risk.jar either by double clicking on file or running java -jar Risk.jar
-3. The java game engine will start and automatically open the game join/host screen in your web browser:
-
+3. The java game engine will start and automatically open the game join/host screen in your web browser (shown below):
+![Image of Join/Host Screen](https://github.com/AlexWilton/Risk-World-Domination-Game/raw/master/Host-Join-Screen.jpg)

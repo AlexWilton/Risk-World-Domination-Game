@@ -1,6 +1,7 @@
-[![Build Status](https://magnum.travis-ci.com/AlexWilton/CS3099_Risk.svg?token=69BvusAWmnnsfHCQzVeH&branch=master)](https://magnum.travis-ci.com/AlexWilton/CS3099_Risk)
+#Risk - World Domination Game
 
+### Fully-featured java server with web-client implementation
 
-README:
- Repository for JS Project CS3099 Risk
-
+- Host a game.
+- Connect to a game over a network.
+- Play as an A.I.
